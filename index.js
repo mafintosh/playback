@@ -83,23 +83,6 @@ server.listen(0, function () { // 10000 in dev
     if (file) list.add(file)
   })
 
-  mdns.on('query', function (query) {
-    var valid = query.questions.some(function (q) {
-      return q.name === 'playback'
-    })
-
-    if (!valid) return
-
-    mdns.respond({
-      answers: [{
-        type: 'SRV',
-        ttl: 5,
-        name: 'playback',
-        data: {port: server.address().port, target: network()}
-      }]
-    })
-  })
-
   if (argv.follow) {
     mdns.on('response', function onresponse(response) {
       response.answers.forEach(function (a) {
@@ -129,6 +112,23 @@ server.listen(0, function () { // 10000 in dev
 
     var interval = setInterval(query, 5000)
     query()
+  } else {
+    mdns.on('query', function (query) {
+      var valid = query.questions.some(function (q) {
+        return q.name === 'playback'
+      })
+
+      if (!valid) return
+
+      mdns.respond({
+        answers: [{
+          type: 'SRV',
+          ttl: 5,
+          name: 'playback',
+          data: {port: server.address().port, target: network()}
+        }]
+      })
+    })
   }
 
   setTimeout(function () {
