@@ -1,0 +1,30 @@
+{
+  "name": "playback",
+  "version": "0.0.0",
+  "description": "WIP - nothing to see here",
+  "main": "index.js",
+  "dependencies": {
+    "concat-stream": "^1.4.7",
+    "drag-and-drop-files": "0.0.1",
+    "filereader-stream": "^0.2.0",
+    "minimist": "^1.1.1",
+    "multicast-dns": "^2.0.0",
+    "network-address": "^1.0.0",
+    "srt-to-vtt": "^1.0.2",
+    "torrent-stream": "^0.18.1"
+  },
+  "devDependencies": {},
+  "bin": {
+    "playback": "./app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mafintosh/playback.git"
+  },
+  "author": "Mathias Buus (@mafintosh)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mafintosh/playback/issues"
+  },
+  "homepage": "https://github.com/mafintosh/playback"
+}
