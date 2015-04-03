@@ -19,11 +19,20 @@ module.exports = function () {
     engine.swarm.add('127.0.0.1:51413') // me!
 
     engine.on('ready', function () {
+      console.log('torrent ready')
+
       engine.files.forEach(function (f) {
-        f.select()
+        if (/\.(mp4|mkv|mp3)$/i.test(f.name)) {
+          f.select()
+          console.log(f.name)
+          that.entries.push(f)
+        }
       })
 
-      that.entries.push.apply(that.entries, engine.files)
+      setInterval(function () {
+        console.log(engine.swarm.downloadSpeed() + ' (' + engine.swarm.wires.length + ')')
+      }, 1000)
+
       that.emit('update')
       cb()
     })

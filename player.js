@@ -3,9 +3,15 @@ var events = require('events')
 module.exports = function ($video) {
   var that = new events.EventEmitter()
 
+  that.setMaxListeners(0)
+
   that.width = 0
   that.height = 0
   that.element = $video
+
+  $video.addEventListener('seeked', function () {
+    that.emit('seek')
+  }, false)
 
   $video.addEventListener('loadedmetadata', function () {
     that.width = $video.videoWidth
@@ -36,6 +42,7 @@ module.exports = function ($video) {
     $track.setAttribute('label', 'Subtitles')
     $track.setAttribute('kind', 'subtitles')
     $video.appendChild($track)
+    that.emit('subtitles', buf)
   }
 
   return that

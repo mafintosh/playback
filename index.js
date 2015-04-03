@@ -9,7 +9,9 @@ var http = require('http')
 var rangeParser = require('range-parser')
 var pump = require('pump')
 var fs = require('fs')
+var eos = require('end-of-stream')
 var minimist = require('minimist')
+var JSONStream = require('JSONStream')
 var network = require('network-address')
 var player = require('./player')
 var playlist = require('./playlist')
@@ -46,7 +48,25 @@ var server = http.createServer(function (req, res) {
   console.log('request for ' + req.url + ' ' + req.headers.range)
 
   if (req.url === '/follow') { // TODO: do not hardcode /0
-    res.end(JSON.stringify({url: 'http://' + network() + ':' + server.address().port + '/0', time: media.time() }))
+    var stringify = JSONStream.stringify()
+
+    var onseek = function () {
+      stringify.write({type: 'seek', time: media.time() })
+    }
+
+    var onsubs = function (data) {
+      stringify.write({type: 'subtitles', data: data.toString('base64')})
+    }
+
+    stringify.pipe(res)
+    stringify.write({type: 'open', url: 'http://' + network() + ':' + server.address().port + '/0', time: media.time() })
+
+    media.on('subtitles', onsubs)
+    media.on('seek', onseek)
+    eos(res, function () {
+      media.removeListener('subtitles', onsubs)
+      media.removeListener('seek', onseek)
+    })
     return
   }
 
@@ -92,11 +112,19 @@ server.listen(0, function () { // 10000 in dev
 
         var host = a.data.target + ':' + a.data.port
 
-        request('http://' + host + '/follow', {json: true}, function (err, response) {
-          if (err) return
-          var body = response.body
-          media.play(body.url)
-          media.time(body.time)
+        request('http://' + host + '/follow').pipe(JSONStream.parse('*')).on('data', function (data) {
+          if (data.type === 'open') {
+            media.play(data.url)
+            media.time(data.time)
+          }
+
+          if (data.type === 'seek') {
+            media.time(data.time)
+          }
+
+          if (data.type === 'subtitles') {
+            media.subtitles(data.data)
+          }
         })
       })
     })
