@@ -1,10 +1,8 @@
 var torrents = require('torrent-stream')
-var ytdl = require('ytdl-core')
 var request = require('request')
 var events = require('events')
 var path = require('path')
 var fs = require('fs')
-var duplexify = require('duplexify')
 
 var noop = function () {}
 

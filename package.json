@@ -10,6 +10,9 @@
     "minimist": "^1.1.1",
     "multicast-dns": "^2.0.0",
     "network-address": "^1.0.0",
+    "pump": "^1.0.0",
+    "range-parser": "^1.0.2",
+    "request": "^2.54.0",
     "srt-to-vtt": "^1.0.2",
     "torrent-stream": "^0.18.1"
   },
