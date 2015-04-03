@@ -1,16 +1,15 @@
 # playback
 
-WIP - nothing to see here
+experimental video player build using atom-shell
 
 ```
-npm install playback
+npm install -g atom-shell
+git clone git://github.com/mafintosh/playback.git
+npm link
+playback a-video-file.mp4
 ```
 
-## Usage
-
-``` js
-var playback = require('playback')
-```
+when it's ready i'll add .app builds as well
 
 ## License
 

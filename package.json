@@ -1,7 +1,7 @@
 {
   "name": "playback",
   "version": "0.0.0",
-  "description": "WIP - nothing to see here",
+  "description": "experimental video player build using atom-shell",
   "main": "index.js",
   "dependencies": {
     "concat-stream": "^1.4.7",
