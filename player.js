@@ -19,6 +19,7 @@ module.exports = function ($video) {
     atEnd = true
     that.playing = false
     that.emit('pause')
+    that.emit('end')
   }, false)
 
   $video.addEventListener('loadedmetadata', function () {
@@ -39,6 +40,7 @@ module.exports = function ($video) {
 
   that.play = function (url) {
     if (atEnd && url === lastUrl) $video.time(0)
+    var changed = url && lastUrl !== url
     lastUrl = url
     atEnd = false
     $video.innerHTML = '' // clear
@@ -46,6 +48,7 @@ module.exports = function ($video) {
     $src.setAttribute('src', url)
     $src.setAttribute('type', 'video/mp4')
     $video.appendChild($src)
+    if (changed) $video.load()
     $video.play()
     that.playing = true
     that.emit('play')

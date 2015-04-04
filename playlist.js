@@ -69,6 +69,13 @@ module.exports = function () {
     that.emit('deselect')
   }
 
+  that.selectNext = function () {
+    if (!that.entries.length) return null
+    if (!that.selected) return that.select(0)
+    if (that.selected.id === that.entries.length - 1) return null
+    return that.select(that.selected.id + 1)
+  }
+
   that.select = function (id) {
     that.selected = that.get(id)
     that.emit('select')

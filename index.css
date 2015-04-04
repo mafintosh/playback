@@ -3,7 +3,7 @@ body, html {
   padding: 0;
   width: 100%;
   height: 100%;
-  background-color: black;
+  background-color: #000000;
   overflow: hidden;
   -webkit-user-select: none;
   font-family: 'Roboto', sans-serif;
@@ -31,8 +31,73 @@ body, html {
   transition: opacity 0.3s ease;
 }
 
+#popup {
+  opacity: 0;
+  display: none;
+  position: absolute;
+  z-index: 20;
+  right: 5px;
+  bottom: 55px;
+  top: 100px;
+  width: 400px;
+  background-color: #1F2021;
+  border-radius: 3px;
+  font-size: 14px;
+  transition: opacity 0.3s ease;
+}
+
+#playlist-entries {
+  position: absolute;
+  top: 46px;
+  bottom: 55px;
+  right: 0;
+  left: 0;
+  overflow: auto;
+}
+
+.playlist-entry {
+  color: #fff;
+  font-size: 13px;
+  padding: 10px 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playlist-entry.odd {
+  background-color: #222324;
+}
+
+.playlist-entry.selected {
+  background-color: #31A357;
+}
+
+#popup .header {
+  background-color: #363738;
+  color: #E1E1E1;
+  font-size: 16px;
+  line-height: 16px;
+  padding: 15px;
+  border-radius: 3px 3px 0 0;
+}
+
+#popup .button {
+  margin: 10px;
+  background-color: #31A357;
+  padding: 10px;
+  text-align: center;
+  color: #E1E1E1;
+  border-radius: 3px;
+}
+
+#popup .button.bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
 #drag {
-  -webkit-app-region: drag;
   position: absolute;
   top: 0;
   left: 0;
@@ -80,9 +145,20 @@ body:hover #overlay {
   transition: width 0.25s linear;
 }
 
-#controls-play {
+#controls-fullscreen, #controls-playlist, #controls-play, #controls-broadcast {
   float: left;
   padding: 9px 20px;
+}
+
+#controls-playlist, #controls-broadcast {
+  padding-right: 0;
+}
+
+#controls-playlist.selected .mega-octicon, #controls-broadcast.selected .mega-octicon {
+  color: #31A357;
+}
+
+#controls-play {
   padding-right: 15px;
 }
 
@@ -95,14 +171,13 @@ body:hover #overlay {
   color: #31A357;
 }
 
-#controls-fullscreen {
-  float: left;
-  padding: 9px 20px;
-}
-
 #controls-time {
   width: 100px;
   float: left;
+}
+
+#controls-main {
+  display: none;
 }
 
 #controls-time-current {

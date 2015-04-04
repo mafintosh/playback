@@ -39,6 +39,7 @@ drop($('body'), function (files) {
 })
 
 var isFullscreen = false
+var showPopup = false
 
 on($('#controls-fullscreen'), 'click', function (e) {
   var $icon = $('#controls-fullscreen .mega-octicon')
@@ -63,10 +64,57 @@ mouseidle($('#drag'), 3000, 'hide-cursor')
 list.on('select', function () {
   $('#controls-name').innerText = list.selected.name
   media.play('http://127.0.0.1:' + server.address().port + '/' + list.selected.id)
+  updatePlaylist()
 })
 
+var updatePlaylist = function () {
+  var html = ''
+
+  list.entries.forEach(function (entry, i) {
+    html += '<div class="playlist-entry ' + (i % 2 ? 'odd ' : '') + (list.selected === entry ? 'selected ' : '') + '" data-id="' + entry.id + '">' + entry.name + '</div>'
+  })
+
+  $('#playlist-entries').innerHTML = html
+}
+
+list.on('update', updatePlaylist)
+
 list.once('update', function () {
-  list.select(list.entries.length - 1)
+  list.select(0)
+})
+
+var closePopup = function (e) {
+  if (e && (e.target === $('#controls-playlist .mega-octicon') || e.target === $('#controls-broadcast .mega-octicon'))) return
+  $('#popup').style.opacity = 0
+  $('#controls-playlist').className = ''
+  $('#controls-broadcast').className = ''
+}
+
+on($('#controls'), 'click', closePopup)
+on($('#drag'), 'click', closePopup)
+
+on($('#playlist-entries'), 'click', function (e) {
+  if (!e.target.getAttribute('data-id')) return
+  var id = Number(e.target.getAttribute('data-id'))
+  list.select(id)
+})
+
+on($('#controls-playlist'), 'click', function () {
+  if (showPopup) {
+    showPopup = false
+    $('#popup').style.opacity = 0
+    $('#controls-playlist').className = ''
+  } else {
+    showPopup = true
+    $('#popup').style.display = 'block'
+    $('#popup').style.opacity = 1
+    $('#controls-playlist').className = 'selected'
+    $('#controls-broadcast').className = ''
+  }
+})
+
+on($('#popup'), 'transitionend', function () {
+  if (!showPopup) $('#popup').style.display = 'none'
 })
 
 var formatTime = function (secs) {
@@ -88,6 +136,7 @@ media.on('metadata', function () {
     })
   }
 
+  $('#controls-main').style.display = 'block'
   $('#controls-time-total').innerText = formatTime(media.duration)
   $('#controls-time-current').innerText = '00:00'
 
@@ -98,9 +147,21 @@ media.on('metadata', function () {
   }, 250)
 })
 
+on($('#drag'), 'mouseover', function () {
+  $('#drag').style['-webkit-app-region'] = 'drag'
+})
+
+on($('#drag'), 'mouseout', function () {
+  $('#drag').style['-webkit-app-region'] = 'no-drag'
+})
+
 on($('#controls-play'), 'click', function () {
   if (media.playing) media.pause()
   else media.play()
+})
+
+media.on('end', function () {
+  list.selectNext()
 })
 
 media.on('play', function () {

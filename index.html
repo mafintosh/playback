@@ -11,20 +11,35 @@
     <video id="player"></video>
     <div id="overlay">
       <div id="drag"></div>
+      <div id="popup">
+        <div id="playlist-popup">
+          <div class="header">Play queue</div>
+          <div id="playlist-entries"></div>
+          <div id="playlist-add-media" class="button bottom">Add media</div>
+        </div>
+      </div>
       <div id="controls">
         <div id="controls-timeline">
           <div id="controls-timeline-position"></div>
         </div>
-        <div id="controls-play">
-          <span class="mega-octicon octicon-playback-play"></span>
+        <div id="controls-main">
+          <div id="controls-play">
+            <span class="mega-octicon octicon-playback-play"></span>
+          </div>
+          <div id="controls-time" class="center">
+            <span id="controls-time-current">‒‒:‒‒</span>
+            <span id="controls-time-separator">/</span>
+            <span id="controls-time-total">‒‒:‒‒</span>
+          </div>
+          <div id="controls-name" class="center"></div>
         </div>
-        <div id="controls-time" class="center">
-          <span id="controls-time-current">‒‒:‒‒</span>
-          <span id="controls-time-separator">/</span>
-          <span id="controls-time-total">‒‒:‒‒</span>
-        </div>
-        <div id="controls-name" class="center"></div>
         <div class="right">
+          <div id="controls-playlist">
+            <span class="mega-octicon octicon-three-bars"></span>
+          </div>
+          <div id="controls-broadcast">
+            <span class="mega-octicon octicon-rss"></span>
+          </div>
           <div id="controls-fullscreen">
             <span class="mega-octicon octicon-screen-full"></span>
           </div>
