@@ -65,6 +65,7 @@ body:hover #overlay {
   background-color: #31A357;
   width: 0%;
   height: 10px;
+  transition: width 0.25s linear;
 }
 
 #controls-play {
