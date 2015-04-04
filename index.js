@@ -15,6 +15,7 @@ var JSONStream = require('JSONStream')
 var network = require('network-address')
 var player = require('./player')
 var playlist = require('./playlist')
+var mouseidle = require('./mouseidle')
 
 var argv = minimist(JSON.parse(window.location.toString().split('#')[1]), {
   alias: {follow: 'f'},
@@ -42,13 +43,15 @@ on($('#controls-timeline'), 'click', function (e) {
   media.time(time)
 })
 
+mouseidle($('#drag'), 4000, 'hide-cursor')
+
 list.on('select', function () {
   $('#controls-name').innerText = list.selected.name
   media.play('http://127.0.0.1:' + server.address().port + '/' + list.selected.id)
 })
 
 list.once('update', function () {
-  list.select(0)
+  list.select(list.entries.length - 1)
 })
 
 var formatTime = function (secs) {

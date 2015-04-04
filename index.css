@@ -36,6 +36,14 @@ body, html {
   right: 0;
 }
 
+.hide-cursor {
+  cursor: none;
+}
+
+.hide-cursor #overlay {
+  opacity: 0 !important;
+}
+
 body:hover #overlay {
   opacity: 1;
 }
