@@ -11,6 +11,10 @@ body, html {
   cursor: default;
 }
 
+.right {
+  float: right;
+}
+
 #player {
   width: 100%;
   height: 100%;
@@ -82,9 +86,18 @@ body:hover #overlay {
   padding-right: 15px;
 }
 
-#controls-play .octicon {
-  color: #31A357;
+.mega-octicon {
+  color: #F0F0F0;
   font-size: 22px;
+}
+
+#controls-play .mega-octicon {
+  color: #31A357;
+}
+
+#controls-fullscreen {
+  float: left;
+  padding: 9px 20px;
 }
 
 #controls-time {

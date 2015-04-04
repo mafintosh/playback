@@ -38,6 +38,21 @@ drop($('body'), function (files) {
   filereader(files[0]).pipe(vtt()).pipe(concat(onsubs))
 })
 
+var isFullscreen = false
+
+on($('#controls-fullscreen'), 'click', function (e) {
+  var $icon = $('#controls-fullscreen .mega-octicon')
+  if (isFullscreen) {
+    isFullscreen = false
+    $icon.className = 'mega-octicon octicon-screen-full'
+    ipc.send('exit-full-screen')
+  } else {
+    isFullscreen = true
+    $icon.className = 'mega-octicon octicon-screen-normal'
+    ipc.send('enter-full-screen')
+  }
+})
+
 on($('#controls-timeline'), 'click', function (e) {
   var time = e.pageX / $('#controls-timeline').offsetWidth * media.duration
   media.time(time)
@@ -65,11 +80,13 @@ var formatTime = function (secs) {
 
 var updateInterval
 media.on('metadata', function () {
-  ipc.send('metadata', {
-    width: media.width,
-    height: media.height,
-    ratio: media.ratio
-  })
+  if (!isFullscreen) {
+    ipc.send('resize', {
+      width: media.width,
+      height: media.height,
+      ratio: media.ratio
+    })
+  }
 
   $('#controls-time-total').innerText = formatTime(media.duration)
   $('#controls-time-current').innerText = '00:00'

@@ -17,10 +17,18 @@ app.on('ready', function () {
 
   win.loadUrl('file://' + path.join(__dirname, 'index.html#' + JSON.stringify(process.argv.slice(2))))
 
-  ipc.on('metadata', function (e, message) {
+  ipc.on('resize', function (e, message) {
     var wid = win.getSize()[0]
     var hei = (wid / message.ratio) | 0
     win.setSize(wid, hei)
+  })
+
+  ipc.on('enter-full-screen', function () {
+    win.setFullScreen(true)
+  })
+
+  ipc.on('exit-full-screen', function () {
+    win.setFullScreen(false)
   })
 
   ipc.on('ready', function () {
