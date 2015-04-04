@@ -58,7 +58,7 @@ on($('#controls-timeline'), 'click', function (e) {
   media.time(time)
 })
 
-mouseidle($('#drag'), 4000, 'hide-cursor')
+mouseidle($('#drag'), 3000, 'hide-cursor')
 
 list.on('select', function () {
   $('#controls-name').innerText = list.selected.name
