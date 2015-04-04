@@ -8,8 +8,8 @@ var ipc = require('ipc')
 app.on('ready', function () {
   var win = new BrowserWindow({
     title: 'playback',
-    width: 600,
-    height: 352,
+    width: 860,
+    height: 470,
     frame: false,
     show: false,
     'always-on-top': true
