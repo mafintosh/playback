@@ -2,6 +2,8 @@ var events = require('events')
 
 module.exports = function ($video) {
   var that = new events.EventEmitter()
+  var atEnd = false
+  var lastUrl = null
 
   that.setMaxListeners(0)
 
@@ -13,6 +15,12 @@ module.exports = function ($video) {
     that.emit('seek')
   }, false)
 
+  $video.addEventListener('ended', function () {
+    atEnd = true
+    that.playing = false
+    that.emit('pause')
+  }, false)
+
   $video.addEventListener('loadedmetadata', function () {
     that.width = $video.videoWidth
     that.height =  $video.videoHeight
@@ -22,17 +30,31 @@ module.exports = function ($video) {
   }, false)
 
   that.time = function (time) {
+    atEnd = false
     if (time) $video.currentTime = time
     return $video.currentTime
   }
 
+  that.playing = false
+
   that.play = function (url) {
+    if (atEnd && url === lastUrl) $video.time(0)
+    lastUrl = url
+    atEnd = false
     $video.innerHTML = '' // clear
     var $src = document.createElement('source')
     $src.setAttribute('src', url)
     $src.setAttribute('type', 'video/mp4')
     $video.appendChild($src)
     $video.play()
+    that.playing = true
+    that.emit('play')
+  }
+
+  that.pause = function () {
+    $video.pause()
+    that.playing = false
+    that.emit('pause')
   }
 
   that.subtitles = function (buf) {

@@ -30,6 +30,7 @@ app.on('ready', function () {
 
   ipc.on('exit-full-screen', function () {
     win.setFullScreen(false)
+    win.show()
   })
 
   ipc.on('ready', function () {

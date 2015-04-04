@@ -98,6 +98,19 @@ media.on('metadata', function () {
   }, 250)
 })
 
+on($('#controls-play'), 'click', function () {
+  if (media.playing) media.pause()
+  else media.play()
+})
+
+media.on('play', function () {
+  $('#controls-play .mega-octicon').className = 'mega-octicon octicon-playback-pause'
+})
+
+media.on('pause', function () {
+  $('#controls-play .mega-octicon').className = 'mega-octicon octicon-playback-play'
+})
+
 var server = http.createServer(function (req, res) {
   console.log('request for ' + req.url + ' ' + req.headers.range)
 
