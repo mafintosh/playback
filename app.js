@@ -4,9 +4,10 @@ var app = require('app')
 var BrowserWindow = require('browser-window')
 var path = require('path')
 var ipc = require('ipc')
+var win
 
 app.on('ready', function () {
-  var win = new BrowserWindow({
+  win = new BrowserWindow({
     title: 'playback',
     width: 860,
     height: 470,
