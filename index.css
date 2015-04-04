@@ -1,0 +1,98 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  overflow: hidden;
+  -webkit-user-select: none;
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  cursor: default;
+}
+
+#player {
+  width: 100%;
+  height: 100%;
+}
+
+#overlay {
+  opacity: 0;
+  z-index: 10;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: opacity 0.3s ease;
+}
+
+#drag {
+  -webkit-app-region: drag;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 50px;
+  right: 0;
+}
+
+body:hover #overlay {
+  opacity: 1;
+}
+
+#controls {
+  z-index: 11;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 50px;
+  background-color: #1F2021;
+  color: #727374;
+}
+
+#controls .center {
+  margin-top: 13px;
+}
+
+#controls-timeline {
+  background-color: #303233;
+  height: 10px;
+  width: 100%;
+}
+
+#controls-timeline-position {
+  background-color: #31A357;
+  width: 0%;
+  height: 10px;
+}
+
+#controls-play {
+  float: left;
+  padding: 9px 20px;
+  padding-right: 15px;
+}
+
+#controls-play .octicon {
+  color: #31A357;
+  font-size: 22px;
+}
+
+#controls-time {
+  width: 100px;
+  float: left;
+}
+
+#controls-time-current {
+  color: #F0F0F0;
+}
+
+#controls-time-current, #controls-time-total {
+  display: inline-block;
+  min-width: 33px;
+}
+
+#controls-name {
+  float: left;
+  margin-left: 20px;
+}

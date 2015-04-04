@@ -17,6 +17,7 @@ module.exports = function ($video) {
     that.width = $video.videoWidth
     that.height =  $video.videoHeight
     that.ratio = that.width / that.height
+    that.duration = $video.duration
     that.emit('metadata')
   }, false)
 

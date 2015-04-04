@@ -21,10 +21,15 @@ var argv = minimist(JSON.parse(window.location.toString().split('#')[1]), {
   boolean: ['follow']
 })
 
-var media = player(document.querySelector('#player'))
+var on = function (el, name, fn) {
+  el.addEventListener(name, fn, false)
+}
+
+var $ = document.querySelector.bind(document)
+var media = player($('#player'))
 var list = playlist()
 
-drop(document.querySelector('body'), function (files) {
+drop($('body'), function (files) {
   var onsubs = function (data) {
     media.subtitles(data)
   }
@@ -32,22 +37,52 @@ drop(document.querySelector('body'), function (files) {
   filereader(files[0]).pipe(vtt()).pipe(concat(onsubs))
 })
 
-list.once('update', function () {
-  media.play('http://127.0.0.1:' + server.address().port + '/0')
+on($('#controls-timeline'), 'click', function (e) {
+  var time = e.pageX / $('#controls-timeline').offsetWidth * media.duration
+  media.time(time)
 })
 
+list.on('select', function () {
+  $('#controls-name').innerText = list.selected.name
+  media.play('http://127.0.0.1:' + server.address().port + '/' + list.selected.id)
+})
+
+list.once('update', function () {
+  list.select(0)
+})
+
+var formatTime = function (secs) {
+  var hours = (secs / 3600) | 0
+  var mins = ((secs - hours * 3600) / 60) | 0
+  secs = (secs - (3600 * hours + 60 * mins)) | 0
+  if (mins < 10) mins = '0' + mins
+  if (secs < 10) secs = '0' + secs
+  return (hours ? hours + ':' : '') + mins + ':' + secs
+}
+
+var updateInterval
 media.on('metadata', function () {
   ipc.send('metadata', {
     width: media.width,
     height: media.height,
     ratio: media.ratio
   })
+
+  $('#controls-time-total').innerText = formatTime(media.duration)
+  $('#controls-time-current').innerText = '00:00'
+
+  clearInterval(updateInterval)
+  updateInterval = setInterval(function () {
+    $('#controls-timeline-position').style.width = (100 * (media.time() / media.duration)) + '%'
+    $('#controls-time-current').innerText = formatTime(media.time())
+  }, 250)
 })
 
 var server = http.createServer(function (req, res) {
   console.log('request for ' + req.url + ' ' + req.headers.range)
 
   if (req.url === '/follow') { // TODO: do not hardcode /0
+    if (!list.selected) return res.end()
     var stringify = JSONStream.stringify()
 
     var onseek = function () {
@@ -59,7 +94,7 @@ var server = http.createServer(function (req, res) {
     }
 
     stringify.pipe(res)
-    stringify.write({type: 'open', url: 'http://' + network() + ':' + server.address().port + '/0', time: media.time() })
+    stringify.write({type: 'open', url: 'http://' + network() + ':' + server.address().port + '/' + list.selected.id, time: media.time() })
 
     media.on('subtitles', onsubs)
     media.on('seek', onseek)
@@ -71,7 +106,7 @@ var server = http.createServer(function (req, res) {
   }
 
   var id = Number(req.url.slice(1))
-  var file = list.entries[id]
+  var file = list.get(id)
 
   if (!file) {
     res.statusCode = 404

@@ -24,8 +24,7 @@ module.exports = function () {
       engine.files.forEach(function (f) {
         if (/\.(mp4|mkv|mp3)$/i.test(f.name)) {
           f.select()
-          console.log(f.name)
-          that.entries.push(f)
+          f.id = that.entries.push(f) - 1
         }
       })
 
@@ -57,10 +56,27 @@ module.exports = function () {
         return fs.createReadStream(link, opts)
       }
 
-      that.entries.push(file)
+      file.id = that.entries.push(file) - 1
       that.emit('update')
       cb()
     })
+  }
+
+  that.selected = null
+
+  that.deselect = function () {
+    that.selected = null
+    that.emit('deselect')
+  }
+
+  that.select = function (id) {
+    that.selected = that.get(id)
+    that.emit('select')
+    return that.selected
+  }
+
+  that.get = function (id) {
+    return that.entries[id]
   }
 
   that.add = function (link, cb) {
