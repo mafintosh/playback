@@ -22,6 +22,7 @@
   "bin": {
     "playback": "./app.js"
   },
+  "main": "app.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/mafintosh/playback.git"
