@@ -19,7 +19,7 @@
     "torrent-stream": "^0.18.1"
   },
   "devDependencies": {
-    "atom-shell-packager": "^2.1.0"
+    "atom-shell-packager": "^2.1.1"
   },
   "bin": {
     "playback": "./app.js"
