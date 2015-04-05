@@ -18,9 +18,14 @@
     "srt-to-vtt": "^1.0.2",
     "torrent-stream": "^0.18.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "atom-shell-packager": "^2.1.0"
+  },
   "bin": {
     "playback": "./app.js"
+  },
+  "scripts": {
+    "bundle": "atom-shell-packager . Playback --ignore=test.mp4 --protocol=magnet --protocol-name=\"BitTorrent Magnet URL\""
   },
   "repository": {
     "type": "git",
