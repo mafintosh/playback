@@ -4,7 +4,21 @@ var app = require('app')
 var BrowserWindow = require('browser-window')
 var path = require('path')
 var ipc = require('ipc')
+
 var win
+var link
+var ready = false
+
+app.on('open-url', function (e, lnk) {
+  e.preventDefault()
+
+  if (ready) {
+    win.send('add-to-playlist', lnk)
+    return
+  }
+
+  link = lnk
+})
 
 app.on('ready', function () {
   win = new BrowserWindow({
@@ -34,6 +48,8 @@ app.on('ready', function () {
   })
 
   ipc.on('ready', function () {
+    ready = true
+    if (link) win.send('add-to-playlist', link)
     win.show()
   })
 })

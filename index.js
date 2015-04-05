@@ -22,6 +22,10 @@ var argv = minimist(JSON.parse(window.location.toString().split('#')[1]), {
   boolean: ['follow']
 })
 
+ipc.on('add-to-playlist', function (link) {
+  list.add(link)
+})
+
 var on = function (el, name, fn) {
   el.addEventListener(name, fn, false)
 }
