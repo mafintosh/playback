@@ -4,6 +4,7 @@ var app = require('app')
 var BrowserWindow = require('browser-window')
 var path = require('path')
 var ipc = require('ipc')
+var dialog = require('dialog')
 
 var win
 var link
@@ -13,7 +14,7 @@ app.on('open-url', function (e, lnk) {
   e.preventDefault()
 
   if (ready) {
-    win.send('add-to-playlist', lnk)
+    win.send('add-to-playlist', [].concat(lnk))
     return
   }
 
@@ -34,6 +35,11 @@ app.on('ready', function () {
 
   ipc.on('close', function () {
     app.quit()
+  })
+
+  ipc.on('open-file-dialog', function () {
+    var files = dialog.showOpenDialog({ properties: [ 'openFile', 'multiSelections' ]})
+    win.send('add-to-playlist', files)
   })
 
   ipc.on('minimize', function () {

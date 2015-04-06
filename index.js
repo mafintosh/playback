@@ -21,8 +21,10 @@ var argv = minimist(JSON.parse(window.location.toString().split('#')[1]), {
   boolean: ['follow']
 })
 
-ipc.on('add-to-playlist', function (link) {
-  list.add(link)
+ipc.on('add-to-playlist', function (links) {
+  links.forEach(function (link) {
+    list.add(link)
+  })
 })
 
 var on = function (el, name, fn) {
@@ -38,7 +40,14 @@ drop($('body'), function (files) {
     media.subtitles(data)
   }
 
-  filereader(files[0]).pipe(vtt()).pipe(concat(onsubs))
+  for (var i = 0; i < files.length; i++) {
+    if (/\.(vtt|srt)$/i.test(files[i].path)) {
+      fs.createReadStream(files[i].path).pipe(vtt()).pipe(concat(onsubs))
+      return
+    }
+
+    list.add(files[i].path)
+  }
 })
 
 var isFullscreen = false
@@ -131,6 +140,10 @@ on($('#controls-playlist'), 'click', function () {
     $('#controls-playlist').className = 'selected'
     $('#controls-broadcast').className = ''
   }
+})
+
+on($('#playlist-add-media'), 'click', function () {
+  ipc.send('open-file-dialog')
 })
 
 on($('#popup'), 'transitionend', function () {
