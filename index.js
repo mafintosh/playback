@@ -1,6 +1,5 @@
 var request = require('request')
 var drop = require('drag-and-drop-files')
-var filereader = require('filereader-stream')
 var mdns = require('multicast-dns')()
 var concat = require('concat-stream')
 var vtt = require('srt-to-vtt')
@@ -45,7 +44,7 @@ drop($('body'), function (files) {
 var isFullscreen = false
 var showPopup = false
 
-on($('#controls-fullscreen'), 'click', function (e) {
+var onfullscreentoggle = function () {
   var $icon = $('#controls-fullscreen .mega-octicon')
   if (isFullscreen) {
     isFullscreen = false
@@ -56,7 +55,10 @@ on($('#controls-fullscreen'), 'click', function (e) {
     $icon.className = 'mega-octicon octicon-screen-normal'
     ipc.send('enter-full-screen')
   }
-})
+}
+
+on($('#idle'), 'dblclick', onfullscreentoggle)
+on($('#controls-fullscreen'), 'click', onfullscreentoggle)
 
 on($('#controls-timeline'), 'click', function (e) {
   var time = e.pageX / $('#controls-timeline').offsetWidth * media.duration
