@@ -25,7 +25,7 @@
     "playback": "./app.js"
   },
   "scripts": {
-    "bundle": "atom-shell-packager . Playback --ignore=test.mp4 --protocol=magnet --protocol-name=\"BitTorrent Magnet URL\" && cp icon.icns Playback.app/Contents/Resources/atom.icns"
+    "bundle": "atom-shell-packager . Playback --ignore=test.mp4 && cp info.plist Playback.app/Contents/Info.plist && cp icon.icns Playback.app/Contents/Resources/atom.icns"
   },
   "repository": {
     "type": "git",
