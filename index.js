@@ -65,10 +65,23 @@ on($('#controls-timeline'), 'click', function (e) {
 
 mouseidle($('#drag'), 3000, 'hide-cursor')
 
+var onspeed;
 list.on('select', function () {
+  if (onspeed) clearInterval(onspeed);
+
   $('#controls-name').innerText = list.selected.name
   media.play('http://127.0.0.1:' + server.address().port + '/' + list.selected.id)
+  console.log(list.selected)
   updatePlaylist()
+
+  if (list.selected.downloadSpeed) {
+    onspeeed = setInterval(function() {
+      var kilobytes = list.selected.downloadSpeed() / 1024
+      var megabytes = kilobytes / 1024
+      var text = megabytes > 1 ? megabytes.toFixed(1) + ' mb/s' : Math.floor(kilobytes) + ' kb/s'
+      $('#player-downloadspeed').innerText = text
+    }, 1000)
+  }
 })
 
 var updatePlaylist = function () {

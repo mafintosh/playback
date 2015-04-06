@@ -145,13 +145,17 @@ body:hover #overlay {
   transition: width 0.25s linear;
 }
 
-#controls-fullscreen, #controls-playlist, #controls-play, #controls-broadcast {
+#controls-fullscreen, #controls-playlist, #controls-play, #controls-broadcast, #player-downloadspeed {
   float: left;
   padding: 9px 20px;
 }
 
 #controls-playlist, #controls-broadcast {
   padding-right: 0;
+}
+
+#player-downloadspeed {
+  margin-top: 4px;
 }
 
 #controls-playlist.selected .mega-octicon, #controls-broadcast.selected .mega-octicon {

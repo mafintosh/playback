@@ -22,6 +22,7 @@ module.exports = function () {
       console.log('torrent ready')
 
       engine.files.forEach(function (f) {
+        f.downloadSpeed = engine.swarm.downloadSpeed
         if (/\.(mp4|mkv|mp3)$/i.test(f.name)) {
           f.select()
           f.id = that.entries.push(f) - 1
