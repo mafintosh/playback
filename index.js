@@ -53,7 +53,16 @@ drop($('body'), function (files) {
 var isFullscreen = false
 var showPopup = false
 
-var onfullscreentoggle = function () {
+var onfullscreentoggle = function (e) {
+  if (!isFullscreen && e.shiftKey) {
+    ipc.send('resize', {
+      width: media.width,
+      height: media.height,
+      ratio: media.ratio
+    })
+    return
+  }
+
   var $icon = $('#controls-fullscreen .mega-octicon')
   if (isFullscreen) {
     isFullscreen = false
