@@ -105,7 +105,7 @@ var updatePlaylist = function () {
 
   list.entries.forEach(function (entry, i) {
     html += '<div class="playlist-entry ' + (i % 2 ? 'odd ' : '') + (list.selected === entry ? 'selected ' : '') + '" data-index="' + i + '" data-id="' + entry.id + '">' +
-      '<span>' + entry.name + '</span><span class="status octicon octicon-sync"></span></div>'
+      '<span>' + entry.name + '</span><span class="status octicon"></span></div>'
   })
 
   $('#playlist-entries').innerHTML = html
@@ -115,7 +115,7 @@ var updateSpeeds = function() {
   list.entries.forEach(function(entry, i) {
     if (!entry.downloadSpeed) return
 
-    document.querySelectorAll('.playlist-entry[data-index="'+i+'"] .status')[0].class += 'downloading'
+    document.querySelectorAll('.playlist-entry[data-index="'+i+'"] .status')[0].className += ' octicon-sync'
 
     var kilobytes = entry.downloadSpeed() / 1024
     var megabytes = kilobytes / 1024
