@@ -180,13 +180,14 @@ var formatTime = function (secs) {
 
 var updateInterval
 media.on('metadata', function () {
-  if (!isFullscreen) {
-    ipc.send('resize', {
-      width: media.width,
-      height: media.height,
-      ratio: media.ratio
-    })
-  }
+  // TODO: comment in again when not quirky
+  // if (!isFullscreen) {
+  //   ipc.send('resize', {
+  //     width: media.width,
+  //     height: media.height,
+  //     ratio: media.ratio
+  //   })
+  // }
 
   $('#controls-main').style.display = 'block'
   $('#controls-time-total').innerText = formatTime(media.duration)

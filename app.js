@@ -51,6 +51,7 @@ app.on('ready', function () {
   })
 
   ipc.on('resize', function (e, message) {
+    if (win.isMaximized()) return
     var wid = win.getSize()[0]
     var hei = (wid / message.ratio) | 0
     win.setSize(wid, hei)
