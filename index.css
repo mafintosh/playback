@@ -64,6 +64,10 @@ body, html {
   white-space: nowrap;
 }
 
+.playlist-entry .downloadspeed {
+  float: right;
+}
+
 .playlist-entry.odd {
   background-color: #222324;
 }

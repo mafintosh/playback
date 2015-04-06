@@ -76,34 +76,35 @@ on($('#controls-timeline'), 'click', function (e) {
 
 mouseidle($('#idle'), 3000, 'hide-cursor')
 
-var onspeed;
 list.on('select', function () {
-  if (onspeed) clearInterval(onspeed);
-
   $('#controls-name').innerText = list.selected.name
   media.play('http://127.0.0.1:' + server.address().port + '/' + list.selected.id)
-  console.log(list.selected)
   updatePlaylist()
-
-  if (list.selected.downloadSpeed) {
-    onspeeed = setInterval(function() {
-      var kilobytes = list.selected.downloadSpeed() / 1024
-      var megabytes = kilobytes / 1024
-      var text = megabytes > 1 ? megabytes.toFixed(1) + ' mb/s' : Math.floor(kilobytes) + ' kb/s'
-      $('#player-downloadspeed').innerText = text
-    }, 1000)
-  }
 })
 
 var updatePlaylist = function () {
   var html = ''
 
   list.entries.forEach(function (entry, i) {
-    html += '<div class="playlist-entry ' + (i % 2 ? 'odd ' : '') + (list.selected === entry ? 'selected ' : '') + '" data-id="' + entry.id + '">' + entry.name + '</div>'
+    html += '<div class="playlist-entry ' + (i % 2 ? 'odd ' : '') + (list.selected === entry ? 'selected ' : '') + '" data-index="' + i + '" data-id="' + entry.id + '"><span>' + entry.name + '</span><span class="downloadspeed"></span></div>'
   })
 
   $('#playlist-entries').innerHTML = html
 }
+
+var updateSpeeds = function() {
+  list.entries.forEach(function(entry, i) {
+    if (!entry.downloadSpeed) return
+
+    var kilobytes = entry.downloadSpeed() / 1024
+    var megabytes = kilobytes / 1024
+    var text = megabytes > 1 ? megabytes.toFixed(1) + ' mb/s' : Math.floor(kilobytes) + ' kb/s'
+
+    if (list.selected === entry) $('#player-downloadspeed').innerText = text
+    document.querySelectorAll('.playlist-entry[data-index="'+i+'"] .downloadspeed')[0].innerText = text
+  })
+}
+setInterval(updateSpeeds, 750)
 
 list.on('update', updatePlaylist)
 
