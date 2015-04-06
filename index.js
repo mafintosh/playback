@@ -109,6 +109,7 @@ var closePopup = function (e) {
 
 on($('#controls'), 'click', closePopup)
 on($('#drag'), 'click', closePopup)
+on($('#idle'), 'click', closePopup)
 
 on($('#playlist-entries'), 'click', function (e) {
   if (!e.target.getAttribute('data-id')) return
