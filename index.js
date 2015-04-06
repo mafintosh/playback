@@ -74,6 +74,11 @@ on($('#controls-timeline'), 'click', function (e) {
   media.time(time)
 })
 
+document.addEventListener('keydown', function(e) {
+  if (e.keyCode === 27 && isFullscreen) return onfullscreentoggle()
+  $('#controls-playlist').click()
+})
+
 mouseidle($('#idle'), 3000, 'hide-cursor')
 
 list.on('select', function () {
