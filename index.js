@@ -74,7 +74,7 @@ on($('#controls-timeline'), 'click', function (e) {
   media.time(time)
 })
 
-document.addEventListener('keydown', function(e) {
+on(document, 'keydown', function(e) {
   if (e.keyCode === 27 && isFullscreen) return onfullscreentoggle()
   $('#controls-playlist').click()
 })
