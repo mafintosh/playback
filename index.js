@@ -66,10 +66,12 @@ var onfullscreentoggle = function (e) {
   var $icon = $('#controls-fullscreen .mega-octicon')
   if (isFullscreen) {
     isFullscreen = false
+    $('#menubar').style.display = 'block'
     $icon.className = 'mega-octicon octicon-screen-full'
     ipc.send('exit-full-screen')
   } else {
     isFullscreen = true
+    $('#menubar').style.display = 'none'
     $icon.className = 'mega-octicon octicon-screen-normal'
     ipc.send('enter-full-screen')
   }
