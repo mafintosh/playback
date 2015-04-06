@@ -32,6 +32,18 @@ app.on('ready', function () {
 
   win.loadUrl('file://' + path.join(__dirname, 'index.html#' + JSON.stringify(process.argv.slice(2))))
 
+  ipc.on('close', function () {
+    app.quit()
+  })
+
+  ipc.on('minimize', function () {
+    win.minimize()
+  })
+
+  ipc.on('maximize', function () {
+    win.maximize()
+  })
+
   ipc.on('resize', function (e, message) {
     var wid = win.getSize()[0]
     var hei = (wid / message.ratio) | 0

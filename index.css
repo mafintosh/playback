@@ -98,10 +98,19 @@ body, html {
 }
 
 #drag {
+  -webkit-app-region: drag;
   position: absolute;
   top: 0;
-  left: 0;
+  left: 70px;
+  right: 0;
+  height: 24px
+}
+
+#idle {
+  position: absolute;
+  top: 24px;
   bottom: 50px;
+  left: 0;
   right: 0;
 }
 
@@ -113,8 +122,33 @@ body, html {
   opacity: 0 !important;
 }
 
-body:hover #overlay {
+body:hover #overlay, body:hover #menubar {
   opacity: 1;
+}
+
+#menubar {
+  padding-left: 3px;
+  height: 24px;
+  background-color: #1F2021;
+}
+
+#menubar-close, #menubar-minimize, #menubar-maximize {
+  float: left;
+  margin: 6px 4px;
+  background-image: url(menubar.png);
+  background-size: auto 12px;
+  width: 12px;
+  height: 12px;
+  border-radius: 6px;
+}
+
+#menubar-close {
+  margin-left: 6px;
+  background-position: -26px 0;
+}
+
+#menubar-maximize {
+  background-position: -13px 0;
 }
 
 #controls {

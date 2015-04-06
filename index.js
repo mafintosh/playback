@@ -63,7 +63,7 @@ on($('#controls-timeline'), 'click', function (e) {
   media.time(time)
 })
 
-mouseidle($('#drag'), 3000, 'hide-cursor')
+mouseidle($('#idle'), 3000, 'hide-cursor')
 
 var onspeed;
 list.on('select', function () {
@@ -134,6 +134,18 @@ on($('#popup'), 'transitionend', function () {
   if (!showPopup) $('#popup').style.display = 'none'
 })
 
+on($('#menubar-close'), 'click', function () {
+  ipc.send('close')
+})
+
+on($('#menubar-minimize'), 'click', function () {
+  ipc.send('minimize')
+})
+
+on($('#menubar-maximize'), 'click', function () {
+  ipc.send('maximize')
+})
+
 var formatTime = function (secs) {
   var hours = (secs / 3600) | 0
   var mins = ((secs - hours * 3600) / 60) | 0
@@ -162,14 +174,6 @@ media.on('metadata', function () {
     $('#controls-timeline-position').style.width = (100 * (media.time() / media.duration)) + '%'
     $('#controls-time-current').innerText = formatTime(media.time())
   }, 250)
-})
-
-on($('#drag'), 'mouseover', function () {
-  $('#drag').style['-webkit-app-region'] = 'drag'
-})
-
-on($('#drag'), 'mouseout', function () {
-  $('#drag').style['-webkit-app-region'] = 'no-drag'
 })
 
 on($('#controls-play'), 'click', function () {
