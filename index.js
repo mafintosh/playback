@@ -112,6 +112,7 @@ var updatePlaylist = function () {
 }
 
 var updateSpeeds = function() {
+  $('#player-downloadspeed').innerText = ''
   list.entries.forEach(function(entry, i) {
     if (!entry.downloadSpeed) return
 
