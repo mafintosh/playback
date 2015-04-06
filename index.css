@@ -64,7 +64,7 @@ body, html {
   white-space: nowrap;
 }
 
-.playlist-entry .downloadspeed {
+.playlist-entry .status {
   float: right;
 }
 
