@@ -10,7 +10,7 @@ var win
 var link
 var ready = false
 
-app.on('open-url', function (e, lnk) {
+var onopen = function (e, lnk) {
   e.preventDefault()
 
   if (ready) {
@@ -19,7 +19,10 @@ app.on('open-url', function (e, lnk) {
   }
 
   link = lnk
-})
+}
+
+app.on('open-file', onopen)
+app.on('open-url', onopen)
 
 app.on('ready', function () {
   win = new BrowserWindow({
@@ -68,7 +71,7 @@ app.on('ready', function () {
 
   ipc.on('ready', function () {
     ready = true
-    if (link) win.send('add-to-playlist', link)
+    if (link) win.send('add-to-playlist', [].concat(link))
     win.show()
   })
 })
