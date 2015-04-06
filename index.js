@@ -85,8 +85,10 @@ on($('#controls-timeline'), 'click', function (e) {
   media.time(time)
 })
 
-on(document, 'keydown', function(e) {
-  if (e.keyCode === 27 && isFullscreen) return onfullscreentoggle()
+on(document, 'keydown', function (e) {
+  if (e.keyCode === 27 && isFullscreen) return onfullscreentoggle(e)
+  if (e.keyCode === 13 && e.metaKey) return onfullscreentoggle(e)
+  if (e.keyCode === 13 && e.shiftKey) return onfullscreentoggle(e)
   $('#controls-playlist').click()
 })
 
