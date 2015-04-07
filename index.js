@@ -81,6 +81,11 @@ var onfullscreentoggle = function (e) {
   }
 }
 
+var onplaytoggle = function () {
+  if (media.playing) media.pause()
+  else media.play()
+}
+
 on($('#idle'), 'dblclick', onfullscreentoggle)
 on($('#controls-fullscreen'), 'click', onfullscreentoggle)
 
@@ -93,6 +98,7 @@ on(document, 'keydown', function (e) {
   if (e.keyCode === 27 && isFullscreen) return onfullscreentoggle(e)
   if (e.keyCode === 13 && e.metaKey) return onfullscreentoggle(e)
   if (e.keyCode === 13 && e.shiftKey) return onfullscreentoggle(e)
+  if (e.keyCode === 32) return onplaytoggle(e)
   $('#controls-playlist').click()
 })
 
@@ -219,10 +225,7 @@ media.on('metadata', function () {
   }, 250)
 })
 
-on($('#controls-play'), 'click', function () {
-  if (media.playing) media.pause()
-  else media.play()
-})
+on($('#controls-play'), 'click', onplaytoggle)
 
 media.on('end', function () {
   list.selectNext()
