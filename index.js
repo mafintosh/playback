@@ -50,6 +50,10 @@ drop($('body'), function (files) {
   }
 })
 
+on($('body'), 'mouseover', function () {
+  ipc.send('focus')
+})
+
 var isFullscreen = false
 var showPopup = false
 

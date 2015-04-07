@@ -45,6 +45,10 @@ app.on('ready', function () {
     win.send('add-to-playlist', files)
   })
 
+  ipc.on('focus', function () {
+    win.focus()
+  })
+
   ipc.on('minimize', function () {
     win.minimize()
   })
