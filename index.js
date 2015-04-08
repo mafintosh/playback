@@ -191,9 +191,8 @@ $('#controls').on('click', closePopup)
 $('#drag').on('click', closePopup)
 $('#idle').on('click', closePopup)
 
-$('#playlist-entries').on('click', function (e) {
-  if (!e.target.getAttribute('data-id')) return
-  var id = Number(e.target.getAttribute('data-id'))
+$('#playlist-entries').on('click', '.playlist-entry', function (e) {
+  var id = Number(this.getAttribute('data-id'))
   list.select(id)
 })
 
