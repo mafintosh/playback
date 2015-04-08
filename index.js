@@ -66,7 +66,7 @@ on(window, 'contextmenu', function (e) {
     checked: onTop,
     click: function() {
       onTop = !onTop
-      ipc.send('always-on-top', onTop)
+      remote.getCurrentWindow().setAlwaysOnTop(onTop)
     }
   }))
 

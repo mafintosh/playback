@@ -41,11 +41,7 @@ app.on('ready', function () {
 
   ipc.on('open-file-dialog', function () {
     var files = dialog.showOpenDialog({ properties: [ 'openFile', 'multiSelections' ]})
-    win.send('add-to-playlist', files)
-  })
-
-  ipc.on('always-on-top', function (e, onTop) {
-    win.setAlwaysOnTop(onTop)
+    if (files) win.send('add-to-playlist', files)
   })
 
   ipc.on('focus', function () {
