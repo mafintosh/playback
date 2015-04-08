@@ -255,7 +255,7 @@ body:hover #overlay, body:hover #menubar {
 
 #player-downloadspeed {
   margin-top: 4px;
-  padding: 9px 20px;
+  padding: 3px 20px;
 }
 
 #controls-playlist.selected .mega-octicon, #controls-broadcast.selected .mega-octicon {
