@@ -15,14 +15,6 @@ body, html {
   float: right;
 }
 
-a:focus {
-  border: none;
-}
-
-a {
-  cursor: default;
-}
-
 /*
 body {
   background-image: url(splash.jpg);
@@ -255,9 +247,9 @@ body:hover #overlay, body:hover #menubar {
   padding: 3px 6px;
 }
 
-#controls-play a:hover .mega-octicon, #player-downloadspeed a:hover .mega-octicon,
-#controls-fullscreen a:hover .mega-octicon, #controls-playlist a:hover .mega-octicon,
-#controls-broadcast a:hover .mega-octicon {
+#controls-play span:hover .mega-octicon, #player-downloadspeed span:hover .mega-octicon,
+#controls-fullscreen span:hover .mega-octicon, #controls-playlist span:hover .mega-octicon,
+#controls-broadcast span:hover .mega-octicon {
   color: #31A357;
 }
 
