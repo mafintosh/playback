@@ -24,6 +24,15 @@ body, html {
   height: 100%;
 }
 
+#drag-video {
+  z-index: 99;
+  position: absolute;
+  top: 24px;
+  bottom: 50px;
+  left: 0;
+  right: 0;
+}
+
 #splash {
   width: 100%;
   height: 100%;
