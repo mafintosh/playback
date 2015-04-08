@@ -1,8 +1,4 @@
-var on = function (el, name, fn) {
-  el.addEventListener(name, fn, false)
-}
-
-var $ = document.querySelector.bind(document)
+var $ = require('dombo')
 
 module.exports = function (elem, timeout, className) {
   var max = (timeout / 250) | 0
@@ -19,27 +15,27 @@ module.exports = function (elem, timeout, className) {
     }
   }
 
-  on(elem, 'mouseover', function () {
+  $(elem).on('mouseover', function () {
     overMovie = true
     update()
   })
 
-  on(elem, 'mouseout', function () {
+  $(elem).on('mouseout', function () {
     overMovie = false
   })
 
-  on(elem, 'mousedown', function (e) {
+  $(elem).on('mousedown', function (e) {
     mousedown = true
     moving = tick
     update()
   })
 
-  on(elem, 'mouseup', function (e) {
+  $(elem).on('mouseup', function (e) {
     mousedown = false
     moving = tick
   })
 
-  on(window, 'mousemove', function (e) {
+  $(window).on('mousemove', function (e) {
     moving = tick
     update()
   })
