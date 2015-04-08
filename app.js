@@ -30,8 +30,7 @@ app.on('ready', function () {
     width: 860,
     height: 470,
     frame: false,
-    show: false,
-    'always-on-top': true
+    show: false
   })
 
   win.loadUrl('file://' + path.join(__dirname, 'index.html#' + JSON.stringify(process.argv.slice(2))))
@@ -43,6 +42,10 @@ app.on('ready', function () {
   ipc.on('open-file-dialog', function () {
     var files = dialog.showOpenDialog({ properties: [ 'openFile', 'multiSelections' ]})
     win.send('add-to-playlist', files)
+  })
+
+  ipc.on('always-on-top', function (e, onTop) {
+    win.setAlwaysOnTop(onTop)
   })
 
   ipc.on('focus', function () {

@@ -4,6 +4,9 @@ var mdns = require('multicast-dns')()
 var concat = require('concat-stream')
 var vtt = require('srt-to-vtt')
 var ipc = require('ipc')
+var remote = require('remote')
+var Menu = remote.require('menu')
+var MenuItem = remote.require('menu-item')
 var http = require('http')
 var rangeParser = require('range-parser')
 var pump = require('pump')
@@ -48,6 +51,26 @@ drop($('body'), function (files) {
 
     list.add(files[i].path)
   }
+})
+
+var onTop = false
+
+on(window, 'contextmenu', function (e) {
+  e.preventDefault()
+
+  var menu = new Menu()
+
+  menu.append(new MenuItem({
+    label: 'Always on top',
+    type: 'checkbox',
+    checked: onTop,
+    click: function() {
+      onTop = !onTop
+      ipc.send('always-on-top', onTop)
+    }
+  }))
+
+  menu.popup(remote.getCurrentWindow())
 })
 
 on($('body'), 'mouseover', function () {
