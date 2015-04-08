@@ -177,6 +177,19 @@ body:hover #overlay, body:hover #menubar {
   background-color: #1F2021;
 }
 
+#menubar:hover #menubar-close {
+  margin-left: 6px;
+  background-position: -26px 0;
+}
+
+#menubar:hover #menubar-minimize {
+  background-position: 0 0;
+}
+
+#menubar:hover #menubar-maximize {
+  background-position: -13px 0;
+}
+
 #menubar-close, #menubar-minimize, #menubar-maximize {
   float: left;
   margin: 6px 4px;
@@ -189,11 +202,15 @@ body:hover #overlay, body:hover #menubar {
 
 #menubar-close {
   margin-left: 6px;
-  background-position: -26px 0;
+  background-position: -142px 0;
 }
 
 #menubar-maximize {
-  background-position: -13px 0;
+  background-position: -129px 0;
+}
+
+#menubar-minimize {
+  background-position: -116px 0;
 }
 
 #controls {
