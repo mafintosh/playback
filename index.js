@@ -255,6 +255,8 @@ media.on('end', function () {
 })
 
 media.on('play', function () {
+  $('#splash').className = 'hidden'
+  $('#player').className = ''
   $('#controls-play .mega-octicon').className = 'mega-octicon octicon-playback-pause'
 })
 

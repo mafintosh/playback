@@ -15,17 +15,23 @@ body, html {
   float: right;
 }
 
-/*
-body {
-  background-image: url(splash.jpg);
-  background-size: 100%;
-  background-position: -50%;
+.hidden {
+  display: none;
 }
-*/
 
 #player {
   width: 100%;
   height: 100%;
+}
+
+#splash {
+  width: 100%;
+  height: 100%;
+  background-image: url('splash.gif');
+  background-size: 100%;
+  background-position: -50%;
+  background-repeat: no-repeat;
+  -webkit-filter: grayscale(100%);
 }
 
 #overlay {
