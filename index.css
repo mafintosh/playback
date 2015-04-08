@@ -247,25 +247,42 @@ body:hover #overlay, body:hover #menubar {
   transition: width 0.25s linear;
 }
 
-#controls-fullscreen, #controls-playlist, #controls-play, #controls-broadcast, #player-downloadspeed {
-  float: left;
-  padding: 9px 20px;
+.controls-secondary {
+  padding: 6px 10px 0 0;
 }
 
-#controls-playlist, #controls-broadcast {
-  padding-right: 0;
+#player-downloadspeed, #controls-playlist, #controls-broadcast {
+  margin-right: 11px;
+}
+
+#controls-play {
+  margin: 6px 9px 6px 14px;
+}
+
+#controls-play, #player-downloadspeed, #controls-fullscreen, #controls-playlist,  #controls-broadcast  {
+  float: left;
+}
+
+#controls-play .mega-octicon, #player-downloadspeed .mega-octicon,
+#controls-fullscreen .mega-octicon, #controls-playlist .mega-octicon,
+#controls-broadcast .mega-octicon {
+  /* this is the click buffer */
+  padding: 3px 6px;
+}
+
+#controls-play span:hover .mega-octicon, #player-downloadspeed span:hover .mega-octicon,
+#controls-fullscreen span:hover .mega-octicon, #controls-playlist span:hover .mega-octicon,
+#controls-broadcast span:hover .mega-octicon {
+  color: #31A357;
 }
 
 #player-downloadspeed {
   margin-top: 4px;
+  padding: 3px 20px;
 }
 
 #controls-playlist.selected .mega-octicon, #controls-broadcast.selected .mega-octicon {
   color: #31A357;
-}
-
-#controls-play {
-  padding-right: 15px;
 }
 
 .mega-octicon {
