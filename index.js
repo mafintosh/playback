@@ -56,16 +56,16 @@ drop($('body'), function (files) {
 var videoDown = false
 var videoOffsets = [0, 0]
 
-on($('#drag-video'), 'mousedown', function (e) {
+on($('#idle'), 'mousedown', function (e) {
   videoDown = true
   videoOffsets = [e.clientX, e.clientY]
 })
 
-on($('#drag-video'), 'mouseup', function () {
+on($('#idle'), 'mouseup', function () {
   videoDown = false
 })
 
-on($('#drag-video'), 'mousemove', function (e) {
+on($('#idle'), 'mousemove', function (e) {
   if (videoDown) remote.getCurrentWindow().setPosition(e.screenX - videoOffsets[0], e.screenY - videoOffsets[1])
 })
 
