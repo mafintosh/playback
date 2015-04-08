@@ -15,6 +15,7 @@ var eos = require('end-of-stream')
 var minimist = require('minimist')
 var JSONStream = require('JSONStream')
 var network = require('network-address')
+var $ = require('dombo')
 var player = require('./player')
 var playlist = require('./playlist')
 var mouseidle = require('./mouseidle')
@@ -30,11 +31,6 @@ ipc.on('add-to-playlist', function (links) {
   })
 })
 
-var on = function (el, name, fn) {
-  el.addEventListener(name, fn, false)
-}
-
-var $ = document.querySelector.bind(document)
 var media = player($('#player'))
 var list = playlist()
 
@@ -56,22 +52,22 @@ drop($('body'), function (files) {
 var videoDown = false
 var videoOffsets = [0, 0]
 
-on($('#idle'), 'mousedown', function (e) {
+$('#idle').on('mousedown', function (e) {
   videoDown = true
   videoOffsets = [e.clientX, e.clientY]
 })
 
-on($('#idle'), 'mouseup', function () {
+$('#idle').on('mouseup', function () {
   videoDown = false
 })
 
-on($('#idle'), 'mousemove', function (e) {
+$('#idle').on('mousemove', function (e) {
   if (videoDown) remote.getCurrentWindow().setPosition(e.screenX - videoOffsets[0], e.screenY - videoOffsets[1])
 })
 
 var onTop = false
 
-on(window, 'contextmenu', function (e) {
+$(window).on('contextmenu', function (e) {
   e.preventDefault()
 
   var menu = new Menu()
@@ -89,7 +85,7 @@ on(window, 'contextmenu', function (e) {
   menu.popup(remote.getCurrentWindow())
 })
 
-on($('body'), 'mouseover', function () {
+$('body').on('mouseover', function () {
   ipc.send('focus')
 })
 
@@ -110,12 +106,14 @@ var onfullscreentoggle = function (e) {
   if (isFullscreen) {
     isFullscreen = false
     $('#menubar').style.display = 'block'
-    $icon.className = 'mega-octicon octicon-screen-full'
+    $icon.removeClass('octicon-screen-normal')
+    $icon.addClass('octicon-screen-full')
     ipc.send('exit-full-screen')
   } else {
     isFullscreen = true
     $('#menubar').style.display = 'none'
-    $icon.className = 'mega-octicon octicon-screen-normal'
+    $icon.removeClass('octicon-screen-full')
+    $icon.addClass('octicon-screen-normal')
     ipc.send('enter-full-screen')
   }
 }
@@ -125,15 +123,15 @@ var onplaytoggle = function () {
   else media.play()
 }
 
-on($('#idle'), 'dblclick', onfullscreentoggle)
-on($('#controls-fullscreen'), 'click', onfullscreentoggle)
+$('#idle').on('dblclick', onfullscreentoggle)
+$('#controls-fullscreen').on('click', onfullscreentoggle)
 
-on($('#controls-timeline'), 'click', function (e) {
+$('#controls-timeline').on('click', function (e) {
   var time = e.pageX / $('#controls-timeline').offsetWidth * media.duration
   media.time(time)
 })
 
-on(document, 'keydown', function (e) {
+$(document).on('keydown', function (e) {
   if (e.keyCode === 27 && isFullscreen) return onfullscreentoggle(e)
   if (e.keyCode === 13 && e.metaKey) return onfullscreentoggle(e)
   if (e.keyCode === 13 && e.shiftKey) return onfullscreentoggle(e)
@@ -165,7 +163,7 @@ var updateSpeeds = function() {
   list.entries.forEach(function(entry, i) {
     if (!entry.downloadSpeed) return
 
-    document.querySelectorAll('.playlist-entry[data-index="'+i+'"] .status')[0].className += ' octicon-sync'
+    $('.playlist-entry[data-index="'+i+'"] .status').addClass('octicon-sync')
 
     var kilobytes = entry.downloadSpeed() / 1024
     var megabytes = kilobytes / 1024
@@ -189,17 +187,17 @@ var closePopup = function (e) {
   $('#controls-broadcast').className = ''
 }
 
-on($('#controls'), 'click', closePopup)
-on($('#drag'), 'click', closePopup)
-on($('#idle'), 'click', closePopup)
+$('#controls').on('click', closePopup)
+$('#drag').on('click', closePopup)
+$('#idle').on('click', closePopup)
 
-on($('#playlist-entries'), 'click', function (e) {
+$('#playlist-entries').on('click', function (e) {
   if (!e.target.getAttribute('data-id')) return
   var id = Number(e.target.getAttribute('data-id'))
   list.select(id)
 })
 
-on($('#controls-playlist'), 'click', function () {
+$('#controls-playlist').on('click', function () {
   if (showPopup) {
     showPopup = false
     $('#popup').style.opacity = 0
@@ -213,23 +211,23 @@ on($('#controls-playlist'), 'click', function () {
   }
 })
 
-on($('#playlist-add-media'), 'click', function () {
+$('#playlist-add-media').on('click', function () {
   ipc.send('open-file-dialog')
 })
 
-on($('#popup'), 'transitionend', function () {
+$('#popup').on('transitionend', function () {
   if (!showPopup) $('#popup').style.display = 'none'
 })
 
-on($('#menubar-close'), 'click', function () {
+$('#menubar-close').on('click', function () {
   ipc.send('close')
 })
 
-on($('#menubar-minimize'), 'click', function () {
+$('#menubar-minimize').on('click', function () {
   ipc.send('minimize')
 })
 
-on($('#menubar-maximize'), 'click', function () {
+$('#menubar-maximize').on('click', function () {
   ipc.send('maximize')
 })
 
@@ -264,7 +262,7 @@ media.on('metadata', function () {
   }, 250)
 })
 
-on($('#controls-play'), 'click', onplaytoggle)
+$('#controls-play').on('click', onplaytoggle)
 
 media.on('end', function () {
   list.selectNext()
