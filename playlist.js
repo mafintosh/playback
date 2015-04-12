@@ -128,8 +128,24 @@ module.exports = function () {
       }
 
       file.id = that.entries.push(file) - 1
-      that.emit('update')
-      cb()
+
+      var ondone = function () {
+        that.emit('update')
+        cb()
+      }
+      var subtitleSrt = link.substr(0, link.lastIndexOf('.')) + '.srt'
+      var subtitleVtt = link.substr(0, link.lastIndexOf('.')) + '.srt'
+      fs.exists(subtitleSrt, function (exists) {
+        if (exists) {
+          file.subtitle = subtitleSrt
+          ondone()
+          return
+        }
+        fs.exists(subtitleVtt, function (exists) {
+          if (exists) file.subtitle = subtitleVtt
+          ondone()
+        })
+      })
     })
   }
 
