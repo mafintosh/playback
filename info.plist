@@ -46,6 +46,14 @@
           <string>magnet</string>
         </array>
       </dict>
+      <dict>
+        <key>CFBundleURLName</key>
+        <string>Playback URL</string>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>playback</string>
+        </array>
+      </dict>
     </array>
     <key>CFBundleDocumentTypes</key>
     <array>
