@@ -116,7 +116,7 @@ module.exports = function ($video) {
         var subsUrl = mediaUrl.replace(/(:\/\/.+)\/.*/, '$1/subtitles')
         var subsList = []
         for (var i = 0; i < 100; i++) subsList.push(subsUrl)
-        chromecast.play(mediaUrl, {title: 'Playback', seek: time || 0, subtitles: subsList, autoSubtitles: !!subs, }, onmetadata)
+        chromecast.play(mediaUrl, {title: 'Playback', seek: time || 0, subtitles: subsList, autoSubtitles: !!subs }, onmetadata)
       } else {
         chromecast.resume()
       }
