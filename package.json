@@ -1,7 +1,7 @@
 {
   "name": "playback",
   "version": "1.0.0",
-  "description": "experimental video player build using atom-shell",
+  "description": "Video player build using atom-shell and node.js",
   "main": "app.js",
   "dependencies": {
     "JSONStream": "^0.10.0",
