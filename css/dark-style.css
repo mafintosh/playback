@@ -1,0 +1,266 @@
+html,body{
+  min-height: 100%;
+  font-family: Helvetica, "Trebuchet MS", Arial, sans-serif;
+}
+body{
+  background: white;
+  color:#303030;
+  margin: 0;
+  padding: 0;
+}
+header h1{
+  margin: 0;
+  font-size: 40px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background-size: auto 100px;
+  color:#F7DA03;
+}
+header h1 .container{
+  padding: 80px 0;
+  background-size: auto 150px;
+  position: relative;
+  top:-50px;
+  text-align: center;
+}
+header h2 {
+  margin:0;
+  background-color: #31a357;
+  padding: 10px 20px;
+  color:white;
+  letter-spacing: 4px;
+  text-align:center;
+  font-size: 15px;
+  text-transform: uppercase;
+  font-weight: 200;
+}
+header h1 .what{
+  display: none;
+}
+li { line-height: 26px; }
+header h1 .where{
+  padding: 6px 12px;
+  color:#F7DA03;
+  background: #303030;
+  border:3px solid white;
+}
+header h1 .where{
+  margin: 0 auto;
+}
+header .container {
+  overflow: auto;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+header .image {
+  float: left;
+  background-image: url('../images/icon.png');
+  width: 100px;
+  height: 100px;
+  background-size: 100px;
+}
+header .name {
+  font-size: 60px;
+  float: left;
+  height: 100px;
+  line-height: 110px;
+  margin-left: 10px;
+}
+header span { 
+  display: inline-block;
+}
+
+footer{
+  height: 160px;
+  background: url('../images/node-js.svg') center center no-repeat;
+  background-size: auto 150px;
+  margin-top: 50px;
+}
+.container, section {
+  max-width: 860px;
+  margin:0 auto
+}
+section{
+  padding:10px;
+}
+p{
+  font-size: 20px;
+  text-align: left;
+  margin-bottom: 30px;
+  line-height: 1.5em;
+}
+a{
+  color:teal;
+}
+a:hover{
+  text-decoration: bold;
+  color: teal;
+}
+
+#next{
+  background-color: #303030;
+  color:white;
+}
+
+.term,
+.term .chrome,
+.term .chrome .btn{
+  border:solid 2px #303030;
+}
+.term{
+  display: block;
+  min-width: 300px;
+  border-radius: 4px;
+  margin-bottom:10px;
+  text-align: left;
+}
+.term .shell{
+  min-height:130px;
+  overflow:hidden;
+}
+.term .chrome{
+  height:34px;
+  padding-left:4px;
+  border-top:0 none;
+  border-right:0 none;
+  border-left:0 none;
+}
+.term .chrome:before{
+  content:" ";
+  display:inline-block;
+  height:100%;
+  vertical-align:middle;
+}
+.term .chrome .btn{
+  display:inline-block;
+  vertical-align:middle;
+  width:8px;
+  height:8px;
+  border-radius:100%;
+}
+.term .shell{
+  padding:10px;
+  color:#777;
+}
+.term .workshopper{
+  background: #F8F0BD;
+  padding:2px;
+}
+.term .workshopper code{
+  border:0 none;
+}
+.term code{
+  display:block;
+  margin:12px 0;
+  padding: 4px 10px;
+  border-left: 8px solid #F7DA03;
+  font-family: AndaleMono, courier, monospace;
+}
+.term.max{
+  top:0;
+  left:0;
+  position:absolute;
+  width:100%;
+  height:100%;
+  max-width:none;
+}
+.term.min{
+  position:absolute;
+  bottom:0;
+}
+.term.min .shell{
+  min-height:0;
+  height:0;
+  padding:0;
+}
+.term.min .chrome{
+  border:0 none;
+}
+.term .chrome .btn.close:hover{
+  background:red;
+}
+.term .chrome .btn.max:hover{
+  background:green;
+}
+.term .chrome .btn.min:hover{
+  background:#F7DA03;
+}
+
+
+.sign{
+  padding: 6px 12px;
+  color:#F7DA03;
+  background: #303030;
+  border:3px solid white;
+  text-transform: uppercase;
+}
+.sign:before,
+.sign:after{
+  content:"";
+  display: inline-block;
+  width:3px;
+  height: 40px;
+  background: white;
+  position: relative;
+  top:  55px;
+}
+#next h2{
+  margin-bottom: 80px;
+}
+
+#logo {
+  display: none;
+}
+
+.map img {
+  max-width: 100%
+}
+
+@media screen and (min-width : 500px) {
+  header h1{
+    background: #303030 center 20px no-repeat;
+    background-size: auto 120px;
+  }
+  header h1 .container{
+    text-align: left;
+    position: static;
+  }
+  header h1 .where{
+    padding: 6px 12px;
+    color:#F7DA03;
+    background: #303030;
+    border:3px solid white;
+  }
+  header h1 .where:before,
+  header h1 .where:after{
+    content:"";
+    display: inline-block;
+    width:3px;
+    height: 60px;
+    background: white;
+    position: relative;
+    top:  80px;
+  }
+
+  #intro .term{
+    width:40%;
+    max-width: 500px;
+    display: inline-block;
+  }
+  .terms {
+    text-align: center;
+  }
+  #logo {
+    float: right;
+    height: 130px;
+    margin-top: 10px;
+    margin-right: 60px;
+    display: block;
+  }
+}
+
+@media screen and (min-width : 700px) {
+  div.term ~ div.term {
+    margin-left: 50px;
+  }
+}
