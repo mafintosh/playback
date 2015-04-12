@@ -1,16 +1,21 @@
-# playback
+# Playback
 
-experimental video player build using atom-shell
+Video player build using atom-shell and node.js
 
-```
-npm install -g atom-shell
-git clone git://github.com/mafintosh/playback.git
-cd playback
-npm link
-playback a-video-file.mp4
-```
+It currently has support for playing mp4/webm and chromecasting videos.
+In addition to that it supports live streaming of video shared using a BitTorrent magnet link.
 
-when it's ready i'll add .app builds as well
+## Installation
+
+To install it download the [latest release](https://github.com/mafintosh/playback/releases/latest) for your platform.
+Currently only MacOSX is supported but pull requests are welcome that adds support to other platforms.
+
+If you think it is missing
+
+## Development
+
+Simply clone this repo and run `npm install`.
+Afterwards you can run `npm start` to run the app.
 
 ## License
 
