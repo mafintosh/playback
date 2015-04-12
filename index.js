@@ -45,10 +45,10 @@ ipc.on('add-to-playlist', function (links) {
   })
 })
 
-var media = player($('#player'))
+var media = player($('#player')[0])
 var list = playlist()
 
-drop($('body'), function (files) {
+drop($('body')[0], function (files) {
   for (var i = 0; i < files.length; i++) {
     if (/\.(vtt|srt)$/i.test(files[i].path)) {
       fs.createReadStream(files[i].path).pipe(vtt()).pipe(concat(onsubs))
@@ -123,13 +123,13 @@ var onfullscreentoggle = function (e) {
   var $icon = $('#controls-fullscreen .mega-octicon')
   if (isFullscreen) {
     isFullscreen = false
-    $('#menubar').style.display = 'block'
+    $('#menubar')[0].style.display = 'block'
     $icon.removeClass('octicon-screen-normal')
     $icon.addClass('octicon-screen-full')
     ipc.send('exit-full-screen')
   } else {
     isFullscreen = true
-    $('#menubar').style.display = 'none'
+    $('#menubar')[0].style.display = 'none'
     $icon.removeClass('octicon-screen-full')
     $icon.addClass('octicon-screen-normal')
     ipc.send('enter-full-screen')
@@ -145,7 +145,7 @@ $('#idle').on('dblclick', onfullscreentoggle)
 $('#controls-fullscreen').on('click', onfullscreentoggle)
 
 $('#controls-timeline').on('click', function (e) {
-  var time = e.pageX / $('#controls-timeline').offsetWidth * media.duration
+  var time = e.pageX / $('#controls-timeline')[0].offsetWidth * media.duration
   media.time(time)
 })
 
@@ -155,14 +155,14 @@ $(document).on('keydown', function (e) {
   if (e.keyCode === 13 && e.shiftKey) return onfullscreentoggle(e)
   if (e.keyCode === 32) return onplaytoggle(e)
 
-  if ($('#controls-playlist').hasClass('selected')) $('#controls-playlist').click()
-  if ($('#controls-broadcast').hasClass('selected')) $('#controls-broadcast').click()
+  if ($('#controls-playlist').hasClass('selected')) $('#controls-playlist').trigger('click')
+  if ($('#controls-broadcast').hasClass('selected')) $('#controls-broadcast').trigger('click')
 })
 
-mouseidle($('#idle'), 3000, 'hide-cursor')
+mouseidle($('#idle')[0], 3000, 'hide-cursor')
 
 list.on('select', function () {
-  $('#controls-name').innerText = list.selected.name
+  $('#controls-name')[0].innerText = list.selected.name
   media.play('http://127.0.0.1:' + server.address().port + '/' + list.selected.id)
   updatePlaylist()
 })
@@ -175,7 +175,7 @@ var updatePlaylist = function () {
       '<span>' + entry.name + '</span><span class="status octicon"></span></div>'
   })
 
-  $('#playlist-entries').innerHTML = html
+  $('#playlist-entries')[0].innerHTML = html
 }
 
 var updateBroadcast = function () {
@@ -186,13 +186,13 @@ var updateBroadcast = function () {
       '<span>' + player.name + '</span>'
   })
 
-  $('#broadcast-entries').innerHTML = html
+  $('#broadcast-entries')[0].innerHTML = html
 }
 
 chromecasts.on('update', updateBroadcast)
 
 var updateSpeeds = function () {
-  $('#player-downloadspeed').innerText = ''
+  $('#player-downloadspeed')[0].innerText = ''
   list.entries.forEach(function (entry, i) {
     if (!entry.downloadSpeed) return
 
@@ -202,7 +202,7 @@ var updateSpeeds = function () {
     var megabytes = kilobytes / 1024
     var text = megabytes > 1 ? megabytes.toFixed(1) + ' mb/s' : Math.floor(kilobytes) + ' kb/s'
 
-    if (list.selected === entry) $('#player-downloadspeed').innerText = text
+    if (list.selected === entry) $('#player-downloadspeed')[0].innerText = text
   })
 }
 setInterval(updateSpeeds, 750)
@@ -218,10 +218,10 @@ var popupSelected = function () {
 }
 
 var closePopup = function (e) {
-  if (e && (e.target === $('#controls-playlist .mega-octicon') || e.target === $('#controls-broadcast .mega-octicon'))) return
-  $('#popup').style.opacity = 0
-  $('#controls-playlist').className = ''
-  $('#controls-broadcast').className = ''
+  if (e && (e.target === $('#controls-playlist .mega-octicon')[0] || e.target === $('#controls-broadcast .mega-octicon')[0])) return
+  $('#popup')[0].style.opacity = 0
+  $('#controls-playlist')[0].className = ''
+  $('#controls-broadcast')[0].className = ''
 }
 
 $('#controls').on('click', closePopup)
@@ -250,25 +250,25 @@ $('#broadcast-entries').on('click', '.broadcast-entry', function (e) {
 
 var updatePopup = function () {
   if (popupSelected()) {
-    $('#popup').style.display = 'block'
-    $('#popup').style.opacity = 1
+    $('#popup')[0].style.display = 'block'
+    $('#popup')[0].style.opacity = 1
   } else {
-    $('#popup').style.opacity = 0
+    $('#popup')[0].style.opacity = 0
   }
 }
 
 $('#controls-broadcast').on('click', function () {
-  $('#popup').className = 'broadcast'
-  $('#controls-playlist').className = ''
+  $('#popup')[0].className = 'broadcast'
+  $('#controls-playlist')[0].className = ''
   $('#controls-broadcast').toggleClass('selected')
   chromecasts.update()
   updatePopup()
 })
 
 $('#controls-playlist').on('click', function (e) {
-  $('#popup').className = 'playlist'
+  $('#popup')[0].className = 'playlist'
   $('#controls-playlist').toggleClass('selected')
-  $('#controls-broadcast').className = ''
+  $('#controls-broadcast')[0].className = ''
   updatePopup()
 })
 
@@ -277,7 +277,7 @@ $('#playlist-add-media').on('click', function () {
 })
 
 $('#popup').on('transitionend', function () {
-  if (!popupSelected()) $('#popup').style.display = 'none'
+  if (!popupSelected()) $('#popup')[0].style.display = 'none'
 })
 
 $('#menubar-close').on('click', function () {
@@ -312,14 +312,14 @@ media.on('metadata', function () {
   //   })
   // }
 
-  $('#controls-main').style.display = 'block'
-  $('#controls-time-total').innerText = formatTime(media.duration)
-  $('#controls-time-current').innerText = formatTime(media.time())
+  $('#controls-main')[0].style.display = 'block'
+  $('#controls-time-total')[0].innerText = formatTime(media.duration)
+  $('#controls-time-current')[0].innerText = formatTime(media.time())
 
   clearInterval(updateInterval)
   updateInterval = setInterval(function () {
-    $('#controls-timeline-position').style.width = (100 * (media.time() / media.duration)) + '%'
-    $('#controls-time-current').innerText = formatTime(media.time())
+    $('#controls-timeline-position')[0].style.width = (100 * (media.time() / media.duration)) + '%'
+    $('#controls-time-current')[0].innerText = formatTime(media.time())
   }, 250)
 })
 
@@ -331,17 +331,17 @@ media.on('end', function () {
 
 media.on('play', function () {
   if (media.casting) {
-    $('#splash').className = ''
-    $('#player').className = 'hidden'
+    $('#splash')[0].className = ''
+    $('#player')[0].className = 'hidden'
   } else {
-    $('#splash').className = 'hidden'
-    $('#player').className = ''
+    $('#splash')[0].className = 'hidden'
+    $('#player')[0].className = ''
   }
-  $('#controls-play .mega-octicon').className = 'mega-octicon octicon-playback-pause'
+  $('#controls-play .mega-octicon')[0].className = 'mega-octicon octicon-playback-pause'
 })
 
 media.on('pause', function () {
-  $('#controls-play .mega-octicon').className = 'mega-octicon octicon-playback-play'
+  $('#controls-play .mega-octicon')[0].className = 'mega-octicon octicon-playback-play'
 })
 
 var server = http.createServer(function (req, res) {

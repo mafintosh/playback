@@ -7,7 +7,7 @@
     "JSONStream": "^0.10.0",
     "chromecasts": "^1.2.1",
     "concat-stream": "^1.4.7",
-    "dombo": "^2.0.3",
+    "dombo": "^3.0.1",
     "drag-and-drop-files": "0.0.1",
     "duplexify": "^3.2.0",
     "end-of-stream": "^1.1.0",
