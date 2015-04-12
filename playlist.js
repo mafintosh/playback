@@ -1,5 +1,6 @@
 var torrents = require('torrent-stream')
 var request = require('request')
+var ytdl = require('ytdl-core')
 var events = require('events')
 var path = require('path')
 var fs = require('fs')
@@ -42,6 +43,51 @@ module.exports = function () {
     fs.readFile(link, function (err, buf) {
       if (err) return cb(err)
       onmagnet(buf, cb)
+    })
+  }
+  
+  var onyoutube = function (link, cb) {
+    var file = {}
+    var url = link.split(':')[1]
+    url = 'https:' + url
+    ytdl.getInfo(url, function (err, info) {
+      if (err) return cb(err)
+
+      var vidFmt
+      var formats = info.formats
+      
+      formats.sort(function sort (a, b) {
+        return +a.itag - +b.itag
+      }).reverse()
+      
+      for (var i = 0; i < formats.length; i++) {
+        var fmt = info.formats[i]
+        // just webm for now
+        if (fmt.itag === '46') vidFmt = fmt
+        if (fmt.itag === '45') vidFmt = fmt
+        if (fmt.itag === '44') vidFmt = fmt
+        if (fmt.itag === '43') vidFmt = fmt
+      }
+
+      if (!vidFmt) return cb (new Error('No suitable video format found'))
+
+      request({method: 'HEAD', url: vidFmt.url}, function (err, resp, body) {
+        if (err) return cb(err)
+        var len = resp.headers['content-length']
+        if (!len) return cb(new Error('no content-length on response'))
+        file.length = +len
+        file.name = info.title
+      
+        file.createReadStream = function (opts) {
+          var vidUrl = vidFmt.url
+          if (opts.start || opts.end) vidUrl += '&range=' + ([opts.start || 0, opts.end || len].join('-'))
+          console.log('youtube readstream', vidUrl)
+          return request(vidUrl)
+        }
+        file.id = that.entries.push(file) - 1
+        that.emit('update')
+        cb()  
+      })
     })
   }
 
@@ -91,6 +137,7 @@ module.exports = function () {
     if (!cb) cb = noop
     if (/magnet:/.test(link)) return onmagnet(link, cb)
     if (/\.torrent$/i.test(link)) return ontorrent(link, cb)
+    if (/youtube\.com\/watch/i.test(link)) return onyoutube(link, cb)
     onfile(link, cb)
   }
 
