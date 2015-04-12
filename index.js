@@ -26,6 +26,10 @@ var argv = minimist(JSON.parse(window.location.toString().split('#')[1]), {
   boolean: ['follow']
 })
 
+var printError = function (err) {
+  if (err) console.log(err)
+}
+
 var onsubs = function (data) {
   media.subtitles(data)
 }
@@ -37,7 +41,7 @@ ipc.on('add-to-playlist', function (links) {
       return
     }
 
-    list.add(link)
+    list.add(link, printError)
   })
 })
 
@@ -51,7 +55,7 @@ drop($('body'), function (files) {
       return
     }
 
-    list.add(files[i].path)
+    list.add(files[i].path, printError)
   }
 })
 
@@ -412,7 +416,7 @@ server.listen(0, function () {
   console.log('Playback server running on port ' + server.address().port)
 
   argv._.forEach(function (file) {
-    if (file) list.add(file)
+    if (file) list.add(file, printError)
   })
 
   if (argv.follow) {
