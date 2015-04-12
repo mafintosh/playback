@@ -10,7 +10,7 @@ In addition to that it supports live streaming of video shared using a BitTorren
 To install it download the [latest release](https://github.com/mafintosh/playback/releases/latest) for your platform.
 Currently only MacOSX is supported but pull requests are welcome that adds support to other platforms.
 
-If you think it is missing
+If you think it is missing a feature or you've found a bug feel free to open an issue, or even better sending a PR that fixes that.
 
 ## Development
 
