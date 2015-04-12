@@ -21,13 +21,16 @@
     "torrent-stream": "^0.18.1"
   },
   "devDependencies": {
+    "atom-shell": "^0.23.0",
     "atom-shell-packager": "^2.1.1"
   },
   "bin": {
     "playback": "./app.js"
   },
   "scripts": {
-    "bundle": "atom-shell-packager . Playback --ignore=test.mp4 && cp info.plist Playback.app/Contents/Info.plist && cp icon.icns Playback.app/Contents/Resources/atom.icns"
+    "start": "atom-shell app.js",
+    "dev": "atom-shell app.js test.mp4",
+    "bundle": "atom-shell-packager . Playback --ignore=test.mp4 --ignore=node_modules/atom-shell && cp info.plist Playback.app/Contents/Info.plist && cp icon.icns Playback.app/Contents/Resources/atom.icns"
   },
   "repository": {
     "type": "git",
