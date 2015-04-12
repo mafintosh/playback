@@ -192,6 +192,32 @@ module.exports = function () {
     head.end()
   }
 
+  var onipfslink = function (link, cb) {
+    var local = "localhost:8080" // todo: make this configurable
+    var gateway = "gateway.ipfs.io"
+    var file = {}
+
+    // first, try the local http gateway
+    console.log('trying local ipfs gateway at ' + local)
+    var u = "http://" + local + link
+    onhttplink(u, function(err) {
+      if (!err) return cb() // done.
+
+      // error? ok try fuse... maybe the gateway's broken.
+      console.log('trying mounted ipfs fs (just in case)')
+      onfile(link, function(err) {
+        if (!err) return cb() // done.
+
+        // worst case, try global ipfs gateway.
+        console.log('trying ipfs global gateway')
+        var u = "http://" + gateway + link
+        onhttplink(u, function(err) {
+          cb(new Error("failed to find ipfs gateway. is ipfs running?"))
+        })
+      })
+    })
+  }
+
   that.selected = null
 
   that.deselect = function () {
@@ -221,6 +247,7 @@ module.exports = function () {
     if (/magnet:/.test(link)) return onmagnet(link, cb)
     if (/\.torrent$/i.test(link)) return ontorrent(link, cb)
     if (/youtube\.com\/watch/i.test(link)) return onyoutube(link, cb)
+    if (/^\/(ipfs|ipns)\//i.test(link)) return onipfslink(link, cb)
     if (/^\/https?:\/\//i.test(link)) return onhttplink(link, cb)
     onfile(link, cb)
   }
