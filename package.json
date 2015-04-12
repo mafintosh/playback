@@ -5,9 +5,9 @@
   "main": "app.js",
   "dependencies": {
     "JSONStream": "^0.10.0",
-    "chromecasts": "^1.0.0",
+    "chromecasts": "^1.2.1",
     "concat-stream": "^1.4.7",
-    "dombo": "^2.0.2",
+    "dombo": "^2.0.3",
     "drag-and-drop-files": "0.0.1",
     "end-of-stream": "^1.1.0",
     "filereader-stream": "^0.2.0",

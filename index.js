@@ -26,8 +26,17 @@ var argv = minimist(JSON.parse(window.location.toString().split('#')[1]), {
   boolean: ['follow']
 })
 
+var onsubs = function (data) {
+  media.subtitles(data)
+}
+
 ipc.on('add-to-playlist', function (links) {
   links.forEach(function (link) {
+    if (/\.(vtt|srt)$/i.test(link)) {
+      fs.createReadStream(link).pipe(vtt()).pipe(concat(onsubs))
+      return
+    }
+
     list.add(link)
   })
 })
@@ -36,10 +45,6 @@ var media = player($('#player'))
 var list = playlist()
 
 drop($('body'), function (files) {
-  var onsubs = function (data) {
-    media.subtitles(data)
-  }
-
   for (var i = 0; i < files.length; i++) {
     if (/\.(vtt|srt)$/i.test(files[i].path)) {
       fs.createReadStream(files[i].path).pipe(vtt()).pipe(concat(onsubs))
@@ -82,6 +87,15 @@ $(window).on('contextmenu', function (e) {
       remote.getCurrentWindow().setAlwaysOnTop(onTop)
     }
   }))
+
+  if (media.subtitles()) {
+    menu.append(new MenuItem({
+      label: 'Remove subtitles',
+      click: function () {
+        media.subtitles(null)
+      }
+    }))
+  }
 
   menu.popup(remote.getCurrentWindow())
 })
@@ -239,23 +253,17 @@ var updatePopup = function () {
   }
 }
 
-var toggleClass = function (el, cl) {
-  el = $(el)
-  if (el.hasClass(cl)) el.removeClass(cl)
-  else el.addClass(cl)
-}
-
 $('#controls-broadcast').on('click', function () {
   $('#popup').className = 'broadcast'
   $('#controls-playlist').className = ''
-  toggleClass('#controls-broadcast', 'selected')
+  $('#controls-broadcast').toggleClass('selected')
   chromecasts.update()
   updatePopup()
 })
 
 $('#controls-playlist').on('click', function (e) {
   $('#popup').className = 'playlist'
-  toggleClass('#controls-playlist', 'selected')
+  $('#controls-playlist').toggleClass('selected')
   $('#controls-broadcast').className = ''
   updatePopup()
 })
@@ -333,7 +341,20 @@ media.on('pause', function () {
 })
 
 var server = http.createServer(function (req, res) {
-  console.log('request for ' + req.url + ' ' + req.headers.range)
+  if (req.headers.origin) res.setHeader('Access-Control-Allow-Origin', req.headers.origin)
+
+  if (req.url === '/subtitles') {
+    var buf = media.subtitles()
+
+    if (buf) {
+      res.setHeader('Content-Type', 'text/vtt; charset=utf-8')
+      res.setHeader('Content-Length', buf.length)
+      res.end(buf)
+    } else {
+      res.statusCode = 404
+      res.end()
+    }
+  }
 
   if (req.url === '/follow') { // TODO: do not hardcode /0
     if (!list.selected) return res.end()
@@ -387,7 +408,9 @@ var server = http.createServer(function (req, res) {
   pump(file.createReadStream(range), res)
 })
 
-server.listen(0, function () { // 10000 in dev
+server.listen(0, function () {
+  console.log('Playback server running on port ' + server.address().port)
+
   argv._.forEach(function (file) {
     if (file) list.add(file)
   })

@@ -15,6 +15,7 @@ module.exports = function ($video) {
   var chromecast = null
   var chromecastTime = 0
   var chromecastOffset = 0
+  var chromecastSubtitles = 1
   var interval = null
 
   var onerror = function () {
@@ -26,6 +27,7 @@ module.exports = function ($video) {
     if (err) return onerror(err)
     if (chromecastTime) chromecastOffset = 0
     chromecastTime = status.currentTime
+    chromecastSubtitles = 1
     that.duration = status.media.duration
     that.emit('metadata')
 
@@ -87,30 +89,39 @@ module.exports = function ($video) {
   that.time = function (time) {
     atEnd = false
     if (chromecast) {
-      if (time) {
+      if (arguments.length) {
         chromecastOffset = 0
         chromecast.seek(time)
       }
       return chromecastOffset || chromecastTime
     }
-    if (time) $video.currentTime = time
+    if (arguments.length) $video.currentTime = time
     return $video.currentTime
   }
 
   that.playing = false
 
   that.play = function (url, time) {
+    if (!url && !lastUrl) return
+    var changed = url && lastUrl !== url
+    if (changed) subs = null
     if (chromecast) {
       $video.innerHTML = '' // clear
       $video.pause()
       $video.load()
-      if (url) chromecast.play(url.replace('127.0.0.1', network()), {title: 'Playback', seek: time || 0}, onmetadata)
-      else chromecast.resume()
       lastUrl = url
       atEnd = false
+      if (url) {
+        var mediaUrl = url.replace('127.0.0.1', network())
+        var subsUrl = mediaUrl.replace(/(:\/\/.+)\/.*/, '$1/subtitles')
+        var subsList = []
+        for (var i = 0; i < 100; i++) subsList.push(subsUrl)
+        chromecast.play(mediaUrl, {title: 'Playback', seek: time || 0, subtitles: subsList, autoSubtitles: !!subs, }, onmetadata)
+      } else {
+        chromecast.resume()
+      }
     } else {
       if (atEnd && url === lastUrl) $video.time(0)
-      var changed = url && lastUrl !== url
       lastUrl = url
       atEnd = false
       $video.innerHTML = '' // clear
@@ -133,8 +144,19 @@ module.exports = function ($video) {
     that.emit('pause')
   }
 
+  var subs = null
   that.subtitles = function (buf) {
+    if (!arguments.length) return subs
+    subs = buf
+
+    if (chromecast) {
+      if (!buf) chromecast.subtitles(false)
+      else chromecast.subtitles(++chromecastSubtitles)
+      return
+    }
+
     if ($video.querySelector('track')) $video.removeChild($video.querySelector('track'))
+    if (!buf) return null
     var $track = document.createElement('track')
     $track.setAttribute('default', 'default')
     $track.setAttribute('src', 'data:text/vtt;base64,'+buf.toString('base64'))
@@ -142,6 +164,7 @@ module.exports = function ($video) {
     $track.setAttribute('kind', 'subtitles')
     $video.appendChild($track)
     that.emit('subtitles', buf)
+    return buf
   }
 
   return that
