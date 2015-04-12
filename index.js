@@ -105,7 +105,7 @@ $(window).on('contextmenu', function (e) {
 })
 
 $('body').on('mouseover', function () {
-  ipc.send('focus')
+  if (onTop) ipc.send('focus')
 })
 
 var isFullscreen = false
