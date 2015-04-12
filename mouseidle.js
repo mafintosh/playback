@@ -10,7 +10,7 @@ module.exports = function (elem, timeout, className) {
 
   var update = function () {
     if (hiding) {
-      $('body').className = ''
+      $('body').removeClass(className)
       hiding = false
     }
   }
@@ -45,6 +45,6 @@ module.exports = function (elem, timeout, className) {
     if (!overMovie) return
     if (tick - moving < max || mousedown) return
     hiding = true
-    $('body').className = className
+    $('body').addClass(className)
   }, 250)
 }

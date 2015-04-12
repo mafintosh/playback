@@ -5,6 +5,7 @@
   "main": "app.js",
   "dependencies": {
     "JSONStream": "^0.10.0",
+    "chromecasts": "^1.0.0",
     "concat-stream": "^1.4.7",
     "dombo": "^2.0.2",
     "drag-and-drop-files": "0.0.1",

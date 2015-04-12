@@ -15,6 +15,7 @@ var eos = require('end-of-stream')
 var minimist = require('minimist')
 var JSONStream = require('JSONStream')
 var network = require('network-address')
+var chromecasts = require('chromecasts')()
 var $ = require('dombo')
 var player = require('./player')
 var playlist = require('./playlist')
@@ -76,7 +77,7 @@ $(window).on('contextmenu', function (e) {
     label: 'Always on top',
     type: 'checkbox',
     checked: onTop,
-    click: function() {
+    click: function () {
       onTop = !onTop
       remote.getCurrentWindow().setAlwaysOnTop(onTop)
     }
@@ -90,7 +91,6 @@ $('body').on('mouseover', function () {
 })
 
 var isFullscreen = false
-var showPopup = false
 
 var onfullscreentoggle = function (e) {
   if (!isFullscreen && e.shiftKey) {
@@ -136,7 +136,9 @@ $(document).on('keydown', function (e) {
   if (e.keyCode === 13 && e.metaKey) return onfullscreentoggle(e)
   if (e.keyCode === 13 && e.shiftKey) return onfullscreentoggle(e)
   if (e.keyCode === 32) return onplaytoggle(e)
-  $('#controls-playlist').click()
+
+  if ($('#controls-playlist').hasClass('selected')) $('#controls-playlist').click()
+  if ($('#controls-broadcast').hasClass('selected')) $('#controls-broadcast').click()
 })
 
 mouseidle($('#idle'), 3000, 'hide-cursor')
@@ -158,12 +160,25 @@ var updatePlaylist = function () {
   $('#playlist-entries').innerHTML = html
 }
 
-var updateSpeeds = function() {
+var updateBroadcast = function () {
+  var html = ''
+
+  chromecasts.players.forEach(function (player, i) {
+    html += '<div class="broadcast-entry ' + (i % 2 ? 'odd ' : '') + (media.casting === player ? 'selected ' : '') + '" data-index="' + i + '" data-id="' + i + '">' +
+      '<span>' + player.name + '</span>'
+  })
+
+  $('#broadcast-entries').innerHTML = html
+}
+
+chromecasts.on('update', updateBroadcast)
+
+var updateSpeeds = function () {
   $('#player-downloadspeed').innerText = ''
-  list.entries.forEach(function(entry, i) {
+  list.entries.forEach(function (entry, i) {
     if (!entry.downloadSpeed) return
 
-    $('.playlist-entry[data-index="'+i+'"] .status').addClass('octicon-sync')
+    $('.playlist-entry[data-index="' + i + '"] .status').addClass('octicon-sync')
 
     var kilobytes = entry.downloadSpeed() / 1024
     var megabytes = kilobytes / 1024
@@ -179,6 +194,10 @@ list.on('update', updatePlaylist)
 list.once('update', function () {
   list.select(0)
 })
+
+var popupSelected = function () {
+  return $('#controls-playlist').hasClass('selected') || $('#controls-broadcast').hasClass('selected')
+}
 
 var closePopup = function (e) {
   if (e && (e.target === $('#controls-playlist .mega-octicon') || e.target === $('#controls-broadcast .mega-octicon'))) return
@@ -196,18 +215,49 @@ $('#playlist-entries').on('click', '.playlist-entry', function (e) {
   list.select(id)
 })
 
-$('#controls-playlist').on('click', function () {
-  if (showPopup) {
-    showPopup = false
-    $('#popup').style.opacity = 0
-    $('#controls-playlist').className = ''
-  } else {
-    showPopup = true
+$('#broadcast-entries').on('click', '.broadcast-entry', function (e) {
+  var id = Number(this.getAttribute('data-id'))
+  var player = chromecasts.players[id]
+
+  if (media.casting === player) {
+    $('body').removeClass('broadcasting')
+    media.chromecast(null)
+    return updateBroadcast()
+  }
+
+  $('body').addClass('broadcasting')
+  media.chromecast(player)
+  updateBroadcast()
+})
+
+var updatePopup = function () {
+  if (popupSelected()) {
     $('#popup').style.display = 'block'
     $('#popup').style.opacity = 1
-    $('#controls-playlist').className = 'selected'
-    $('#controls-broadcast').className = ''
+  } else {
+    $('#popup').style.opacity = 0
   }
+}
+
+var toggleClass = function (el, cl) {
+  el = $(el)
+  if (el.hasClass(cl)) el.removeClass(cl)
+  else el.addClass(cl)
+}
+
+$('#controls-broadcast').on('click', function () {
+  $('#popup').className = 'broadcast'
+  $('#controls-playlist').className = ''
+  toggleClass('#controls-broadcast', 'selected')
+  chromecasts.update()
+  updatePopup()
+})
+
+$('#controls-playlist').on('click', function (e) {
+  $('#popup').className = 'playlist'
+  toggleClass('#controls-playlist', 'selected')
+  $('#controls-broadcast').className = ''
+  updatePopup()
 })
 
 $('#playlist-add-media').on('click', function () {
@@ -215,7 +265,7 @@ $('#playlist-add-media').on('click', function () {
 })
 
 $('#popup').on('transitionend', function () {
-  if (!showPopup) $('#popup').style.display = 'none'
+  if (!popupSelected()) $('#popup').style.display = 'none'
 })
 
 $('#menubar-close').on('click', function () {
@@ -252,7 +302,7 @@ media.on('metadata', function () {
 
   $('#controls-main').style.display = 'block'
   $('#controls-time-total').innerText = formatTime(media.duration)
-  $('#controls-time-current').innerText = '00:00'
+  $('#controls-time-current').innerText = formatTime(media.time())
 
   clearInterval(updateInterval)
   updateInterval = setInterval(function () {
@@ -268,8 +318,13 @@ media.on('end', function () {
 })
 
 media.on('play', function () {
-  $('#splash').className = 'hidden'
-  $('#player').className = ''
+  if (media.casting) {
+    $('#splash').className = ''
+    $('#player').className = 'hidden'
+  } else {
+    $('#splash').className = 'hidden'
+    $('#player').className = ''
+  }
   $('#controls-play .mega-octicon').className = 'mega-octicon octicon-playback-pause'
 })
 

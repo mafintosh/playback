@@ -69,7 +69,23 @@ body, html {
   transition: opacity 0.3s ease;
 }
 
-#playlist-entries {
+#popup.broadcast #broadcast-popup {
+  display: block;
+}
+
+#popup.broadcast #playlist-popup {
+  display: none;
+}
+
+#popup.playlist #playlist-popup {
+  display: block;
+}
+
+#popup.playlist #broadcast-popup {
+  display: none;
+}
+
+#playlist-entries, #broadcast-entries {
   position: absolute;
   top: 46px;
   bottom: 55px;
@@ -78,7 +94,7 @@ body, html {
   overflow: auto;
 }
 
-.playlist-entry {
+.playlist-entry, .broadcast-entry {
   color: #fff;
   font-size: 13px;
   padding: 10px 15px;
@@ -124,11 +140,11 @@ body, html {
   transform: rotate(45deg);
 }
 
-.playlist-entry.odd {
+.playlist-entry.odd, .broadcast-entry.odd {
   background-color: #222324;
 }
 
-.playlist-entry.selected {
+.playlist-entry.selected, .broadcast-entry.selected {
   background-color: #31A357;
 }
 
@@ -290,7 +306,7 @@ body:hover #overlay, body:hover #menubar {
   padding: 3px 20px;
 }
 
-#controls-playlist.selected .mega-octicon, #controls-broadcast.selected .mega-octicon {
+.broadcasting #controls-broadcast .mega-octicon, #controls-playlist.selected .mega-octicon, #controls-broadcast.selected .mega-octicon {
   color: #31A357;
 }
 

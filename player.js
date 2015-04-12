@@ -1,4 +1,5 @@
 var events = require('events')
+var network = require('network-address')
 
 module.exports = function ($video) {
   var that = new events.EventEmitter()
@@ -11,11 +12,63 @@ module.exports = function ($video) {
   that.height = 0
   that.element = $video
 
+  var chromecast = null
+  var chromecastTime = 0
+  var chromecastOffset = 0
+  var interval = null
+
+  var onerror = function () {
+    if (chromecast) chromecast.removeListener('error', onerror)
+    that.chromecast(null)
+  }
+
+  var onmetadata = function (err, status) {
+    if (err) return onerror(err)
+    if (chromecastTime) chromecastOffset = 0
+    chromecastTime = status.currentTime
+    that.duration = status.media.duration
+    that.emit('metadata')
+
+    clearInterval(interval)
+    interval = setInterval(function () {
+      chromecast.status(function (err, status) {
+        if (err) return onerror(err)
+
+        if (!status) {
+          chromecastOffset = 0
+          clearInterval(interval)
+          atEnd = true
+          that.playing = false
+          that.emit('pause')
+          that.emit('end')
+          return
+        }
+
+        if (chromecastTime) chromecastOffset = 0
+        chromecastTime = status.currentTime
+      })
+    }, 1000)
+  }
+
+  that.casting = false
+  that.chromecast = function (player) {
+    chromecastOffset = chromecast ? 0 : $video.currentTime
+    clearInterval(interval)
+    if (chromecast && that.playing) chromecast.stop()
+    chromecast = player
+    that.casting = player
+    if (chromecast) chromecast.on('error', onerror)
+    if (!that.playing) return
+    media.play(lastUrl, that.casting ? chromecastOffset : chromecastTime)
+  }
+
   $video.addEventListener('seeked', function () {
+    if (chromecast) return
     that.emit('seek')
   }, false)
 
   $video.addEventListener('ended', function () {
+    if (chromecast) return
     atEnd = true
     that.playing = false
     that.emit('pause')
@@ -23,6 +76,7 @@ module.exports = function ($video) {
   }, false)
 
   $video.addEventListener('loadedmetadata', function () {
+    if (chromecast) return
     that.width = $video.videoWidth
     that.height =  $video.videoHeight
     that.ratio = that.width / that.height
@@ -32,30 +86,49 @@ module.exports = function ($video) {
 
   that.time = function (time) {
     atEnd = false
+    if (chromecast) {
+      if (time) {
+        chromecastOffset = 0
+        chromecast.seek(time)
+      }
+      return chromecastOffset || chromecastTime
+    }
     if (time) $video.currentTime = time
     return $video.currentTime
   }
 
   that.playing = false
 
-  that.play = function (url) {
-    if (atEnd && url === lastUrl) $video.time(0)
-    var changed = url && lastUrl !== url
-    lastUrl = url
-    atEnd = false
-    $video.innerHTML = '' // clear
-    var $src = document.createElement('source')
-    $src.setAttribute('src', url)
-    $src.setAttribute('type', 'video/mp4')
-    $video.appendChild($src)
-    if (changed) $video.load()
-    $video.play()
+  that.play = function (url, time) {
+    if (chromecast) {
+      $video.innerHTML = '' // clear
+      $video.pause()
+      $video.load()
+      if (url) chromecast.play(url.replace('127.0.0.1', network()), {title: 'Playback', seek: time || 0}, onmetadata)
+      else chromecast.resume()
+      lastUrl = url
+      atEnd = false
+    } else {
+      if (atEnd && url === lastUrl) $video.time(0)
+      var changed = url && lastUrl !== url
+      lastUrl = url
+      atEnd = false
+      $video.innerHTML = '' // clear
+      var $src = document.createElement('source')
+      $src.setAttribute('src', url)
+      $src.setAttribute('type', 'video/mp4')
+      $video.appendChild($src)
+      if (changed) $video.load()
+      $video.play()
+      if (time) $video.currentTime = time
+    }
     that.playing = true
     that.emit('play')
   }
 
   that.pause = function () {
-    $video.pause()
+    if (chromecast) chromecast.pause()
+    else $video.pause()
     that.playing = false
     that.emit('pause')
   }
