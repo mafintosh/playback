@@ -18,7 +18,8 @@
     "range-parser": "^1.0.2",
     "request": "^2.54.0",
     "srt-to-vtt": "^1.0.2",
-    "torrent-stream": "^0.18.1"
+    "torrent-stream": "^0.18.1",
+    "ytdl-core": "^0.5.1"
   },
   "devDependencies": {
     "atom-shell": "^0.23.0",
