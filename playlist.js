@@ -1,5 +1,6 @@
 var torrents = require('torrent-stream')
 var request = require('request')
+var duplex = require('duplexify')
 var ytdl = require('ytdl-core')
 var events = require('events')
 var path = require('path')
@@ -50,45 +51,68 @@ module.exports = function () {
     var file = {}
     var url = link.split(':')[1]
     url = 'https:' + url
-    ytdl.getInfo(url, function (err, info) {
+    
+    getYoutubeData(function (err, data) {
       if (err) return cb(err)
-
-      var vidFmt
-      var formats = info.formats
-      
-      formats.sort(function sort (a, b) {
-        return +a.itag - +b.itag
-      }).reverse()
-      
-      for (var i = 0; i < formats.length; i++) {
-        var fmt = info.formats[i]
-        // just webm for now
-        if (fmt.itag === '46') vidFmt = fmt
-        if (fmt.itag === '45') vidFmt = fmt
-        if (fmt.itag === '44') vidFmt = fmt
-        if (fmt.itag === '43') vidFmt = fmt
-      }
-
-      if (!vidFmt) return cb (new Error('No suitable video format found'))
-
-      request({method: 'HEAD', url: vidFmt.url}, function (err, resp, body) {
+      var fmt = data.fmt
+      var info = data.info
+      request({method: 'HEAD', url: fmt.url}, function (err, resp, body) {
         if (err) return cb(err)
         var len = resp.headers['content-length']
         if (!len) return cb(new Error('no content-length on response'))
         file.length = +len
         file.name = info.title
-      
+    
         file.createReadStream = function (opts) {
-          var vidUrl = vidFmt.url
-          if (opts.start || opts.end) vidUrl += '&range=' + ([opts.start || 0, opts.end || len].join('-'))
-          console.log('youtube readstream', vidUrl)
-          return request(vidUrl)
+          // fetch this for every range request
+          // TODO try and avoid doing this call twice the first time
+          getYoutubeData(function (err, data) {
+            if (err) return cb(err)
+            var vidUrl = data.fmt.url
+            if (opts.start || opts.end) vidUrl += '&range=' + ([opts.start || 0, opts.end || len].join('-'))
+            stream.setReadable(request(vidUrl))
+          })
+          
+          var stream = duplex()
+          return stream
         }
         file.id = that.entries.push(file) - 1
         that.emit('update')
         cb()  
       })
     })
+    
+    function getYoutubeData(cb) {
+      ytdl.getInfo(url, function (err, info) {
+        if (err) return cb(err)
+
+        var vidFmt
+        var formats = info.formats
+      
+        formats.sort(function sort (a, b) {
+          return +a.itag - +b.itag
+        })
+      
+        var vidFmt
+        formats.forEach(function (fmt) {
+          // prefer webm
+          if (fmt.itag === '46') return vidFmt = fmt
+          if (fmt.itag === '45') return vidFmt = fmt
+          if (fmt.itag === '44') return vidFmt = fmt
+          if (fmt.itag === '43') return vidFmt = fmt
+
+          // otherwise h264
+          if (fmt.itag === '38') return vidFmt = fmt
+          if (fmt.itag === '37') return vidFmt = fmt
+          if (fmt.itag === '22') return vidFmt = fmt
+          if (fmt.itag === '18') return vidFmt = fmt
+        })
+
+        if (!vidFmt) return cb (new Error('No suitable video format found'))
+
+        cb(null, {info: info, fmt: vidFmt})
+      })
+    }
   }
 
   var onfile = function (link, cb) {

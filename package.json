@@ -9,6 +9,7 @@
     "concat-stream": "^1.4.7",
     "dombo": "^2.0.3",
     "drag-and-drop-files": "0.0.1",
+    "duplexify": "^3.2.0",
     "end-of-stream": "^1.1.0",
     "filereader-stream": "^0.2.0",
     "minimist": "^1.1.1",
