@@ -3,7 +3,7 @@
 Video player build using atom-shell and node.js
 
 It currently has support for playing mp4/webm and chromecasting videos.
-In addition to that it supports live streaming of video shared using a BitTorrent magnet link.
+In addition to that it supports live streaming of video using http links, BitTorrent magnet links, and IPFS links.
 
 ## Installation
 

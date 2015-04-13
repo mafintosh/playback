@@ -4,6 +4,7 @@ var duplex = require('duplexify')
 var ytdl = require('ytdl-core')
 var events = require('events')
 var path = require('path')
+var httpStream = require('http-client-stream')
 var fs = require('fs')
 var vtt = require('srt-to-vtt')
 var concat = require('concat-stream')
@@ -48,12 +49,12 @@ module.exports = function () {
       onmagnet(buf, cb)
     })
   }
-  
+
   var onyoutube = function (link, cb) {
     var file = {}
     var url = link.split(':')[1]
     url = 'https:' + url
-    
+
     getYoutubeData(function (err, data) {
       if (err) return cb(err)
       var fmt = data.fmt
@@ -64,7 +65,7 @@ module.exports = function () {
         if (!len) return cb(new Error('no content-length on response'))
         file.length = +len
         file.name = info.title
-    
+
         file.createReadStream = function (opts) {
           // fetch this for every range request
           // TODO try and avoid doing this call twice the first time
@@ -74,27 +75,27 @@ module.exports = function () {
             if (opts.start || opts.end) vidUrl += '&range=' + ([opts.start || 0, opts.end || len].join('-'))
             stream.setReadable(request(vidUrl))
           })
-          
+
           var stream = duplex()
           return stream
         }
         file.id = that.entries.push(file) - 1
         that.emit('update')
-        cb()  
+        cb()
       })
     })
-    
+
     function getYoutubeData(cb) {
       ytdl.getInfo(url, function (err, info) {
         if (err) return cb(err)
 
         var vidFmt
         var formats = info.formats
-      
+
         formats.sort(function sort (a, b) {
           return +a.itag - +b.itag
         })
-      
+
         var vidFmt
         formats.forEach(function (fmt) {
           // prefer webm
@@ -153,6 +154,74 @@ module.exports = function () {
     })
   }
 
+  var onhttplink = function (link, cb) {
+    var file = httpStream(link)
+
+    // call the http-stream's createStream with given range.
+    file.createReadStream = function(opts) {
+
+      var httpopts = {}
+      if (opts && (opts.start || opts.end)) {
+        var rs = "bytes=" + (opts.start || 0) + '-' + (opts.end || file.length || '')
+        httpopts.headers = {"Range": rs}
+      }
+
+      var stream = file.createStream(httpopts)
+      stream.end()
+      return stream
+    }
+
+    // first, get the head for the content length.
+    // IMPORTANT: servers without HEAD will not work.
+    var head = file.createStream({method: 'HEAD'})
+    head.on('response', function() {
+      if (!/2\d\d/.test(head.res.statusCode))
+        return cb(new Error("request failed"))
+
+      // get the file length
+      file.length = head.res.headers['content-length']
+      console.log('found stream of length ' + file.length)
+
+      // ok it worked. add the file.
+      file.id = that.entries.push(file) - 1
+      that.emit('update')
+      cb()
+    })
+
+    head.on('error', function(err) {
+      console.log(err)
+      cb(err)
+    })
+
+    head.end()
+  }
+
+  var onipfslink = function (link, cb) {
+    var local = "localhost:8080" // todo: make this configurable
+    var gateway = "gateway.ipfs.io"
+    var file = {}
+
+    // first, try the local http gateway
+    console.log('trying local ipfs gateway at ' + local)
+    var u = "http://" + local + link
+    onhttplink(u, function(err) {
+      if (!err) return cb() // done.
+
+      // error? ok try fuse... maybe the gateway's broken.
+      console.log('trying mounted ipfs fs (just in case)')
+      onfile(link, function(err) {
+        if (!err) return cb() // done.
+
+        // worst case, try global ipfs gateway.
+        console.log('trying ipfs global gateway')
+        var u = "http://" + gateway + link
+        onhttplink(u, function(err) {
+          cb(new Error("failed to find ipfs gateway. is ipfs running?"))
+        })
+      })
+    })
+  }
+
   that.selected = null
 
   that.deselect = function () {
@@ -182,6 +251,8 @@ module.exports = function () {
     if (/magnet:/.test(link)) return onmagnet(link, cb)
     if (/\.torrent$/i.test(link)) return ontorrent(link, cb)
     if (/youtube\.com\/watch/i.test(link)) return onyoutube(link, cb)
+    if (/^\/(ipfs|ipns)\//i.test(link)) return onipfslink(link, cb)
+    if (/^\/https?:\/\//i.test(link)) return onhttplink(link, cb)
     onfile(link, cb)
   }
 
