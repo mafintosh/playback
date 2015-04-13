@@ -4,7 +4,6 @@ var duplex = require('duplexify')
 var ytdl = require('ytdl-core')
 var events = require('events')
 var path = require('path')
-var httpStream = require('http-client-stream')
 var fs = require('fs')
 var vtt = require('srt-to-vtt')
 var concat = require('concat-stream')
@@ -67,6 +66,7 @@ module.exports = function () {
         file.name = info.title
 
         file.createReadStream = function (opts) {
+          if (!opts) opts = {}
           // fetch this for every range request
           // TODO try and avoid doing this call twice the first time
           getYoutubeData(function (err, data) {
@@ -85,7 +85,7 @@ module.exports = function () {
       })
     })
 
-    function getYoutubeData(cb) {
+    function getYoutubeData (cb) {
       ytdl.getInfo(url, function (err, info) {
         if (err) return cb(err)
 
@@ -155,69 +155,54 @@ module.exports = function () {
   }
 
   var onhttplink = function (link, cb) {
-    var file = httpStream(link)
+    var file = {}
 
-    // call the http-stream's createStream with given range.
-    file.createReadStream = function(opts) {
+    file.name = link.lastIndexOf('/') > -1 ? link.split('/').pop() : link
 
-      var httpopts = {}
+    file.createReadStream = function (opts) {
+      if (!opts) opts = {}
+
       if (opts && (opts.start || opts.end)) {
-        var rs = "bytes=" + (opts.start || 0) + '-' + (opts.end || file.length || '')
-        httpopts.headers = {"Range": rs}
+        var rs = 'bytes=' + (opts.start || 0) + '-' + (opts.end || file.length || '')
+        return request(link, {headers: {Range: rs}})
       }
 
-      var stream = file.createStream(httpopts)
-      stream.end()
-      return stream
+      return request(link)
     }
 
     // first, get the head for the content length.
     // IMPORTANT: servers without HEAD will not work.
-    var head = file.createStream({method: 'HEAD'})
-    head.on('response', function() {
-      if (!/2\d\d/.test(head.res.statusCode))
-        return cb(new Error("request failed"))
+    request.head(link, function (err, response) {
+      if (err) return cb(err)
+      if (!/2\d\d/.test(response.statusCode)) return cb(new Error('request failed'))
 
-      // get the file length
-      file.length = head.res.headers['content-length']
-      console.log('found stream of length ' + file.length)
-
-      // ok it worked. add the file.
+      file.length = Number(response.headers['content-length'])
       file.id = that.entries.push(file) - 1
       that.emit('update')
       cb()
     })
-
-    head.on('error', function(err) {
-      console.log(err)
-      cb(err)
-    })
-
-    head.end()
   }
 
   var onipfslink = function (link, cb) {
-    var local = "localhost:8080" // todo: make this configurable
-    var gateway = "gateway.ipfs.io"
+    var local = 'localhost:8080' // todo: make this configurable
+    var gateway = 'gateway.ipfs.io'
     var file = {}
 
     // first, try the local http gateway
     console.log('trying local ipfs gateway at ' + local)
-    var u = "http://" + local + link
-    onhttplink(u, function(err) {
+    var u = 'http://' + local + link
+    onhttplink(u, function (err) {
       if (!err) return cb() // done.
 
       // error? ok try fuse... maybe the gateway's broken.
       console.log('trying mounted ipfs fs (just in case)')
-      onfile(link, function(err) {
+      onfile(link, function (err) {
         if (!err) return cb() // done.
 
         // worst case, try global ipfs gateway.
         console.log('trying ipfs global gateway')
-        var u = "http://" + gateway + link
-        onhttplink(u, function(err) {
-          cb(new Error("failed to find ipfs gateway. is ipfs running?"))
-        })
+        var u = 'http://' + gateway + link
+        onhttplink(u, cb)
       })
     })
   }
