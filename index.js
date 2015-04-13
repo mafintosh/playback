@@ -160,7 +160,7 @@ $(document).on('keydown', function (e) {
   if (e.keyCode === 32) return onplaytoggle(e)
 
   if ($('#controls-playlist').hasClass('selected')) $('#controls-playlist').trigger('click')
-  if ($('#controls-broadcast').hasClass('selected')) $('#controls-broadcast').trigger('click')
+  if ($('#controls-chromecast').hasClass('selected')) $('#controls-chromecast').trigger('click')
 })
 
 mouseidle($('#idle')[0], 3000, 'hide-cursor')
@@ -183,18 +183,18 @@ var updatePlaylist = function () {
   $('#playlist-entries')[0].innerHTML = html
 }
 
-var updateBroadcast = function () {
+var updateChromecast = function () {
   var html = ''
 
   chromecasts.players.forEach(function (player, i) {
-    html += '<div class="broadcast-entry ' + (i % 2 ? 'odd ' : '') + (media.casting === player ? 'selected ' : '') + '" data-index="' + i + '" data-id="' + i + '">' +
+    html += '<div class="chromecast-entry ' + (i % 2 ? 'odd ' : '') + (media.casting === player ? 'selected ' : '') + '" data-index="' + i + '" data-id="' + i + '">' +
       '<span>' + player.name + '</span>'
   })
 
-  $('#broadcast-entries')[0].innerHTML = html
+  $('#chromecast-entries')[0].innerHTML = html
 }
 
-chromecasts.on('update', updateBroadcast)
+chromecasts.on('update', updateChromecast)
 
 var updateSpeeds = function () {
   $('#player-downloadspeed')[0].innerText = ''
@@ -219,14 +219,14 @@ list.once('update', function () {
 })
 
 var popupSelected = function () {
-  return $('#controls-playlist').hasClass('selected') || $('#controls-broadcast').hasClass('selected')
+  return $('#controls-playlist').hasClass('selected') || $('#controls-chromecast').hasClass('selected')
 }
 
 var closePopup = function (e) {
-  if (e && (e.target === $('#controls-playlist .mega-octicon')[0] || e.target === $('#controls-broadcast .mega-octicon')[0])) return
+  if (e && (e.target === $('#controls-playlist .mega-octicon')[0] || e.target === $('#controls-chromecast .chromecast')[0])) return
   $('#popup')[0].style.opacity = 0
-  $('#controls-playlist')[0].className = ''
-  $('#controls-broadcast')[0].className = ''
+  $('#controls-playlist').removeClass('selected')
+  $('#controls-chromecast').removeClass('selected')
 }
 
 $('#controls').on('click', closePopup)
@@ -238,19 +238,19 @@ $('#playlist-entries').on('click', '.playlist-entry', function (e) {
   list.select(id)
 })
 
-$('#broadcast-entries').on('click', '.broadcast-entry', function (e) {
+$('#chromecast-entries').on('click', '.chromecast-entry', function (e) {
   var id = Number(this.getAttribute('data-id'))
   var player = chromecasts.players[id]
 
   if (media.casting === player) {
-    $('body').removeClass('broadcasting')
+    $('body').removeClass('chromecasting')
     media.chromecast(null)
-    return updateBroadcast()
+    return updateChromecast()
   }
 
-  $('body').addClass('broadcasting')
+  $('body').addClass('chromecasting')
   media.chromecast(player)
-  updateBroadcast()
+  updateChromecast()
 })
 
 var updatePopup = function () {
@@ -262,18 +262,18 @@ var updatePopup = function () {
   }
 }
 
-$('#controls-broadcast').on('click', function () {
-  $('#popup')[0].className = 'broadcast'
-  $('#controls-playlist')[0].className = ''
-  $('#controls-broadcast').toggleClass('selected')
+$('#controls-chromecast').on('click', function () {
+  $('#popup')[0].className = 'chromecast'
+  $('#controls .controls-secondary .selected').removeClass('selected')
+  $('#controls-chromecast').addClass('selected')
   chromecasts.update()
   updatePopup()
 })
 
 $('#controls-playlist').on('click', function (e) {
   $('#popup')[0].className = 'playlist'
-  $('#controls-playlist').toggleClass('selected')
-  $('#controls-broadcast')[0].className = ''
+  $('#controls .controls-secondary .selected').removeClass('selected')
+  $('#controls-playlist').addClass('selected')
   updatePopup()
 })
 

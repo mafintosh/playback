@@ -69,11 +69,11 @@ body, html {
   transition: opacity 0.3s ease;
 }
 
-#popup.broadcast #broadcast-popup {
+#popup.chromecast #chromecast-popup {
   display: block;
 }
 
-#popup.broadcast #playlist-popup {
+#popup.chromecast #playlist-popup {
   display: none;
 }
 
@@ -81,11 +81,11 @@ body, html {
   display: block;
 }
 
-#popup.playlist #broadcast-popup {
+#popup.playlist #chromecast-popup {
   display: none;
 }
 
-#playlist-entries, #broadcast-entries {
+#playlist-entries, #chromecast-entries {
   position: absolute;
   top: 46px;
   bottom: 55px;
@@ -94,7 +94,7 @@ body, html {
   overflow: auto;
 }
 
-.playlist-entry, .broadcast-entry {
+.playlist-entry, .chromecast-entry {
   color: #fff;
   font-size: 13px;
   padding: 10px 15px;
@@ -140,11 +140,11 @@ body, html {
   transform: rotate(45deg);
 }
 
-.playlist-entry.odd, .broadcast-entry.odd {
+.playlist-entry.odd, .chromecast-entry.odd {
   background-color: #222324;
 }
 
-.playlist-entry.selected, .broadcast-entry.selected {
+.playlist-entry.selected, .chromecast-entry.selected {
   background-color: #31A357;
 }
 
@@ -276,7 +276,7 @@ body:hover #overlay, body:hover #menubar {
   padding: 6px 10px 0 0;
 }
 
-#player-downloadspeed, #controls-playlist, #controls-broadcast {
+#player-downloadspeed, #controls-playlist, #controls-chromecast {
   margin-right: 11px;
 }
 
@@ -284,21 +284,40 @@ body:hover #overlay, body:hover #menubar {
   margin: 6px 9px 6px 14px;
 }
 
-#controls-play, #player-downloadspeed, #controls-fullscreen, #controls-playlist,  #controls-broadcast  {
+#controls-play, #player-downloadspeed, #controls-fullscreen, #controls-playlist, #controls-chromecast {
   float: left;
 }
 
 #controls-play .mega-octicon, #player-downloadspeed .mega-octicon,
-#controls-fullscreen .mega-octicon, #controls-playlist .mega-octicon,
-#controls-broadcast .mega-octicon {
+#controls-fullscreen .mega-octicon, #controls-playlist .mega-octicon {
   /* this is the click buffer */
   padding: 3px 6px;
 }
 
 #controls-play span:hover .mega-octicon, #player-downloadspeed span:hover .mega-octicon,
 #controls-fullscreen span:hover .mega-octicon, #controls-playlist span:hover .mega-octicon,
-#controls-broadcast span:hover .mega-octicon {
+#controls-chromecast span:hover .mega-octicon {
   color: #31A357;
+}
+
+#controls-chromecast .chromecast {
+  background-image: url('chromecast.png');
+  background-size: 26px 72px;
+  background-repeat: no-repeat;
+  background-position: 0px 0px;
+  margin-top: 5px;
+  display: block;
+  width: 26px;
+  height: 18px;
+}
+#controls-chromecast .chromecast:hover, #controls-chromecast.selected .chromecast {
+  background-position: 0px -18px;
+}
+.chromecasting #controls-chromecast .chromecast {
+  background-position: 0px -36px;
+}
+.chromecasting #controls-chromecast .chromecast:hover, .chromecasting #controls-chromecast.selected .chromecast {
+  background-position: 0px -54px;
 }
 
 #player-downloadspeed {
@@ -306,7 +325,7 @@ body:hover #overlay, body:hover #menubar {
   padding: 3px 20px;
 }
 
-.broadcasting #controls-broadcast .mega-octicon, #controls-playlist.selected .mega-octicon, #controls-broadcast.selected .mega-octicon {
+#controls-playlist.selected .mega-octicon {
   color: #31A357;
 }
 
