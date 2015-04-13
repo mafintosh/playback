@@ -183,13 +183,15 @@ module.exports = function () {
   }
 
   var onipfslink = function (link, cb) {
+    if (link[0] != '/') link = "/" + link // / may be stripped in add
+
     var local = 'localhost:8080' // todo: make this configurable
     var gateway = 'gateway.ipfs.io'
     var file = {}
 
     // first, try the local http gateway
-    console.log('trying local ipfs gateway at ' + local)
     var u = 'http://' + local + link
+    console.log('trying local ipfs gateway: ' + u)
     onhttplink(u, function (err) {
       if (!err) return cb() // done.
 
@@ -199,8 +201,8 @@ module.exports = function () {
         if (!err) return cb() // done.
 
         // worst case, try global ipfs gateway.
-        console.log('trying ipfs global gateway')
         var u = 'http://' + gateway + link
+        console.log('trying local ipfs gateway: ' + u)
         onhttplink(u, cb)
       })
     })
@@ -231,7 +233,7 @@ module.exports = function () {
   }
 
   that.add = function (link, cb) {
-    link = link.replace('playback://').replace('playback:', '') // strip playback protocol
+    link = link.replace('playback://', '').replace('playback:', '') // strip playback protocol
     if (!cb) cb = noop
     if (/magnet:/.test(link)) return onmagnet(link, cb)
     if (/\.torrent$/i.test(link)) return ontorrent(link, cb)
