@@ -301,7 +301,7 @@ body:hover #overlay, body:hover #menubar {
 }
 
 #controls-chromecast .chromecast {
-  background-image: url('chromecast2.png');
+  background-image: url('chromecast.png');
   background-size: 26px 72px;
   background-repeat: no-repeat;
   background-position: 0px 0px;
