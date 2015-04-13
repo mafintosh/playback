@@ -45,6 +45,13 @@ ipc.on('add-to-playlist', function (links) {
   })
 })
 
+$(document).on('paste', function (e) {
+  var text = e.clipboardData.getData('text')
+  text.split('\n').forEach(function (link) {
+    list.add(link, printError)
+  })
+})
+
 var media = player($('#player')[0])
 var list = playlist()
 
