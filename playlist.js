@@ -190,8 +190,8 @@ module.exports = function () {
     var file = {}
 
     // first, try the local http gateway
-    console.log('trying local ipfs gateway at ' + local)
     var u = 'http://' + local + link
+    console.log('trying local ipfs gateway: ' + u)
     onhttplink(u, function (err) {
       if (!err) return cb() // done.
 
@@ -201,8 +201,8 @@ module.exports = function () {
         if (!err) return cb() // done.
 
         // worst case, try global ipfs gateway.
-        console.log('trying ipfs global gateway')
         var u = 'http://' + gateway + link
+        console.log('trying local ipfs gateway: ' + u)
         onhttplink(u, cb)
       })
     })
