@@ -5,6 +5,8 @@ var ytdl = require('ytdl-core')
 var events = require('events')
 var path = require('path')
 var fs = require('fs')
+var vtt = require('srt-to-vtt')
+var concat = require('concat-stream')
 
 var noop = function () {}
 
@@ -133,19 +135,21 @@ module.exports = function () {
         that.emit('update')
         cb()
       }
-      var subtitleSrt = link.substr(0, link.lastIndexOf('.')) + '.srt'
-      var subtitleVtt = link.substr(0, link.lastIndexOf('.')) + '.srt'
-      fs.exists(subtitleSrt, function (exists) {
-        if (exists) {
-          file.subtitle = subtitleSrt
-          ondone()
-          return
-        }
-        fs.exists(subtitleVtt, function (exists) {
-          if (exists) file.subtitle = subtitleVtt
-          ondone()
+      var basename = link.substr(0, link.lastIndexOf('.'))
+      var extensions = ['srt', 'vtt']
+      var next = function () {
+        var ext = extensions.shift()
+        if (!ext) return ondone()
+
+        fs.exists(basename + '.' + ext, function(exists) {
+          if (!exists) return next()
+          fs.createReadStream(basename + '.' + ext).pipe(vtt()).pipe(concat(function(data) {
+            file.subtitles = data
+            ondone()
+          }))
         })
-      })
+      }
+      next()
     })
   }
 
