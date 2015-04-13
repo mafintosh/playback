@@ -335,18 +335,15 @@ media.on('end', function () {
 })
 
 media.on('play', function () {
-  if (media.casting) {
-    $('#splash')[0].className = ''
-    $('#player')[0].className = 'hidden'
-  } else {
-    $('#splash')[0].className = 'hidden'
-    $('#player')[0].className = ''
-  }
-  $('#controls-play .mega-octicon')[0].className = 'mega-octicon octicon-playback-pause'
+  $('#splash').toggleClass('hidden', !media.casting)
+  $('#player').toggleClass('hidden', media.casting)
+  $('#controls-play .octicon-playback-play').removeClass('octicon-playback-play')
+  $('#controls-play .mega-octicon').addClass('octicon-playback-pause')
 })
 
 media.on('pause', function () {
-  $('#controls-play .mega-octicon')[0].className = 'mega-octicon octicon-playback-play'
+  $('#controls-play .octicon-playback-pause').removeClass('octicon-playback-pause')
+  $('#controls-play .mega-octicon').addClass('octicon-playback-play')
 })
 
 var server = http.createServer(function (req, res) {
