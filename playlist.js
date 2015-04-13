@@ -231,7 +231,7 @@ module.exports = function () {
   }
 
   that.add = function (link, cb) {
-    link = link.replace('playback://').replace('playback:', '') // strip playback protocol
+    link = link.replace('playback://', '').replace('playback:', '') // strip playback protocol
     if (!cb) cb = noop
     if (/magnet:/.test(link)) return onmagnet(link, cb)
     if (/\.torrent$/i.test(link)) return ontorrent(link, cb)
