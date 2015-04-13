@@ -183,6 +183,8 @@ module.exports = function () {
   }
 
   var onipfslink = function (link, cb) {
+    if (link[0] != '/') link = "/" + link // / may be stripped in add
+
     var local = 'localhost:8080' // todo: make this configurable
     var gateway = 'gateway.ipfs.io'
     var file = {}
