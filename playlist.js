@@ -158,11 +158,15 @@ module.exports = function () {
     var file = httpStream(link)
 
     // call the http-stream's createStream with given range.
-    file.createReadStream = function(range) {
-      var rangestr = "bytes=" + range.start + '-' + range.end
-      var opts = {"headers": {"Range": rangestr} }
+    file.createReadStream = function(opts) {
 
-      var stream = file.createStream(opts)
+      var httpopts = {}
+      if (opts && (opts.start || opts.end)) {
+        var rs = "bytes=" + (opts.start || 0) + '-' + (opts.end || file.length || '')
+        httpopts.headers = {"Range": rs}
+      }
+
+      var stream = file.createStream(httpopts)
       stream.end()
       return stream
     }
@@ -172,7 +176,7 @@ module.exports = function () {
     var head = file.createStream({method: 'HEAD'})
     head.on('response', function() {
       if (!/2\d\d/.test(head.res.statusCode))
-        cb(new Error("request failed"))
+        return cb(new Error("request failed"))
 
       // get the file length
       file.length = head.res.headers['content-length']
