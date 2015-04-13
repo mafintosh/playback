@@ -51,8 +51,7 @@ module.exports = function () {
 
   var onyoutube = function (link, cb) {
     var file = {}
-    var url = link.split(':')[1]
-    url = 'https:' + url
+    var url = /https?:/.test(link) ? link : 'https:' + link
 
     getYoutubeData(function (err, data) {
       if (err) return cb(err)
@@ -232,6 +231,7 @@ module.exports = function () {
   }
 
   that.add = function (link, cb) {
+    link = link.replace('playback://').replace('playback:', '') // strip playback protocol
     if (!cb) cb = noop
     if (/magnet:/.test(link)) return onmagnet(link, cb)
     if (/\.torrent$/i.test(link)) return ontorrent(link, cb)
