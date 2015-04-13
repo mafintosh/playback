@@ -12,7 +12,6 @@
     "duplexify": "^3.2.0",
     "end-of-stream": "^1.1.0",
     "filereader-stream": "^0.2.0",
-    "http-client-stream": "^0.3.0",
     "minimist": "^1.1.1",
     "multicast-dns": "^2.0.0",
     "network-address": "^1.0.0",
