@@ -301,11 +301,11 @@ body:hover #overlay, body:hover #menubar {
 }
 
 #controls-chromecast .chromecast {
-  background-image: url('chromecast.png');
+  background-image: url('chromecast2.png');
   background-size: 26px 72px;
   background-repeat: no-repeat;
   background-position: 0px 0px;
-  margin-top: 5px;
+  margin-top: 6px;
   display: block;
   width: 26px;
   height: 18px;
