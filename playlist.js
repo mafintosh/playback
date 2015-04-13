@@ -236,7 +236,7 @@ module.exports = function () {
     if (/magnet:/.test(link)) return onmagnet(link, cb)
     if (/\.torrent$/i.test(link)) return ontorrent(link, cb)
     if (/youtube\.com\/watch/i.test(link)) return onyoutube(link, cb)
-    if (/^\/(ipfs|ipns)\//i.test(link)) return onipfslink(link, cb)
+    if (/^\/*(ipfs|ipns)\//i.test(link)) return onipfslink(link, cb)
     if (/^\/https?:\/\//i.test(link)) return onhttplink(link, cb)
     onfile(link, cb)
   }
