@@ -17,6 +17,7 @@ var JSONStream = require('JSONStream')
 var network = require('network-address')
 var chromecasts = require('chromecasts')()
 var $ = require('dombo')
+var titlebar = require('titlebar')()
 var player = require('./player')
 var playlist = require('./playlist')
 var mouseidle = require('./mouseidle')
@@ -51,6 +52,7 @@ $(document).on('paste', function (e) {
 
 var media = player($('#player')[0])
 var list = playlist()
+titlebar.appendTo('#titlebar')
 
 drop($('body')[0], function (files) {
   for (var i = 0; i < files.length; i++) {
@@ -127,13 +129,13 @@ var onfullscreentoggle = function (e) {
   var $icon = $('#controls-fullscreen .mega-octicon')
   if (isFullscreen) {
     isFullscreen = false
-    $('#menubar')[0].style.display = 'block'
+    $('#titlebar')[0].style.display = 'block'
     $icon.removeClass('octicon-screen-normal')
     $icon.addClass('octicon-screen-full')
     ipc.send('exit-full-screen')
   } else {
     isFullscreen = true
-    $('#menubar')[0].style.display = 'none'
+    $('#titlebar')[0].style.display = 'none'
     $icon.removeClass('octicon-screen-full')
     $icon.addClass('octicon-screen-normal')
     ipc.send('enter-full-screen')
@@ -230,7 +232,6 @@ var closePopup = function (e) {
 }
 
 $('#controls').on('click', closePopup)
-$('#drag').on('click', closePopup)
 $('#idle').on('click', closePopup)
 
 $('#playlist-entries').on('click', '.playlist-entry', function (e) {
@@ -285,17 +286,19 @@ $('#popup').on('transitionend', function () {
   if (!popupSelected()) $('#popup')[0].style.display = 'none'
 })
 
-$('#menubar-close').on('click', function () {
+titlebar.on('close', function () {
   ipc.send('close')
 })
 
-$('#menubar-minimize').on('click', function () {
+titlebar.on('minimize', function () {
   ipc.send('minimize')
 })
 
-$('#menubar-maximize').on('click', function () {
+titlebar.on('maximize', function () {
   ipc.send('maximize')
 })
+
+titlebar.on('fullscreen', onfullscreentoggle)
 
 var formatTime = function (secs) {
   var hours = (secs / 3600) | 0
