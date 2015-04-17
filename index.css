@@ -173,15 +173,6 @@ body, html {
   right: 0;
 }
 
-#drag {
-  -webkit-app-region: drag;
-  position: absolute;
-  top: 0;
-  left: 70px;
-  right: 0;
-  height: 24px
-}
-
 #idle {
   position: absolute;
   top: 24px;
@@ -198,50 +189,12 @@ body, html {
   opacity: 0 !important;
 }
 
-body:hover #overlay, body:hover #menubar {
+body:hover #overlay, body:hover .titlebar {
   opacity: 1;
 }
 
-#menubar {
-  padding-left: 3px;
-  height: 24px;
+.titlebar {
   background-color: #1F2021;
-}
-
-#menubar:hover #menubar-close {
-  margin-left: 6px;
-  background-position: -26px 0;
-}
-
-#menubar:hover #menubar-minimize {
-  background-position: 0 0;
-}
-
-#menubar:hover #menubar-maximize {
-  background-position: -13px 0;
-}
-
-#menubar-close, #menubar-minimize, #menubar-maximize {
-  float: left;
-  margin: 6px 4px;
-  background-image: url(menubar.png);
-  background-size: auto 12px;
-  width: 12px;
-  height: 12px;
-  border-radius: 6px;
-}
-
-#menubar-close {
-  margin-left: 6px;
-  background-position: -142px 0;
-}
-
-#menubar-maximize {
-  background-position: -129px 0;
-}
-
-#menubar-minimize {
-  background-position: -116px 0;
 }
 
 #controls {
