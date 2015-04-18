@@ -263,7 +263,12 @@ var updatePopup = function () {
   }
 }
 
-$('#controls-chromecast').on('click', function () {
+$('#controls-chromecast').on('click', function (e) {
+  if ($('#controls-chromecast').hasClass('selected')) {
+    closePopup()
+    return
+  }
+
   $('#popup')[0].className = 'chromecast'
   $('#controls .controls-secondary .selected').removeClass('selected')
   $('#controls-chromecast').addClass('selected')
@@ -272,9 +277,14 @@ $('#controls-chromecast').on('click', function () {
 })
 
 $('#controls-playlist').on('click', function (e) {
+  if ($('#controls-playlist').hasClass('selected')) {
+    closePopup()
+    return
+  }
+
   $('#popup')[0].className = 'playlist'
   $('#controls .controls-secondary .selected').removeClass('selected')
-  $('#controls-playlist').addClass('selected')
+  $('#controls-playlist').addClass('selected')  
   updatePopup()
 })
 
