@@ -250,7 +250,7 @@ body:hover #overlay, body:hover .titlebar {
   background-color: #31A357;
   width: 0%;
   height: 10px;
-  transition: width 0.25s;
+  transition: width 0.25s linear;
 }
 
 .controls-secondary {
