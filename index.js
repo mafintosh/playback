@@ -155,6 +155,29 @@ $('#controls-timeline').on('click', function (e) {
   media.time(time)
 })
 
+function updateTimelineTooltip(e) {
+  var tooltip = $('#controls-timeline-tooltip')[0]
+  var percentage = e.pageX / $('#controls-timeline')[0].offsetWidth
+  var time =  formatTime(percentage * media.duration)
+  tooltip.innerHTML = time
+  tooltip.style.left = (e.pageX - tooltip.offsetWidth / 2) + "px"
+}
+
+$('#controls-timeline').on('mousemove', function (e) {
+  updateTimelineTooltip(e)
+})
+
+$('#controls-timeline').on('mouseover', function (e) {
+  var tooltip = $('#controls-timeline-tooltip')[0]
+  tooltip.style.opacity = 1
+  updateTimelineTooltip(e)
+})
+
+$('#controls-timeline').on('mouseout', function (e) {
+  var tooltip = $('#controls-timeline-tooltip')[0]
+  tooltip.style.opacity = 0
+})
+
 $(document).on('keydown', function (e) {
   if (e.keyCode === 27 && isFullscreen) return onfullscreentoggle(e)
   if (e.keyCode === 13 && e.metaKey) return onfullscreentoggle(e)
