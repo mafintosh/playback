@@ -109,7 +109,8 @@ module.exports = function ($video) {
       $video.innerHTML = '' // clear
       $video.pause()
       $video.load()
-      lastUrl = url
+      if (url) lastUrl = url
+      else url = lastUrl
       atEnd = false
       if (url) {
         var mediaUrl = url.replace('127.0.0.1', network())
@@ -122,16 +123,20 @@ module.exports = function ($video) {
       }
     } else {
       if (atEnd && url === lastUrl) $video.time(0)
-      lastUrl = url
-      atEnd = false
-      $video.innerHTML = '' // clear
-      var $src = document.createElement('source')
-      $src.setAttribute('src', url)
-      $src.setAttribute('type', 'video/mp4')
-      $video.appendChild($src)
-      if (changed) $video.load()
-      $video.play()
-      if (time) $video.currentTime = time
+      if (!url) {
+        $video.play()
+      } else {
+        lastUrl = url
+        atEnd = false
+        $video.innerHTML = '' // clear
+        var $src = document.createElement('source')
+        $src.setAttribute('src', url)
+        $src.setAttribute('type', 'video/mp4')
+        $video.appendChild($src)
+        if (changed) $video.load()
+        $video.play()
+        if (time) $video.currentTime = time
+      }
     }
     that.playing = true
     that.emit('play')
