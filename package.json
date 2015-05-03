@@ -31,9 +31,9 @@
     "playback": "./app.js"
   },
   "scripts": {
-    "start": "atom-shell app.js",
-    "dev": "atom-shell app.js test.mp4",
-    "bundle": "atom-shell-packager . Playback --ignore=test.mp4 --ignore=node_modules/atom-shell && cp info.plist Playback.app/Contents/Info.plist && cp icon.icns Playback.app/Contents/Resources/atom.icns"
+    "start": "electron app.js",
+    "dev": "electron app.js test.mp4",
+    "bundle": "electron-packager . Playback --ignore=test.mp4 --ignore=node_modules/electron-prebuilt && cp info.plist Playback.app/Contents/Info.plist && cp icon.icns Playback.app/Contents/Resources/atom.icns"
   },
   "repository": {
     "type": "git",
