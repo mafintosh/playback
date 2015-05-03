@@ -24,8 +24,8 @@
     "ytdl-core": "^0.5.1"
   },
   "devDependencies": {
-    "atom-shell": "^0.23.0",
-    "atom-shell-packager": "^2.1.1"
+    "electron-packager": "^3.1.0",
+    "electron-prebuilt": "^0.25.2"
   },
   "bin": {
     "playback": "./app.js"
