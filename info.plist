@@ -3,15 +3,15 @@
 <plist version="1.0">
   <dict>
     <key>BuildMachineOSBuild</key>
-    <string>13F34</string>
+    <string>14D136</string>
     <key>CFBundleDisplayName</key>
     <string>Playback</string>
     <key>CFBundleExecutable</key>
-    <string>Atom</string>
+    <string>Electron</string>
     <key>CFBundleIconFile</key>
     <string>atom.icns</string>
     <key>CFBundleIdentifier</key>
-    <string>com.atom-shell.playback</string>
+    <string>com.electron.playback</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
@@ -19,15 +19,15 @@
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleVersion</key>
-    <string>0.18.0</string>
+    <string>0.25.3</string>
     <key>DTSDKBuild</key>
-    <string>13C64</string>
+    <string>14D125</string>
     <key>DTSDKName</key>
     <string>macosx</string>
     <key>DTXcode</key>
-    <string>0510</string>
+    <string>0631</string>
     <key>DTXcodeBuild</key>
-    <string>5B130a</string>
+    <string>6D1002</string>
     <key>LSMinimumSystemVersion</key>
     <string>10.8.0</string>
     <key>NSMainNibFile</key>
