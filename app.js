@@ -1,4 +1,4 @@
-#!/usr/bin/env atom-shell
+#!/usr/bin/env electron
 
 var app = require('app')
 var BrowserWindow = require('browser-window')
