@@ -1,6 +1,6 @@
 # how to contribute?
 
-playback is an video player build using [atom-shell](https://github.com/atom/atom-shell) (aka Electron) and [io.js](https://iojs.org/en/index.html). first you should install latest node.js or io.js (which installs npm).
+playback is an video player build using [electron](https://github.com/atom/electron) (formerly known as atom-shell) and [io.js](https://iojs.org/en/index.html). first you should install latest node.js or io.js (which installs npm).
 the easiest way to get started with development is to first clone this git repo and run
 
 ```

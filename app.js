@@ -24,12 +24,14 @@ var onopen = function (e, lnk) {
 app.on('open-file', onopen)
 app.on('open-url', onopen)
 
+var frame = process.platform === 'win32'
+
 app.on('ready', function () {
   win = new BrowserWindow({
     title: 'playback',
     width: 860,
     height: 470,
-    frame: false,
+    frame: frame,
     show: false
   })
 
