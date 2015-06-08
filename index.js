@@ -52,7 +52,10 @@ $(document).on('paste', function (e) {
 
 var media = player($('#player')[0])
 var list = playlist()
-titlebar.appendTo('#titlebar')
+
+if (process.platform !== 'win32'){
+  titlebar.appendTo('#titlebar')
+}
 
 drop($('body')[0], function (files) {
   for (var i = 0; i < files.length; i++) {
