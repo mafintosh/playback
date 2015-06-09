@@ -33,7 +33,7 @@
   "scripts": {
     "start": "electron app.js",
     "dev": "electron app.js test.mp4",
-    "bundle": "electron-packager . Playback --ignore=test.mp4 --ignore=node_modules/electron-prebuilt && cp info.plist Playback.app/Contents/Info.plist && cp icon.icns Playback.app/Contents/Resources/atom.icns",
+    "mac-bundle": "electron-packager . Playback --platform=darwin --arch=x64 --version=0.27.2 --ignore=node_modules/electron-prebuilt && cp info.plist Playback.app/Contents/Info.plist && cp icon.icns Playback.app/Contents/Resources/atom.icns",
     "win-bundle": "electron-packager . Playback --platform=win32 --arch=ia32 --version=0.27.2 --icon=icon.ico"
   },
   "repository": {
