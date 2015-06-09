@@ -10,7 +10,7 @@ In addition to that it supports live streaming of video using http links, BitTor
 
 To install it download the [latest release](https://github.com/mafintosh/playback/releases/latest) for your platform.
 
-##Currently supported releases:
+## Currently supported releases:
 
 * OS X
 * Windows

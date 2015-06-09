@@ -53,7 +53,7 @@ $(document).on('paste', function (e) {
 var media = player($('#player')[0])
 var list = playlist()
 
-if (process.platform !== 'win32'){
+if (process.platform !== 'win32') {
   titlebar.appendTo('#titlebar')
 }
 
@@ -310,7 +310,7 @@ $('#controls-playlist').on('click', function (e) {
 
   $('#popup')[0].className = 'playlist'
   $('#controls .controls-secondary .selected').removeClass('selected')
-  $('#controls-playlist').addClass('selected')  
+  $('#controls-playlist').addClass('selected')
   updatePopup()
 })
 
