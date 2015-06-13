@@ -19,6 +19,7 @@ module.exports = function () {
     console.log('torrent ' + link)
 
     var engine = torrents(link)
+    var subtitles = {}
 
     engine.swarm.add('127.0.0.1:51413') // me!
 
@@ -26,11 +27,26 @@ module.exports = function () {
       console.log('torrent ready')
 
       engine.files.forEach(function (f) {
+        if (/\.(vtt|srt)$/i.test(f.name)) {
+          subtitles[f.name] = f;
+        }
+      })
+
+      engine.files.forEach(function (f) {
         f.downloadSpeed = engine.swarm.downloadSpeed
         if (/\.(mp4|mkv|mp3)$/i.test(f.name)) {
           f.select()
           f.id = that.entries.push(f) - 1
+
+          var basename = f.name.substr(0, f.name.lastIndexOf('.'))
+          var subtitle = subtitles[basename + '.srt'] || subtitles[basename + '.vtt']
+          if (subtitle) {
+             subtitle.createReadStream().pipe(vtt()).pipe(concat(function(data) {
+               f.subtitles = data
+            }))
+          }
         }
+
       })
 
       setInterval(function () {
