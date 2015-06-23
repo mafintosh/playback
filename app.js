@@ -32,7 +32,8 @@ app.on('ready', function () {
     width: 860,
     height: 470,
     frame: frame,
-    show: false
+    show: false,
+    transparent: true
   })
 
   win.loadUrl('file://' + path.join(__dirname, 'index.html#' + JSON.stringify(process.argv.slice(2))))
