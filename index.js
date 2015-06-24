@@ -181,6 +181,36 @@ $('#controls-timeline').on('mouseout', function (e) {
   tooltip.style.opacity = 0
 })
 
+var isVolumeSliderClicked = false
+
+function updateAudioVolume(value) {
+  media.volume(value)
+}
+
+function updateVolumeSlider(volume) {
+  var val = volume.value * 100
+  volume.style.background = '-webkit-gradient(linear, left top, right top, color-stop(' + val.toString() + '%, #31A357), color-stop(' + val.toString() + '%, #727374))'
+}
+
+$('#controls-volume-slider').on('mousemove', function (e) {
+  if (isVolumeSliderClicked) {
+    var volume = $('#controls-volume-slider')[0]
+    updateAudioVolume(volume.value)
+    updateVolumeSlider(volume)
+  }
+})
+
+$('#controls-volume-slider').on('mousedown', function (e) {
+  isVolumeSliderClicked = true
+})
+
+$('#controls-volume-slider').on('mouseup', function (e) {
+  var volume = $('#controls-volume-slider')[0]
+  updateAudioVolume(volume.value)
+  updateVolumeSlider(volume)
+  isVolumeSliderClicked = false
+})
+
 $(document).on('keydown', function (e) {
   if (e.keyCode === 27 && isFullscreen) return onfullscreentoggle(e)
   if (e.keyCode === 13 && e.metaKey) return onfullscreentoggle(e)
@@ -520,3 +550,9 @@ server.listen(0, function () {
     ipc.send('ready')
   }, 10)
 })
+
+media.volume(0.5)
+$('#controls-volume-slider')[0].setAttribute("value", 0.5)
+$('#controls-volume-slider')[0].setAttribute("min", 0)
+$('#controls-volume-slider')[0].setAttribute("max", 1)
+$('#controls-volume-slider')[0].setAttribute("step", 0.05)
