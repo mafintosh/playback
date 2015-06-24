@@ -337,6 +337,34 @@ body:hover #overlay, body:hover .titlebar {
   min-width: 33px;
 }
 
+#controls-volume {
+  margin: 11px 9px 11px 0;
+  padding: 0;
+  float: left;
+}
+
+#controls-volume-slider {
+  -webkit-appearance: none;
+  background: -webkit-gradient(linear, left top, right top, color-stop(50%, #31A357), color-stop(50%, #727374));
+  width: 50px;
+  height: 3px;
+  border-radius: 0px;
+}
+
+#controls-volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  background-color: #fff;
+  opacity: 1.0;
+  width: 5px;
+  height: 15px;
+  border: 1px solid #303233;
+  border-radius: 1px;
+}
+
+#controls-volume-slider:focus {
+  outline: none;
+}
+
 #controls-name {
   float: left;
   margin-left: 20px;

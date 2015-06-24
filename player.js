@@ -172,5 +172,9 @@ module.exports = function ($video) {
     return buf
   }
 
+  that.volume = function (value) {
+    $video.volume = value
+  }
+
   return that
 }
