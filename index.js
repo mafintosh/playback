@@ -181,7 +181,7 @@ $('#controls-timeline').on('mouseout', function (e) {
   tooltip.style.opacity = 0
 })
 
-var isVolumeSliderClicked = false;
+var isVolumeSliderClicked = false
 
 function updateAudioVolume(value) {
   media.volume(value)
@@ -201,7 +201,7 @@ $('#controls-volume-slider').on('mousemove', function (e) {
 })
 
 $('#controls-volume-slider').on('mousedown', function (e) {
-  isVolumeSliderClicked = true;
+  isVolumeSliderClicked = true
 })
 
 $('#controls-volume-slider').on('mouseup', function (e) {
