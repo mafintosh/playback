@@ -18,6 +18,7 @@ var network = require('network-address')
 var chromecasts = require('chromecasts')()
 var $ = require('dombo')
 var titlebar = require('titlebar')()
+var clipboard = require('clipboard')
 var player = require('./player')
 var playlist = require('./playlist')
 var mouseidle = require('./mouseidle')
@@ -98,6 +99,15 @@ $(window).on('contextmenu', function (e) {
     click: function () {
       onTop = !onTop
       remote.getCurrentWindow().setAlwaysOnTop(onTop)
+    }
+  }))
+
+  menu.append(new MenuItem({
+    label: 'Paste Url',
+    accelerator: 'CommandOrControl+V',
+    selector: 'paste:',
+    click: function () {
+      ipc.emit('add-to-playlist', clipboard.readText().split('\n'))
     }
   }))
 
