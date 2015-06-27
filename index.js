@@ -376,6 +376,73 @@ titlebar.on('maximize', function () {
 
 titlebar.on('fullscreen', onfullscreentoggle)
 
+var appmenu_template = [
+  {
+    label: 'Playback',
+    submenu: [
+      {
+        label: 'About Playback',
+        click: function() { ipc.send('open-url-in-external', 'https://mafintosh.github.io/playback/') }
+      },
+      {
+        type: 'separator'
+      },
+      {
+        label: 'Quit',
+        accelerator: 'Command+Q',
+        click: function() { ipc.send('close') }
+      }
+    ]
+  },
+  {
+    label: 'File',
+    submenu: [
+      {
+        label: 'Add media',
+        accelerator: 'Command+O',
+        click: function() { ipc.send('open-file-dialog') }
+      },
+    ]
+  },
+  {
+    label: 'Window',
+    submenu: [
+      {
+        label: 'Minimize',
+        accelerator: 'Command+M',
+        click: function() { ipc.send('minimize') }
+      },
+      {
+        label: 'Toggle Full Screen',
+        accelerator: 'Command+Enter',
+        click: onfullscreentoggle
+      }
+    ]
+  },
+  {
+    label: 'Help',
+    submenu: [
+      {
+        label: 'Report Issue',
+        click: function() { ipc.send('open-url-in-external', 'https://github.com/mafintosh/playback/issues') }
+      },
+      {
+        label: 'View Source Code on GitHub',
+        click: function() { ipc.send('open-url-in-external', 'https://github.com/mafintosh/playback') }
+      },
+      {
+        type: 'separator'
+      },
+      {
+        label: 'Releases',
+        click: function() { ipc.send('open-url-in-external', 'https://github.com/mafintosh/playback/releases') }
+      }
+    ]
+  }
+]
+var appmenu = Menu.buildFromTemplate(appmenu_template)
+Menu.setApplicationMenu(appmenu)
+
 var formatTime = function (secs) {
   var hours = (secs / 3600) | 0
   var mins = ((secs - hours * 3600) / 60) | 0
