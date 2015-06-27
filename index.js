@@ -336,7 +336,7 @@ titlebar.on('maximize', function () {
 
 titlebar.on('fullscreen', onfullscreentoggle)
 
-var template = [
+var appmenu_template = [
   {
     label: 'Playback',
     submenu: [
@@ -400,8 +400,8 @@ var template = [
     ]
   }
 ]
-var menu = Menu.buildFromTemplate(template)
-Menu.setApplicationMenu(menu)
+var appmenu = Menu.buildFromTemplate(appmenu_template)
+Menu.setApplicationMenu(appmenu)
 
 var formatTime = function (secs) {
   var hours = (secs / 3600) | 0
