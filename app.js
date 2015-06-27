@@ -5,6 +5,7 @@ var BrowserWindow = require('browser-window')
 var path = require('path')
 var ipc = require('ipc')
 var dialog = require('dialog')
+var shell = require('shell')
 
 var win
 var link
@@ -45,6 +46,10 @@ app.on('ready', function () {
   ipc.on('open-file-dialog', function () {
     var files = dialog.showOpenDialog({ properties: [ 'openFile', 'multiSelections' ]})
     if (files) win.send('add-to-playlist', files)
+  })
+
+  ipc.on('open-url-in-external', function (event, url) {
+    shell.openExternal(url)
   })
 
   ipc.on('focus', function () {
