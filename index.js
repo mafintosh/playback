@@ -103,9 +103,7 @@ $(window).on('contextmenu', function (e) {
   }))
 
   menu.append(new MenuItem({
-    label: 'Paste Url',
-    accelerator: 'CommandOrControl+V',
-    selector: 'paste:',
+    label: 'Paste link',
     click: function () {
       ipc.emit('add-to-playlist', clipboard.readText().split('\n'))
     }
@@ -402,6 +400,11 @@ var appmenu_template = [
         accelerator: 'Command+O',
         click: function() { ipc.send('open-file-dialog') }
       },
+      {
+        label: 'Add link from clipboard',
+        accelerator: 'CommandOrControl+V',
+        click: function () { ipc.emit('add-to-playlist', clipboard.readText().split('\n')) }
+      }
     ]
   },
   {
