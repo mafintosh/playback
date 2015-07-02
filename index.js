@@ -18,6 +18,7 @@ var network = require('network-address')
 var chromecasts = require('chromecasts')()
 var $ = require('dombo')
 var titlebar = require('titlebar')()
+var clipboard = require('clipboard')
 var player = require('./player')
 var playlist = require('./playlist')
 var mouseidle = require('./mouseidle')
@@ -98,6 +99,13 @@ $(window).on('contextmenu', function (e) {
     click: function () {
       onTop = !onTop
       remote.getCurrentWindow().setAlwaysOnTop(onTop)
+    }
+  }))
+
+  menu.append(new MenuItem({
+    label: 'Paste link',
+    click: function () {
+      ipc.emit('add-to-playlist', clipboard.readText().split('\n'))
     }
   }))
 
@@ -392,6 +400,11 @@ var appmenu_template = [
         accelerator: 'Command+O',
         click: function() { ipc.send('open-file-dialog') }
       },
+      {
+        label: 'Add link from clipboard',
+        accelerator: 'CommandOrControl+V',
+        click: function () { ipc.emit('add-to-playlist', clipboard.readText().split('\n')) }
+      }
     ]
   },
   {
