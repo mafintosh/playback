@@ -10,7 +10,7 @@ var sh = require('shelljs')
 var appVersion = pkgjson.version
 var appName = 'Playback'
 var electronPackager = './node_modules/.bin/electron-packager'
-var electronVersion = pkgjson.devDependencies['electron-prebuilt']
+var electronVersion = require('./node_modules/electron-prebuilt/package.json').version
 var icon = 'icon.icns'
 
 if (process.argv[2] === '--all') {
@@ -24,7 +24,7 @@ if (process.argv[2] === '--all') {
     })
   })
 } else if (process.argv[2] && process.argv[3]) {
-	pack(process.argv[2], process.argv[3])
+  pack(process.argv[2], process.argv[3])
 } else {
   // build for current platform only
   pack(os.platform(), os.arch())
