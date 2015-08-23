@@ -1,10 +1,14 @@
 
 # Playback
 
-Video player build using [electron](http://electron.atom.io/) and [node.js](https://nodejs.org/)
+#### Video player built using [electron](http://electron.atom.io/) and [node.js](https://nodejs.org/)
 
-It currently has support for playing mp4/webm and chromecasting videos.
-In addition to that it supports live streaming of video using http links, BitTorrent magnet links, and IPFS links.
+## Features
+
+- Plays .MP4 and .WebM videos
+- Streaming to Chromecast
+- Streaming from http links, torrent magnet links, and IPFS links
+- [WebTorrent](https://webtorrent.io/) support – can torrent from/to WebRTC peers ("web peers")
 
 ## Installation
 
