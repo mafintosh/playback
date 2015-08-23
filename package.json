@@ -20,7 +20,7 @@
     "request": "^2.54.0",
     "srt-to-vtt": "^1.0.2",
     "titlebar": "^1.1.0",
-    "torrent-stream": "^0.18.1",
+    "webtorrent": "^0.58.0",
     "ytdl-core": "^0.5.1"
   },
   "devDependencies": {

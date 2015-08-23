@@ -1,4 +1,4 @@
-var torrents = require('torrent-stream')
+var torrents = require('webtorrent')
 var request = require('request')
 var duplex = require('duplexify')
 var ytdl = require('ytdl-core')
@@ -18,22 +18,22 @@ module.exports = function () {
   var onmagnet = function (link, cb) {
     console.log('torrent ' + link)
 
-    var engine = torrents(link)
+    var engine = torrents()
     var subtitles = {}
 
-    engine.swarm.add('127.0.0.1:51413') // me!
-
-    engine.on('ready', function () {
+    engine.add(link, {
+      announce: [ 'wss://tracker.webtorrent.io' ]
+    }, function (torrent) {
       console.log('torrent ready')
 
-      engine.files.forEach(function (f) {
+      torrent.files.forEach(function (f) {
         if (/\.(vtt|srt)$/i.test(f.name)) {
           subtitles[f.name] = f;
         }
       })
 
-      engine.files.forEach(function (f) {
-        f.downloadSpeed = engine.swarm.downloadSpeed
+      torrent.files.forEach(function (f) {
+        f.downloadSpeed = torrent.downloadSpeed()
         if (/\.(mp4|mkv|mp3)$/i.test(f.name)) {
           f.select()
           f.id = that.entries.push(f) - 1
@@ -50,7 +50,7 @@ module.exports = function () {
       })
 
       setInterval(function () {
-        console.log(engine.swarm.downloadSpeed() + ' (' + engine.swarm.wires.length + ')')
+        console.log(torrent.downloadSpeed() + ' (' + torrent.swarm.wires.length + ')')
       }, 1000)
 
       that.emit('update')
