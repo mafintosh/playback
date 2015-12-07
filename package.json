@@ -1,6 +1,6 @@
 {
   "name": "playback",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "Video player build using atom-shell and node.js",
   "main": "app.js",
   "dependencies": {
