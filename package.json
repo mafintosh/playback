@@ -34,7 +34,7 @@
     "rebuild": "npm rebuild --runtime=electron --target=0.35.4 --disturl=https://atom.io/download/atom-shell",
     "start": "electron app.js",
     "dev": "electron app.js test.mp4",
-    "mac-bundle": "electron-packager . Playback --platform=darwin --arch=x64 --version=0.35.4 --ignore=node_modules/electron-prebuilt && cp info.plist Playback.app/Contents/Info.plist && cp icon.icns Playback.app/Contents/Resources/atom.icns",
+    "mac-bundle": "electron-packager . Playback --platform=darwin --arch=x64 --version=0.35.4 --ignore=node_modules/electron-prebuilt && cp info.plist Playback-darwin-x64/Playback.app/Contents/Info.plist && cp icon.icns Playback-darwin-x64/Playback.app/Contents/Resources/atom.icns",
     "win-bundle": "electron-packager . Playback --platform=win32 --arch=ia32 --version=0.35.4 --icon=icon.ico",
     "linux-64-bundle": "electron-packager . Playback --platform=linux --arch=x64 --version=0.35.4 ignore='node_modules/(electron-packager|electron-prebuilt)'"
   },
