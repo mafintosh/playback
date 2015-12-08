@@ -6,6 +6,7 @@ var path = require('path')
 var ipc = require('ipc')
 var dialog = require('dialog')
 var shell = require('shell')
+var preventSleep = require('powerSaveBlocker')
 
 var win
 var link
@@ -84,5 +85,13 @@ app.on('ready', function () {
     ready = true
     if (link) win.send('add-to-playlist', [].concat(link))
     win.show()
+  })
+
+  ipc.on('prevent-sleep', function () {
+    app.sleepId = powerSaveBlocker.start('prevent-display-sleep')
+  })
+
+  ipc.on('allow-sleep', function () {
+    powerSaveBlocker.stop(app.sleepId)
   })
 })
