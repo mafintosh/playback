@@ -353,12 +353,11 @@ body:hover #overlay, body:hover .titlebar {
 
 #controls-volume-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
-  background-color: #fff;
+  background-color: #31A357;
   opacity: 1.0;
-  width: 5px;
-  height: 15px;
-  border: 1px solid #303233;
-  border-radius: 1px;
+  width: 7px;
+  height: 7px;
+  border-radius: 3.5px;
 }
 
 #controls-volume-slider:focus {
