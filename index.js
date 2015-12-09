@@ -480,10 +480,12 @@ media.on('metadata', function () {
 $('#controls-play').on('click', onplaytoggle)
 
 media.on('end', function () {
+  ipc.send('allow-sleep')
   list.selectNext()
 })
 
 media.on('play', function () {
+  ipc.send('prevent-sleep')
   $('#splash').toggleClass('hidden', !media.casting)
   $('#player').toggleClass('hidden', media.casting)
   $('#controls-play .octicon-playback-play').removeClass('octicon-playback-play')
@@ -491,6 +493,7 @@ media.on('play', function () {
 })
 
 media.on('pause', function () {
+  ipc.send('allow-sleep')
   $('#controls-play .octicon-playback-pause').removeClass('octicon-playback-pause')
   $('#controls-play .mega-octicon').addClass('octicon-playback-play')
 })
