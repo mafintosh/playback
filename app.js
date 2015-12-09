@@ -6,8 +6,7 @@ var path = require('path')
 var ipc = require('ipc')
 var dialog = require('dialog')
 var shell = require('shell')
-var preventSleep = require('powerSaveBlocker')
-
+var powerSaveBlocker = require('electron').powerSaveBlocker;
 var win
 var link
 var ready = false
