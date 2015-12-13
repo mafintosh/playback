@@ -307,14 +307,10 @@ body:hover #overlay, body:hover .titlebar {
 
 #controls-play span:hover .mega-octicon, #player-downloadspeed span:hover .mega-octicon,
 #controls-fullscreen span:hover .mega-octicon, #controls-playlist span:hover .mega-octicon,
-#controls-settings span:hover .mega-octicon,
-#controls-chromecast span:hover .mega-octicon {
+#controls-chromecast span:hover .mega-octicon, #controls-settings span:hover .mega-octicon {
   color: #31A357;
 }
 
-#controls-settings span:hover .mega-octicon {
-  color: #31A357;
-}
 
 #controls-chromecast .chromecast {
   background-image: url('chromecast.png');
@@ -404,13 +400,11 @@ body:hover #overlay, body:hover .titlebar {
   margin-left: 20px;
 }
 
+
 #controls-settings {
   float: right;
-  /*margin-left: 10px;*/
-  margin-right:10px;
-  /*margin-top: -10px;*/
-  /*margin-bottom: 50px;*/
-  /*padding-top: 20px;*/
+  margin-right: 10px; 
+  margin-top: 10px !important;
 }
 
 .brightness {
