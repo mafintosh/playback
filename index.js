@@ -28,6 +28,28 @@ var argv = minimist(JSON.parse(window.location.toString().split('#')[1]), {
   boolean: ['follow']
 })
 
+
+var FILTER_VALS = {};
+var el = document.querySelector('video');
+
+var set = function (filter, value) {
+  FILTER_VALS[filter] = typeof value == 'number' ? Math.round(value * 10) / 10 : value;
+  if (value == 0 || (typeof value == 'string' && value.indexOf('0') == 0)) {
+    delete FILTER_VALS[filter];
+  }
+  render();
+}
+
+var render = function () {
+  var vals = [];
+  Object.keys(FILTER_VALS).sort().forEach(function(key, i) {
+    vals.push(key + '(' + FILTER_VALS[key] + ')');
+  });
+  var val = vals.join(' ');
+  el.style.webkitFilter = val;
+  document.querySelector('output').textContent = '-webkit-filter: ' + (val ? val : 'none') + ';';
+}
+
 var printError = function (err) {
   if (err) console.log(err)
 }
@@ -227,6 +249,7 @@ $(document).on('keydown', function (e) {
 
   if ($('#controls-playlist').hasClass('selected')) $('#controls-playlist').trigger('click')
   if ($('#controls-chromecast').hasClass('selected')) $('#controls-chromecast').trigger('click')
+  if ($('#controls-settings').hasClass('selected')) $('#controls-settings').trigger('click')
 })
 
 mouseidle($('#idle')[0], 3000, 'hide-cursor')
@@ -285,14 +308,15 @@ list.once('update', function () {
 })
 
 var popupSelected = function () {
-  return $('#controls-playlist').hasClass('selected') || $('#controls-chromecast').hasClass('selected')
+  return $('#controls-playlist').hasClass('selected') || $('#controls-chromecast').hasClass('selected') || $('#controls-settings').hasClass('selected')
 }
 
 var closePopup = function (e) {
-  if (e && (e.target === $('#controls-playlist .mega-octicon')[0] || e.target === $('#controls-chromecast .chromecast')[0])) return
+  if (e && (e.target === $('#controls-playlist .mega-octicon')[0] || e.target === $('#controls-chromecast .chromecast')[0] || e.target === $('#controls-settings .mega-octicon')[0])) return
   $('#popup')[0].style.opacity = 0
   $('#controls-playlist').removeClass('selected')
   $('#controls-chromecast').removeClass('selected')
+  $('#controls-settings').removeClass('selected')
 }
 
 $('#controls').on('click', closePopup)
@@ -326,6 +350,19 @@ var updatePopup = function () {
     $('#popup')[0].style.opacity = 0
   }
 }
+
+$('#controls-settings').on('click', function (e) {
+  if ($('#controls-settings').hasClass('selected')) {
+    closePopup()
+    return
+  }
+
+  $('#popup')[0].className = 'settings'
+  $('#controls .controls-main .selected').removeClass('selected')
+  $('#controls-settings').addClass('selected')
+  chromecasts.update()
+  updatePopup()
+})
 
 $('#controls-chromecast').on('click', function (e) {
   if ($('#controls-chromecast').hasClass('selected')) {
@@ -639,3 +676,6 @@ $('#controls-volume-slider')[0].setAttribute("value", 0.5)
 $('#controls-volume-slider')[0].setAttribute("min", 0)
 $('#controls-volume-slider')[0].setAttribute("max", 1)
 $('#controls-volume-slider')[0].setAttribute("step", 0.05)
+
+var debugMenu = require('debug-menu');
+debugMenu.install();  // activate context menu
