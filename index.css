@@ -413,3 +413,7 @@ body:hover #overlay, body:hover .titlebar {
 
 }
 
+#settings-popup span label {
+  font-size: 15px;
+}
+

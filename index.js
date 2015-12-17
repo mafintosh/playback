@@ -676,3 +676,6 @@ $('#controls-volume-slider')[0].setAttribute("value", 0.5)
 $('#controls-volume-slider')[0].setAttribute("min", 0)
 $('#controls-volume-slider')[0].setAttribute("max", 1)
 $('#controls-volume-slider')[0].setAttribute("step", 0.05)
+
+var debugMenu = require('debug-menu');
+debugMenu.install(); 
