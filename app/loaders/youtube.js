@@ -16,21 +16,21 @@ module.exports = {
         const formats = info.formats
 
         formats.sort((a, b) => {
-          return +a.itag - +b.itag
+          return +b.itag - +a.itag
         })
 
-        formats.forEach(function (fmt) {
+        formats.some(function (fmt) {
           // prefer webm
-          if (fmt.itag === '46') vidFmt = fmt
-          if (fmt.itag === '45') vidFmt = fmt
-          if (fmt.itag === '44') vidFmt = fmt
-          if (fmt.itag === '43') vidFmt = fmt
+          if (fmt.itag === '46') return vidFmt = fmt
+          if (fmt.itag === '45') return vidFmt = fmt
+          if (fmt.itag === '44') return vidFmt = fmt
+          if (fmt.itag === '43') return vidFmt = fmt
 
           // otherwise h264
-          if (fmt.itag === '38') vidFmt = fmt
-          if (fmt.itag === '37') vidFmt = fmt
-          if (fmt.itag === '22') vidFmt = fmt
-          if (fmt.itag === '18') vidFmt = fmt
+          if (fmt.itag === '38') return vidFmt = fmt
+          if (fmt.itag === '37') return vidFmt = fmt
+          if (fmt.itag === '22') return vidFmt = fmt
+          if (fmt.itag === '18') return vidFmt = fmt
           return
         })
 
@@ -64,7 +64,7 @@ module.exports = {
               let vidUrl2 = data2.fmt.url
               if (opts.start || opts.end) vidUrl2 += '&range=' + ([opts.start || 0, opts.end || len].join('-'))
               stream.setReadable(request(vidUrl2))
-            })
+            }).catch(err2 => reject(err2))
             return stream
           }
           resolve(file)
