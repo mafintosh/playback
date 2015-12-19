@@ -29,7 +29,7 @@ class App extends React.Component {
   }
 
   _handleLoadClick() {
-    Controller.addAndStart('file:///Users/brianmathews/Desktop/arrange.mov')
+    Controller.addAndStart('https://www.youtube.com/watch?v=IYia8yiIKGQ')
   }
 
   _handleSeek(e) {
