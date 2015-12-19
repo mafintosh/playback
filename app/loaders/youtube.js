@@ -12,26 +12,20 @@ module.exports = {
       ytdl.getInfo(url, (err, info) => {
         if (err) return reject(err)
 
-        let vidFmt
         const formats = info.formats
 
         formats.sort((a, b) => {
           return +b.itag - +a.itag
         })
 
+        let vidFmt
         formats.some(function (fmt) {
-          // prefer webm
-          if (fmt.itag === '46') return vidFmt = fmt
-          if (fmt.itag === '45') return vidFmt = fmt
-          if (fmt.itag === '44') return vidFmt = fmt
-          if (fmt.itag === '43') return vidFmt = fmt
-
-          // otherwise h264
-          if (fmt.itag === '38') return vidFmt = fmt
-          if (fmt.itag === '37') return vidFmt = fmt
-          if (fmt.itag === '22') return vidFmt = fmt
-          if (fmt.itag === '18') return vidFmt = fmt
-          return
+          ['46', '45', '44', '43', '38', '37', '22', '18'].some(itag => {
+            if (fmt.itag === itag) {
+              vidFmt = fmt
+              return
+            }
+          })
         })
 
         if (!vidFmt) return reject(new Error('No suitable video format found'))
