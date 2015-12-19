@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Playback</title>
+    <link rel="stylesheet" href="./styles/main.css">
+  </head>
+  <body>
+    <div id="react-root"></div>
+    <script>
+      require('babel-register')({
+        presets: ['es2015', 'stage-0', 'react']
+      })
+      require('./index.jsx')
+    </script>
+  </body>
+</html>

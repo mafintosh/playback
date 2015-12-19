@@ -1,0 +1,38 @@
+body {
+  background: black;
+  overflow: hidden;
+  font-family: "Arial";
+  font-size: 13px; }
+
+.controls {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  background-color: #333;
+  color: #fff; }
+  .controls .controls__timeline {
+    height: 10px;
+    width: 100%;
+    background: #222; }
+    .controls .controls__timeline > .controls__timeline__progress {
+      height: 10px;
+      background-color: green; }
+  .controls .controls__toolbar {
+    padding: 6px;
+    display: flex;
+    align-items: center; }
+    .controls .controls__toolbar > button {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: inherit; }
+    .controls .controls__toolbar > .controls__title {
+      flex: 1;
+      color: #aaa; }
+    .controls .controls__toolbar > .controls__time {
+      color: #aaa; }
+
+video {
+  max-width: 100%;
+  max-height: 100%; }

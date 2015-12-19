@@ -1,0 +1,63 @@
+$body-bg: black;
+$body-font: 'Arial';
+$controls-bg: #333;
+$controls-fg: #fff;
+$controls-title-fg: #aaa;
+$controls-timeline-height: 10px;
+$controls-timeline-bg: #222;
+$controls-timeline-progress-bg: green;
+
+body {
+  background: $body-bg;
+  overflow: hidden;
+  font-family: $body-font;
+  font-size: 13px;
+}
+
+.controls {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  background-color: $controls-bg;
+  color: $controls-fg;
+
+  .controls__timeline {
+    height: $controls-timeline-height;
+    width: 100%;
+    background: $controls-timeline-bg;
+
+    > .controls__timeline__progress {
+      height: $controls-timeline-height;
+      background-color: $controls-timeline-progress-bg;
+    }
+  }
+
+  .controls__toolbar {
+    padding: 6px;
+    display: flex;
+    align-items: center;
+
+    > button {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: inherit;
+    }
+
+    > .controls__title {
+      flex: 1;
+      color: $controls-title-fg;
+    }
+
+    > .controls__time {
+      color: $controls-title-fg;
+    }
+
+  }
+}
+
+video {
+  max-width: 100%;
+  max-height: 100%;
+}
