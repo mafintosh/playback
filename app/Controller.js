@@ -3,6 +3,8 @@ import update from 'react-addons-update'
 import Server from './Server'
 import fileLoader from './loaders/file'
 import youtubeLoader from './loaders/youtube'
+import chromecasts from 'chromecasts'
+import ChromecastEngine from './engines/Chromecast'
 
 const loaders = [youtubeLoader, fileLoader]
 
@@ -15,11 +17,13 @@ class Controller extends EventEmitter {
   constructor() {
     super()
     this.server = new Server(this, () => { this.emit('ready') })
+    this.chromecasts = chromecasts()
+    this.chromecasts.on('update', this._onChromecastsUpdate.bind(this))
     this.setState({
       status: this.STATUS_STOPPED,
       volume: 100,
       muted: false,
-      casting: false,
+      casting: null,
       currentFile: null,
       stream: null,
       currentTime: 0,
@@ -27,6 +31,13 @@ class Controller extends EventEmitter {
       playlist: [],
       chromecasts: [],
       engine: null
+    })
+  }
+
+  _onChromecastsUpdate() {
+    console.log('Chromecasts updated')
+    this.setState({
+      chromecasts: this.chromecasts.players
     })
   }
 
@@ -232,11 +243,11 @@ class Controller extends EventEmitter {
    * Toggle casting
    */
 
-  toggleCasting() {
+  toggleCasting(id) {
     if (this.state.casting) {
       this.stopCasting()
     } else {
-      this.startCasting()
+      this.startCasting(id)
     }
   }
 
@@ -245,8 +256,11 @@ class Controller extends EventEmitter {
    * Start casting
    */
 
-  startCasting() {
-
+  startCasting(id) {
+    this.setState({
+      casting: id,
+      engine: new ChromecastEngine(this)
+    })
   }
 
 
@@ -255,7 +269,10 @@ class Controller extends EventEmitter {
    */
 
   stopCasting() {
-
+    this.setState({
+      casting: null,
+      engine: null // TODO NEED UI TO SUPPY ENGINE
+    })
   }
 
 

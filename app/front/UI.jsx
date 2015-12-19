@@ -6,6 +6,10 @@ import Icon from './components/icon'
 
 class App extends React.Component {
 
+  static propTypes = {
+    controller: React.PropTypes.object.isRequired
+  }
+
   constructor(props) {
     console.log('constructed UI')
     super(props)
@@ -33,7 +37,9 @@ class App extends React.Component {
   }
 
   _handleCastClick() {
-
+    const cast = this.state.chromecasts[0]
+    const id = cast.host + cast.name
+    this.controller.toggleCasting(id)
   }
 
   _handleFullscreenClick() {
@@ -64,7 +70,7 @@ class App extends React.Component {
     const title = this.state.currentFile ? this.state.currentFile.name : 'No file'
     const { currentTime, duration } = this.state
     const progressStyle = {
-      transition: `width ${HTML5Video.POLL_FREQUENCY}ms linear`,
+      transition: `width ${1000}ms linear`,
       width: currentTime / duration * 100 + '%'
     }
 
@@ -103,7 +109,7 @@ class App extends React.Component {
               <Icon icon="playlist"/>
             </button>
             <button onClick={this._handleCastClick.bind(this)}>
-              <Icon icon="cast"/>
+              <Icon icon={this.state.casting ? 'cast-connected' : 'cast'}/>
             </button>
             <button onClick={this._handleFullscreenClick.bind(this)}>
               <Icon icon="fullscreen"/>

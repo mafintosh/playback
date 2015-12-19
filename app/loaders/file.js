@@ -11,7 +11,7 @@ module.exports = {
    * Match anything
    */
 
-  test(uri) {
+  test() {
     return true
   },
 
