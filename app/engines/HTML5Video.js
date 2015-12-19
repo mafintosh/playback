@@ -2,7 +2,8 @@ import { EventEmitter } from 'events'
 
 class HTML5Video extends EventEmitter {
 
-  get POLL_FREQUENCY() { return 500 }
+  static POLL_FREQUENCY = 500
+  get POLL_FREQUENCY() { return HTML5Video.POLL_FREQUENCY }
 
   constructor(controller) {
     super()

@@ -1,35 +1,33 @@
 import React from 'react'
 import { render } from 'react-dom'
 
-import Controller from '../Controller'
 import HTML5Video from '../engines/HTML5Video'
 import Icon from './components/icon'
-
-const htmlEngine = new HTML5Video(Controller)
 
 class App extends React.Component {
 
   constructor(props) {
+    console.log('constructed UI')
     super(props)
-    this.state = Controller.getState()
+    this.controller = this.props.controller
+    this.state = this.controller.getState()
   }
 
   componentDidMount() {
-    Controller.setState({
-      engine: htmlEngine
+    this.controller.on('update', () => {
+      this.setState(this.controller.getState())
     })
-    Controller.on('update', () => {
-      this.setState(Controller.getState())
-    })
+    const htmlEngine = new HTML5Video(this.controller)
     htmlEngine.setElement(this.refs.video)
+    this.controller.setState({ engine: htmlEngine })
   }
 
   _handleTogglePlayClick() {
-    Controller.togglePlay()
+    this.controller.togglePlay()
   }
 
   _handlePlaylistClick() {
-    Controller.addAndStart('https://www.youtube.com/watch?v=ct47O2EIpWE').catch(err => {
+    this.controller.addAndStart('https://www.youtube.com/watch?v=ct47O2EIpWE').catch(err => {
       console.error(err, err.stack)
     })
   }
@@ -45,7 +43,7 @@ class App extends React.Component {
   _handleSeek(e) {
     const percentage = e.clientX / window.innerWidth
     const time = this.state.duration * percentage
-    Controller.seekToSecond(time)
+    this.controller.seekToSecond(time)
   }
 
   _handleVolumeClick() {
@@ -62,11 +60,11 @@ class App extends React.Component {
   }
 
   render() {
-    const playIcon = this.state.status === Controller.STATUS_PLAYING ? 'pause' : 'play'
+    const playIcon = this.state.status === this.controller.STATUS_PLAYING ? 'pause' : 'play'
     const title = this.state.currentFile ? this.state.currentFile.name : 'No file'
     const { currentTime, duration } = this.state
     const progressStyle = {
-      transition: `width ${htmlEngine.POLL_FREQUENCY}ms linear`,
+      transition: `width ${HTML5Video.POLL_FREQUENCY}ms linear`,
       width: currentTime / duration * 100 + '%'
     }
 
@@ -118,4 +116,8 @@ class App extends React.Component {
   }
 }
 
-render(<App/>, document.getElementById('react-root'))
+module.exports = {
+  init: (controller) => {
+    render(<App controller={controller}/>, document.getElementById('react-root'))
+  }
+}

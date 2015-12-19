@@ -5,10 +5,11 @@ import network from 'network-address'
 
 class Server {
 
-  constructor(controller) {
+  constructor(controller, cb) {
     this.controller = controller
     this.server = http.createServer(this.route.bind(this)).listen(0, () => {
       console.log('Playback server running at: ' + this.getPath())
+      cb()
     })
   }
 

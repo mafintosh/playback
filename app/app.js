@@ -20,7 +20,7 @@ app.on('ready', () => {
     width: 860,
     height: 470
   })
-  win.loadURL('file://' + __dirname + '/front/index.html')
+  win.loadURL('file://' + __dirname + '/front/index.html#' + JSON.stringify(process.argv.slice(2)))
   win.webContents.openDevTools()
   win.on('closed', () => {
     win = null

@@ -8,11 +8,11 @@ module.exports = {
 
 
   /*
-   * Match file:// URIs
+   * Match anything
    */
 
   test(uri) {
-    return /^file:\/\//i.test(uri)
+    return true
   },
 
 

@@ -4,7 +4,7 @@ import Server from './Server'
 import fileLoader from './loaders/file'
 import youtubeLoader from './loaders/youtube'
 
-const loaders = [fileLoader, youtubeLoader]
+const loaders = [youtubeLoader, fileLoader]
 
 class Controller extends EventEmitter {
 
@@ -14,7 +14,7 @@ class Controller extends EventEmitter {
 
   constructor() {
     super()
-    this.server = new Server(this)
+    this.server = new Server(this, () => { this.emit('ready') })
     this.setState({
       status: this.STATUS_STOPPED,
       volume: 100,
@@ -85,7 +85,6 @@ class Controller extends EventEmitter {
     return prom
   }
 
-
   /*
    * Add a URI to the playlist and play it
    */
@@ -93,6 +92,24 @@ class Controller extends EventEmitter {
   addAndStart(uri) {
     return this.add(uri).then(file => {
       this.start(file)
+    })
+  }
+
+
+  /*
+   * Add an array of URIs
+   */
+
+  addAll(uris) {
+    return Promise.all(uris.map(this.add.bind(this)))
+  }
+
+  /*
+   * Add all and play
+   */
+  addAllAndPlay(uris) {
+    return this.addAll(uris).then(files => {
+      this.start(files[0])
     })
   }
 
