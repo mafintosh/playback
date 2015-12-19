@@ -1,12 +1,14 @@
 $body-bg: black;
 $body-font: 'Arial';
-$controls-bg: #333;
+$primary: #579A57;
+$controls-bg: rgba(0, 0, 0, 0.84);
 $controls-fg: #aaa;
 $controls-icon-color: #fff;
-$controls-icon-color-hover: green;
+$controls-icon-color-hover: $primary;
 $controls-timeline-height: 10px;
-$controls-timeline-bg: #222;
-$controls-timeline-progress-bg: green;
+$controls-timeline-bg: rgba(218, 218, 218, 0.12);
+$controls-timeline-progress-bg: $primary;
+$controls-timeline-buffered-bg: rgba(218, 218, 218, 0.12);
 
 body {
   background: $body-bg;
@@ -14,6 +16,19 @@ body {
   font-family: $body-font;
   font-size: 13px;
   margin: 0;
+  cursor: default;
+
+  .controls {
+    opacity: 0;
+    bottom: -50px;
+  }
+
+  &:hover {
+    .controls {
+      opacity: 1;
+      bottom: 0;
+    }
+  }
 }
 
 .controls {
@@ -23,6 +38,7 @@ body {
   left: 0;
   background-color: $controls-bg;
   color: $controls-fg;
+  transition: opacity 250ms ease-in-out, bottom 250ms ease-in-out;
 
   .controls__timeline {
     height: $controls-timeline-height;
@@ -30,8 +46,15 @@ body {
     background: $controls-timeline-bg;
 
     > .controls__timeline__progress {
+      position: absolute;
       height: $controls-timeline-height;
       background-color: $controls-timeline-progress-bg;
+    }
+
+    > .controls__timeline__buffered {
+      position: absolute;
+      height: $controls-timeline-height;
+      background-color: $controls-timeline-buffered-bg;
     }
   }
 
@@ -40,7 +63,7 @@ body {
     display: flex;
     align-items: center;
 
-    > button {
+    button {
       background: transparent;
       border: none;
       outline: none;
@@ -49,10 +72,19 @@ body {
       &:hover {
         color: $controls-icon-color-hover;
       }
+
+      &:disabled {
+        opacity: .4
+      }
     }
 
-    > .controls__title {
+    .controls__title {
+      margin-left: 10px;
       flex: 1;
+    }
+
+    .controls__metadata {
+      margin-right: 10px;
     }
   }
 }

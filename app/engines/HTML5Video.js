@@ -2,7 +2,7 @@ import { EventEmitter } from 'events'
 
 class HTML5Video extends EventEmitter {
 
-  get POLL_FREQUENCY() { return 250 }
+  get POLL_FREQUENCY() { return 500 }
 
   constructor(controller) {
     super()
@@ -31,11 +31,15 @@ class HTML5Video extends EventEmitter {
   }
 
   duration() {
-    return this.element.duration
+    return this.element.duration || 0
   }
 
   currentTime() {
-    return this.element.currentTime
+    return this.element.currentTime || 0
+  }
+
+  buffered() {
+    return this.element.buffered
   }
 
 }

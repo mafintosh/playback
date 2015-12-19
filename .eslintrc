@@ -22,6 +22,7 @@
     "semi": [2, "never"],
     "func-names": 0,
     "comma-dangle": 0,
-    "consistent-return": 0
+    "consistent-return": 0,
+    "no-return-assign": 0
   }
 }

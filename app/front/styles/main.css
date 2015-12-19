@@ -3,35 +3,53 @@ body {
   overflow: hidden;
   font-family: "Arial";
   font-size: 13px;
-  margin: 0; }
+  margin: 0;
+  cursor: default; }
+  body .controls {
+    opacity: 0;
+    bottom: -50px; }
+  body:hover .controls {
+    opacity: 1;
+    bottom: 0; }
 
 .controls {
   position: fixed;
   bottom: 0;
   right: 0;
   left: 0;
-  background-color: #333;
-  color: #aaa; }
+  background-color: rgba(0, 0, 0, 0.84);
+  color: #aaa;
+  transition: opacity 250ms ease-in-out, bottom 250ms ease-in-out; }
   .controls .controls__timeline {
     height: 10px;
     width: 100%;
-    background: #222; }
+    background: rgba(218, 218, 218, 0.12); }
     .controls .controls__timeline > .controls__timeline__progress {
+      position: absolute;
       height: 10px;
-      background-color: green; }
+      background-color: #579A57; }
+    .controls .controls__timeline > .controls__timeline__buffered {
+      position: absolute;
+      height: 10px;
+      background-color: rgba(218, 218, 218, 0.12); }
   .controls .controls__toolbar {
     padding: 6px;
     display: flex;
     align-items: center; }
-    .controls .controls__toolbar > button {
+    .controls .controls__toolbar button {
       background: transparent;
       border: none;
       outline: none;
       color: #fff; }
-      .controls .controls__toolbar > button:hover {
-        color: green; }
-    .controls .controls__toolbar > .controls__title {
+      .controls .controls__toolbar button:hover {
+        color: #579A57; }
+      .controls .controls__toolbar button:disabled {
+        opacity: .4; }
+    .controls .controls__toolbar .controls__title {
+      margin-left: 10px;
       flex: 1; }
+    .controls .controls__toolbar .controls__metadata {
+      margin-right: 10px; }
 
 video {
   position: fixed;

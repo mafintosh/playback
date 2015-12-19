@@ -195,7 +195,8 @@ class Controller extends EventEmitter {
       console.log('polling!')
       this.setState({
         currentTime: this.state.engine.currentTime(),
-        duration: this.state.engine.duration()
+        duration: this.state.engine.duration(),
+        buffered: this.state.engine.buffered()
       })
     }, this.state.engine.POLL_FREQUENCY)
   }
