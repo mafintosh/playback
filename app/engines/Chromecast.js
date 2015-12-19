@@ -8,14 +8,25 @@ class Chromecast extends EventEmitter {
   constructor(controller) {
     super()
     this.controller = controller
-    controller.on('update', this._update.bind(this))
 
+    this._onStatusUpdate = this._onStatusUpdate.bind(this)
+    this._onMetadata = this._onMetadata.bind(this)
+    this._update = this._update.bind(this)
+  }
+
+  enable() {
+    this.controller.on('update', this._update)
     this.status = {
       currentTime: 0,
       media: {
         duration: 0
       }
     }
+  }
+
+  disable() {
+    this.controller.removeListener('update', this._update)
+    if (this.player) { this._stop() }
   }
 
   _getPlayer() {
@@ -32,6 +43,7 @@ class Chromecast extends EventEmitter {
 
   _update(state) {
     const player = this._getPlayer()
+    if (!player) { return }
 
     // if the current stream isn't the stream we have, stop casting
     if (state.stream && state.stream !== this.currentStream) {
@@ -59,12 +71,12 @@ class Chromecast extends EventEmitter {
     this.player = player
     player.play(stream, {
       type: 'video/mp4'
-    }, this._onMetadata.bind(this))
-    player.on('status', this._onStatusUpdate.bind(this))
+    }, this._onMetadata)
+    player.on('status', this._onStatusUpdate)
     this.playing = true
     this.currentStream = stream
-    setInterval(() => {
-      this.player.status(this._onMetadata.bind(this))
+    this.interval = setInterval(() => {
+      this.player.status(this._onMetadata)
     }, 1000)
   }
 
@@ -80,10 +92,11 @@ class Chromecast extends EventEmitter {
 
   _stop() {
     this.player.stop()
-    this.player.off('status', this._onStatusUpdate.bind(this))
+    this.player.removeListener('status', this._onMetadata)
     this.player = null
     this.playing = false
     this.currentStream = null
+    clearInterval(this.interval)
   }
 
   _onMetadata(err, data) {

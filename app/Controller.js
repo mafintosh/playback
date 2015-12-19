@@ -5,6 +5,7 @@ import fileLoader from './loaders/file'
 import youtubeLoader from './loaders/youtube'
 import chromecasts from 'chromecasts'
 import ChromecastEngine from './engines/Chromecast'
+import HTML5VideoEngine from './engines/HTML5Video'
 
 const loaders = [youtubeLoader, fileLoader]
 
@@ -13,12 +14,14 @@ class Controller extends EventEmitter {
   get STATUS_STOPPED() { return 'stopped' }
   get STATUS_PAUSED() { return 'paused' }
   get STATUS_PLAYING() { return 'playing' }
+  get ENGINE_HTML5VIDEO() { return 'html5video '}
+  get ENGINE_CHROMECAST() { return 'chromecast '}
 
   constructor() {
     super()
     this.server = new Server(this, () => { this.emit('ready') })
-    this.chromecasts = chromecasts()
-    this.chromecasts.on('update', this._onChromecastsUpdate.bind(this))
+    this._initChromecasts()
+    this._initEngines()
     this.setState({
       status: this.STATUS_STOPPED,
       volume: 100,
@@ -34,8 +37,17 @@ class Controller extends EventEmitter {
     })
   }
 
+  _initChromecasts() {
+    this.chromecasts = chromecasts()
+    this.chromecasts.on('update', this._onChromecastsUpdate.bind(this))
+  }
+
+  _initEngines() {
+    this._chromecastEngine = new ChromecastEngine(this)
+    this._htmlEngine = new HTML5VideoEngine(this)
+  }
+
   _onChromecastsUpdate() {
-    console.log('Chromecasts updated')
     this.setState({
       chromecasts: this.chromecasts.players
     })
@@ -68,7 +80,7 @@ class Controller extends EventEmitter {
    */
 
   togglePlay() {
-    if (!this.state.currentFile) { return }
+    if (!this.state.stream) { return }
 
     if (this.state.status !== this.STATUS_PLAYING) {
       this.resume()
@@ -79,7 +91,7 @@ class Controller extends EventEmitter {
 
 
   /*
-   * Add a URI to the playlist IF we can load it
+   * Add a URI to the playlist
    */
 
   add(uri) {
@@ -115,9 +127,11 @@ class Controller extends EventEmitter {
     return Promise.all(uris.map(this.add.bind(this)))
   }
 
+
   /*
    * Add all and play
    */
+
   addAllAndPlay(uris) {
     return this.addAll(uris).then(files => {
       this.start(files[0])
@@ -135,7 +149,7 @@ class Controller extends EventEmitter {
       currentFile: file,
       stream: this.server.getPath() + '/' + encodeURIComponent(file.uri)
     })
-    this.startPollingEngine()
+    this._startPollingEngine()
   }
 
 
@@ -147,7 +161,7 @@ class Controller extends EventEmitter {
     this.setState({
       status: this.STATUS_PLAYING
     })
-    this.startPollingEngine()
+    this._startPollingEngine()
   }
 
 
@@ -159,7 +173,7 @@ class Controller extends EventEmitter {
     this.setState({
       status: this.STATUS_PAUSED
     })
-    this.stopPollingEngine()
+    this._stopPollingEngine()
   }
 
 
@@ -170,9 +184,10 @@ class Controller extends EventEmitter {
   stop() {
     this.setState({
       status: this.STATUS_STOPPED,
-      currentFile: null
+      currentFile: null,
+      stream: null
     })
-    this.stopPollingEngine()
+    this._stopPollingEngine()
   }
 
 
@@ -218,7 +233,7 @@ class Controller extends EventEmitter {
    * Start polling the engine for state updates
    */
 
-  startPollingEngine() {
+  _startPollingEngine() {
     this.pollInterval = setInterval(() => {
       console.log('polling!')
       this.setState({
@@ -234,7 +249,7 @@ class Controller extends EventEmitter {
    * Stop polling the engine for state updates
    */
 
-  stopPollingEngine() {
+  _stopPollingEngine() {
     clearInterval(this.pollInterval)
   }
 
@@ -245,36 +260,46 @@ class Controller extends EventEmitter {
 
   toggleCasting(id) {
     if (this.state.casting) {
-      this.stopCasting()
+      this.setEngine(this.ENGINE_HTML5VIDEO)
     } else {
-      this.startCasting(id)
+      this.setEngine(this.ENGINE_CHROMECAST)
+      this.setState({
+        casting: id
+      })
     }
   }
 
 
   /*
-   * Start casting
+   * Set the engine to use
    */
 
-  startCasting(id) {
+  setEngine(type) {
+    if (this.state.engine) { this.state.engine.disable() }
+
+    let engine
+    if (type === this.ENGINE_CHROMECAST) {
+      engine = this._chromecastEngine
+    } else if (type === this.ENGINE_HTML5VIDEO) {
+      engine = this._htmlEngine
+    }
+
+    engine.enable()
+
     this.setState({
-      casting: id,
-      engine: new ChromecastEngine(this)
+      casting: null,
+      engine
     })
   }
 
 
   /*
-   * Stop casting
+   * Set the video element on the HTML engine
    */
 
-  stopCasting() {
-    this.setState({
-      casting: null,
-      engine: null // TODO NEED UI TO SUPPY ENGINE
-    })
+  setVideoElement(el) {
+    this._htmlEngine.setElement(el)
   }
-
 
   /*
    * Get a file from the playlist

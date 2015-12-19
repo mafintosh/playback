@@ -11,8 +11,10 @@ const argv = minimist(JSON.parse(window.location.toString().split('#')[1]), {
 const uris = argv._
 
 controller.on('ready', () => {
-  UI.init(controller)
-  if (uris.length) {
-    controller.addAllAndPlay(uris)
-  }
+  UI.init(controller, () => {
+    controller.setEngine(controller.ENGINE_HTML5VIDEO)
+    if (uris.length) {
+      controller.addAllAndPlay(uris)
+    }
+  })
 })

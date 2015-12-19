@@ -8,7 +8,18 @@ class HTML5Video extends EventEmitter {
   constructor(controller) {
     super()
     this.controller = controller
-    controller.on('update', this._update.bind(this))
+
+    this._update = this._update.bind(this)
+  }
+
+  enable() {
+    this.controller.on('update', this._update)
+  }
+
+  disable() {
+    this.controller.removeListener('update', this._update)
+    this.element.pause()
+    this.element.removeAttribute('src')
   }
 
   _update(state) {
@@ -17,7 +28,9 @@ class HTML5Video extends EventEmitter {
     }
 
     if (state.status === this.controller.STATUS_PLAYING) {
-      this.element.play()
+      if (this.element.paused) {
+        this.element.play()
+      }
     } else {
       this.element.pause()
     }

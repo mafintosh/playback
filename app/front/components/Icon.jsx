@@ -29,9 +29,13 @@ class Icon extends React.Component {
         return (
           <g><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></g>
         )
-      case 'playlist':
+      case 'playlist-empty':
         return (
           <g><path d="M14 10H2v2h12v-2zm0-4H2v2h12V6zm4 8v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM2 16h8v-2H2v2z"></path></g>
+        )
+      case 'playlist':
+        return (
+          <g><path d="M3 18h18v-2h-18v2zm0-5h18v-2h-18v2zm0-7v2h18v-2h-18z"></path></g>
         )
       case 'cast':
         return (
@@ -56,6 +60,10 @@ class Icon extends React.Component {
       case 'volume-down':
         return (
           <g><path d="M18.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM5 9v6h4l5 5V4L9 9H5z"></path></g>
+        )
+      case 'subtitles':
+        return (
+          <g><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM4 12h4v2H4v-2zm10 6H4v-2h10v2zm6 0h-4v-2h4v2zm0-4H10v-2h10v2z"></path></g>
         )
       default:
         return

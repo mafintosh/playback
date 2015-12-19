@@ -1,7 +1,6 @@
 import React from 'react'
 import { render } from 'react-dom'
 
-import HTML5Video from '../engines/HTML5Video'
 import Icon from './components/icon'
 
 class App extends React.Component {
@@ -18,12 +17,10 @@ class App extends React.Component {
   }
 
   componentDidMount() {
+    this.controller.setVideoElement(this.refs.video)
     this.controller.on('update', () => {
       this.setState(this.controller.getState())
     })
-    const htmlEngine = new HTML5Video(this.controller)
-    htmlEngine.setElement(this.refs.video)
-    this.controller.setState({ engine: htmlEngine })
   }
 
   _handleTogglePlayClick() {
@@ -70,7 +67,7 @@ class App extends React.Component {
     const title = this.state.currentFile ? this.state.currentFile.name : 'No file'
     const { currentTime, duration } = this.state
     const progressStyle = {
-      transition: `width ${1000}ms linear`,
+      transition: `width ${500}ms linear`,
       width: currentTime / duration * 100 + '%'
     }
 
@@ -81,7 +78,7 @@ class App extends React.Component {
         const left = buffered.start(i) / duration * 100
         const width = (buffered.end(i) - buffered.start(i)) / duration * 100
         bufferedBars.push(
-          <div key={i} className="controls__timeline__buffered" style={{ transition: progressStyle.transition, left: left + '%', width: width + '%' }}></div>
+          <div key={i} className="controls__timeline__buffered" style={{ left: left + '%', width: width + '%' }}></div>
         )
       }
     }
@@ -105,8 +102,8 @@ class App extends React.Component {
             <div className="controls__metadata">
               {this._formatTime(currentTime)} / {this._formatTime(duration)}
             </div>
-            <button onClick={this._handlePlaylistClick.bind(this)}>
-              <Icon icon="playlist"/>
+            <button className={this.state.playlist.length ? 'playlist' : 'playlist-empty'} onClick={this._handlePlaylistClick.bind(this)}>
+              <Icon icon={this.state.playlist.length ? 'playlist' : 'playlist-empty'}/>
             </button>
             <button onClick={this._handleCastClick.bind(this)}>
               <Icon icon={this.state.casting ? 'cast-connected' : 'cast'}/>
@@ -123,7 +120,7 @@ class App extends React.Component {
 }
 
 module.exports = {
-  init: (controller) => {
-    render(<App controller={controller}/>, document.getElementById('react-root'))
+  init: (controller, cb) => {
+    render(<App controller={controller}/>, document.getElementById('react-root'), cb)
   }
 }
