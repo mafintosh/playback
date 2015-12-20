@@ -23,8 +23,17 @@ app.on('ready', () => {
   })
   win.loadURL('file://' + __dirname + '/front/index.html#' + JSON.stringify(process.argv.slice(2)))
   win.webContents.openDevTools()
+
   win.on('closed', () => {
     win = null
+  })
+
+  win.on('enter-full-screen', () => {
+    win.send('fullscreen-change', true)
+  })
+
+  win.on('leave-full-screen', () => {
+    win.send('fullscreen-change', false)
   })
 })
 
@@ -33,8 +42,8 @@ ipc.on('open-file-dialog', () => {
   if (files) win.send('load-files', files)
 })
 
-ipc.on('fullscreen', (value = true) => {
-  win.setFullScreen(value)
+ipc.on('toggle-fullscreen', () => {
+  win.setFullScreen(!win.isFullScreen())
 })
 
 ipc.on('focus', function () {

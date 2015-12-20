@@ -1,3 +1,5 @@
+import { ipcRenderer as ipc } from 'electron'
+
 import React from 'react'
 import { render } from 'react-dom'
 import CSSTG from 'react-addons-css-transition-group'
@@ -15,12 +17,21 @@ class App extends React.Component {
     super(props)
     this.controller = this.props.controller
     this.state = this.controller.getState()
-    this.state.ui = {}
+    this._initListeners()
   }
+
 
   componentDidMount() {
     this.controller.on('update', () => {
       this.setState(this.controller.getState())
+    })
+  }
+
+  _initListeners() {
+    ipc.on('fullscreen-change', (sender, fullscreen) => {
+      this.setState({
+        fullscreen
+      })
     })
   }
 
@@ -51,7 +62,7 @@ class App extends React.Component {
   }
 
   _handleFullscreenClick() {
-
+    ipc.send('toggle-fullscreen')
   }
 
   _handleSeek(e) {
@@ -176,7 +187,7 @@ class App extends React.Component {
               <Icon icon={this.state.casting ? 'cast-connected' : 'cast'}/>
             </button>
             <button onClick={this._handleFullscreenClick.bind(this)}>
-              <Icon icon="fullscreen"/>
+              <Icon icon={this.state.fullscreen ? 'fullscreen-exit' : 'fullscreen'}/>
             </button>
           </div>
         </div>
