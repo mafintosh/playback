@@ -1,13 +1,14 @@
-import electron from 'electron'
-
-const app = electron.app
-const BrowserWindow = electron.BrowserWindow
-const ipc = electron.ipcMain
-const dialog = electron.dialog
+import {
+  app,
+  dialog
+  BrowserWindow,
+  ipcMain as ipc,
+  default as electron,
+} from 'electron'
 
 electron.crashReporter.start()
 
-let win = null
+let win
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
