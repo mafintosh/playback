@@ -96,50 +96,38 @@ class Controller extends EventEmitter {
 
 
   /*
-   * Add a URI to the playlist
+   * Add URI(s) to the playlist
    */
 
-  add(uri) {
-    let prom
-    loaders.some((loader) => {
-      if (loader.test(uri)) {
-        prom = loader.load(uri).then(file => {
-          this.setState(update(this.state, { playlist: { $push: [file] } }))
-          return file
-        })
-        return true
-      }
+  add(uris) {
+    let list = uris
+    if (!uris.slice) list = [uris]
+
+    const proms = []
+    list.forEach(uri => {
+      loaders.some(loader => {
+        if (loader.test(uri)) {
+          proms.push(loader.load(uri).then(file => {
+            this.setState(update(this.state, { playlist: { $push: [file] } }))
+            return file
+          }))
+          return true
+        }
+      })
     })
-    return prom
-  }
 
-  /*
-   * Add a URI to the playlist and play it
-   */
-
-  addAndStart(uri) {
-    return this.add(uri).then(file => {
-      this.load(file)
-    })
+    return Promise.all(proms)
   }
 
 
   /*
-   * Add an array of URIs
+   * Add URI(s) to the playlist and start
    */
 
-  addAll(uris) {
-    return Promise.all(uris.map(this.add.bind(this)))
-  }
-
-
-  /*
-   * Add all and play
-   */
-
-  addAllAndPlay(uris) {
-    return this.addAll(uris).then(files => {
+  addAndPlay(uris) {
+    return this.add(uris).then(files => {
       this.load(files[0], true)
+      return files
     })
   }
 
@@ -350,7 +338,7 @@ class Controller extends EventEmitter {
    */
 
   _handleLoadFilesEvent(sender, files) {
-    this.addAll(files)
+    this.add(files)
   }
 
 }

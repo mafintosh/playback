@@ -15,7 +15,7 @@ controller.on('ready', () => {
   UI.init(controller, () => {
     controller.setPlayer(controller.PLAYER_HTML5VIDEO)
     if (uris.length) {
-      controller.addAllAndPlay(uris)
+      controller.addAndPlay(uris)
     }
   })
 })
