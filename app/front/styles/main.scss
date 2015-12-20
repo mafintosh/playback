@@ -1,5 +1,5 @@
 $body-bg: black;
-$body-font: 'Arial';
+$body-font: 'Helvetica Neue';
 $primary: #579A57;
 $controls-bg: rgba(0, 0, 0, 0.84);
 $controls-fg: #aaa;
@@ -10,6 +10,22 @@ $controls-timeline-bg: rgba(218, 218, 218, 0.12);
 $controls-timeline-progress-bg: $primary;
 $controls-timeline-buffered-bg: rgba(218, 218, 218, 0.12);
 
+$playlist-bg: rgba(20,20,20,.9);
+$playlist-fg: $controls-fg;
+$playlist-button-bg: rgb(50,50,50);
+$playlist-button-fg: #aaa;
+$playlist-button-hover-bg: rgb(60,60,60);
+$playlist-button-hover-fg: #fff;
+$playlist-item-icon-fg: #999;
+$playlist-item-hover-bg: rgb(25,25,25);
+$playlist-item-hover-fg: #fff;
+$playlist-item-active-bg: rgb(50,50,50);
+$playlist-item-active-fg: #fff;
+
+*, *:after, *:before {
+  box-sizing: inherit;
+}
+
 body {
   background: $body-bg;
   overflow: hidden;
@@ -17,16 +33,102 @@ body {
   font-size: 13px;
   margin: 0;
   cursor: default;
+  box-sizing: border-box;
+
+  .ui {
+    transition: opacity 250ms ease-in-out;
+    opacity: 0;
+  }
 
   .controls {
-    opacity: 0;
     bottom: -50px;
   }
 
+  .dialog {
+    transition: right 250ms ease-in-out;
+    right: -20px;
+  }
+
   &:hover {
-    .controls {
+    .ui {
       opacity: 1;
+    }
+    .controls {
       bottom: 0;
+    }
+    .dialog {
+      right: 20px;
+    }
+  }
+}
+
+
+.dialog {
+  position: fixed;
+  bottom: 50px;
+  right: 25px;
+  max-height: calc(100% - 100px);
+  width: 400px;
+  background: $playlist-bg;
+  color: $playlist-fg;
+  display: flex;
+  flex-direction: column;
+
+  > ul {
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    flex: 1;
+
+    > li {
+      padding: 10px 6px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      display: flex;
+      align-items: center;
+      min-height: 44px;
+
+      > .playlist__item-icon {
+        width: 30px;
+        text-align: center;
+        margin-right: 6px;
+        color: $playlist-item-icon-fg;
+      }
+
+      > .playlist__item-title {
+        flex: 1;
+      }
+
+      &:hover {
+        background-color: $playlist-item-hover-bg;
+        color: $playlist-item-hover-fg;
+      }
+
+      &.active {
+        background-color: $playlist-item-active-bg;
+        color: $playlist-item-active-fg;
+      }
+    }
+  }
+
+  > div {
+    text-align: right;
+  }
+
+  > div > button {
+    margin: 0 6px 6px;
+    background: $playlist-button-bg;
+    color: $playlist-button-fg;
+    padding: 8px 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 2px;
+    font-family: inherit;
+
+    &:hover {
+      background: $playlist-button-hover-bg;
+      color: $playlist-button-hover-fg;
     }
   }
 }
@@ -93,4 +195,28 @@ video {
   position: fixed;
   width: 100%;
   height: 100%;
+}
+
+
+.fade-up-enter {
+  transform-origin: bottom right;
+  opacity: 0.01;
+  // transform: scale(.75,.75) translate(0, 50%);
+}
+
+.fade-up-enter.fade-up-enter-active {
+  opacity: 1;
+  // transform: scale(1,1) translate(0, 0);
+  transition: opacity 125ms ease-in-out, transform 125ms ease-in-out, right 125ms ease-in-out;
+}
+
+.fade-up-leave {
+  opacity: 1;
+  transform-origin: bottom right;
+}
+
+.fade-up-leave.fade-up-leave-active {
+  opacity: 0.01;
+  // transform: scale(.75,.75) translate(0, 50%);
+  transition: opacity 125ms ease-in-out, transform 125ms ease-in-out, right 125ms ease-in-out;
 }

@@ -11,8 +11,9 @@ const argv = minimist(JSON.parse(window.location.toString().split('#')[1]), {
 const uris = argv._
 
 controller.on('ready', () => {
+  controller.setVideoElement(document.getElementById('video'))
   UI.init(controller, () => {
-    controller.setEngine(controller.ENGINE_HTML5VIDEO)
+    controller.setPlayer(controller.PLAYER_HTML5VIDEO)
     if (uris.length) {
       controller.addAllAndPlay(uris)
     }

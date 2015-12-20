@@ -3,6 +3,7 @@ import electron from 'electron'
 const app = electron.app
 const BrowserWindow = electron.BrowserWindow
 const ipc = electron.ipcMain
+const dialog = electron.dialog
 
 electron.crashReporter.start()
 
@@ -25,6 +26,11 @@ app.on('ready', () => {
   win.on('closed', () => {
     win = null
   })
+})
+
+ipc.on('open-file-dialog', () => {
+  const files = dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] })
+  if (files) win.send('load-files', files)
 })
 
 ipc.on('fullscreen', (value = true) => {

@@ -1,11 +1,15 @@
 import { EventEmitter } from 'events'
+import { ipcRenderer as ipc } from 'electron'
 import update from 'react-addons-update'
-import Server from './Server'
+import chromecasts from 'chromecasts'
+
 import fileLoader from './loaders/file'
 import youtubeLoader from './loaders/youtube'
-import chromecasts from 'chromecasts'
-import ChromecastEngine from './engines/Chromecast'
-import HTML5VideoEngine from './engines/HTML5Video'
+
+import ChromecastPlayer from './players/Chromecast'
+import HTML5VideoPlayer from './players/HTML5Video'
+
+import Server from './Server'
 
 const loaders = [youtubeLoader, fileLoader]
 
@@ -14,14 +18,17 @@ class Controller extends EventEmitter {
   get STATUS_STOPPED() { return 'stopped' }
   get STATUS_PAUSED() { return 'paused' }
   get STATUS_PLAYING() { return 'playing' }
-  get ENGINE_HTML5VIDEO() { return 'html5video '}
-  get ENGINE_CHROMECAST() { return 'chromecast '}
+  get PLAYER_HTML5VIDEO() { return 'html5video '}
+  get PLAYER_CHROMECAST() { return 'chromecast '}
 
   constructor() {
     super()
     this.server = new Server(this, () => { this.emit('ready') })
     this._initChromecasts()
-    this._initEngines()
+    this._initPlayers()
+
+    ipc.on('load-files', this._handleLoadFilesEvent.bind(this))
+
     this.setState({
       status: this.STATUS_STOPPED,
       volume: 100,
@@ -33,7 +40,7 @@ class Controller extends EventEmitter {
       duration: 0,
       playlist: [],
       chromecasts: [],
-      engine: null
+      player: null
     })
   }
 
@@ -42,9 +49,9 @@ class Controller extends EventEmitter {
     this.chromecasts.on('update', this._onChromecastsUpdate.bind(this))
   }
 
-  _initEngines() {
-    this._chromecastEngine = new ChromecastEngine(this)
-    this._htmlEngine = new HTML5VideoEngine(this)
+  _initPlayers() {
+    this._chromecastPlayer = new ChromecastPlayer(this)
+    this._htmlPlayer = new HTML5VideoPlayer(this)
   }
 
   _onChromecastsUpdate() {
@@ -60,9 +67,7 @@ class Controller extends EventEmitter {
   setState(state) {
     this.state = Object.assign({}, this.state || {}, state)
     console.log('Setting state', state, this.state)
-    setImmediate(() => {
-      this.emit('update', this.state)
-    })
+    this.emit('update', this.state)
   }
 
 
@@ -114,7 +119,7 @@ class Controller extends EventEmitter {
 
   addAndStart(uri) {
     return this.add(uri).then(file => {
-      this.start(file)
+      this.load(file)
     })
   }
 
@@ -134,22 +139,27 @@ class Controller extends EventEmitter {
 
   addAllAndPlay(uris) {
     return this.addAll(uris).then(files => {
-      this.start(files[0])
+      this.load(files[0], true)
     })
   }
 
 
   /*
-   * Start a file
+   * Load a file
    */
 
-  start(file) {
+  load(file, autoPlay = false, currentTime = 0) {
+    const stream = this.server.getPath() + '/' + encodeURIComponent(file.uri)
     this.setState({
-      status: this.STATUS_PLAYING,
+      status: autoPlay ? this.STATUS_PLAYING : this.STATUS_PAUSED,
       currentFile: file,
-      stream: this.server.getPath() + '/' + encodeURIComponent(file.uri)
+      currentTime,
+      stream
     })
-    this._startPollingEngine()
+    this.state.player.load(file, stream, autoPlay, currentTime)
+    if (autoPlay) {
+      this._startPollingPlayer()
+    }
   }
 
 
@@ -161,7 +171,8 @@ class Controller extends EventEmitter {
     this.setState({
       status: this.STATUS_PLAYING
     })
-    this._startPollingEngine()
+    this.state.player.resume()
+    this._startPollingPlayer()
   }
 
 
@@ -173,7 +184,8 @@ class Controller extends EventEmitter {
     this.setState({
       status: this.STATUS_PAUSED
     })
-    this._stopPollingEngine()
+    this.state.player.pause()
+    this._stopPollingPlayer()
   }
 
 
@@ -187,7 +199,8 @@ class Controller extends EventEmitter {
       currentFile: null,
       stream: null
     })
-    this._stopPollingEngine()
+    this.state.player.stop()
+    this._stopPollingPlayer()
   }
 
 
@@ -196,7 +209,7 @@ class Controller extends EventEmitter {
    */
 
   seekToSecond(second) {
-    this.state.engine.seekToSecond(second)
+    this.state.player.seekToSecond(second)
     this.setState({
       currentTime: second
     })
@@ -212,7 +225,7 @@ class Controller extends EventEmitter {
     const currentIndex = playlist.indexOf(currentFile)
     const nextFile = playlist[currentIndex + 1]
     if (!nextFile) { return }
-    this.start(nextFile)
+    this.load(nextFile, true)
   }
 
 
@@ -225,31 +238,32 @@ class Controller extends EventEmitter {
     const currentIndex = playlist.indexOf(currentFile)
     const prevFile = playlist[currentIndex - 1]
     if (!prevFile) { return }
-    this.start(prevFile)
+    this.load(prevFile, true)
   }
 
 
   /*
-   * Start polling the engine for state updates
+   * Start polling the player for state updates
    */
 
-  _startPollingEngine() {
+  _startPollingPlayer() {
+    this._stopPollingPlayer()
     this.pollInterval = setInterval(() => {
       console.log('polling!')
       this.setState({
-        currentTime: this.state.engine.currentTime(),
-        duration: this.state.engine.duration(),
-        buffered: this.state.engine.buffered()
+        currentTime: this.state.player.currentTime(),
+        duration: this.state.player.duration(),
+        buffered: this.state.player.buffered()
       })
-    }, this.state.engine.POLL_FREQUENCY)
+    }, this.state.player.POLL_FREQUENCY)
   }
 
 
   /*
-   * Stop polling the engine for state updates
+   * Stop polling the player for state updates
    */
 
-  _stopPollingEngine() {
+  _stopPollingPlayer() {
     clearInterval(this.pollInterval)
   }
 
@@ -258,48 +272,59 @@ class Controller extends EventEmitter {
    * Toggle casting
    */
 
-  toggleCasting(id) {
+  toggleCasting(deviceId) {
     if (this.state.casting) {
-      this.setEngine(this.ENGINE_HTML5VIDEO)
+      this.setPlayer(this.PLAYER_HTML5VIDEO, { casting: null })
     } else {
-      this.setEngine(this.ENGINE_CHROMECAST)
-      this.setState({
-        casting: id
-      })
+      this.setPlayer(this.PLAYER_CHROMECAST, { casting: deviceId })
     }
   }
 
 
   /*
-   * Set the engine to use
+   * Set the player to use.
+   *
+   * Disables the current player
+   * Enables the new player
+   * Continue where we left off
    */
 
-  setEngine(type) {
-    if (this.state.engine) { this.state.engine.disable() }
+  setPlayer(type, additionalState = {}) {
+    const currentFile = this.state.currentFile
+    const currentTime = this.state.currentTime
+    const autoPlay = this.state.status === this.STATUS_PLAYING
 
-    let engine
-    if (type === this.ENGINE_CHROMECAST) {
-      engine = this._chromecastEngine
-    } else if (type === this.ENGINE_HTML5VIDEO) {
-      engine = this._htmlEngine
+    if (this.state.status !== this.STATUS_STOPPED) {
+      this.stop()
     }
 
-    engine.enable()
+    if (this.state.player) { this.state.player.disable() }
 
-    this.setState({
-      casting: null,
-      engine
-    })
+    let player
+    if (type === this.PLAYER_CHROMECAST) {
+      player = this._chromecastPlayer
+    } else if (type === this.PLAYER_HTML5VIDEO) {
+      player = this._htmlPlayer
+    }
+
+    player.enable()
+
+    this.setState(Object.assign({ player }, additionalState))
+
+    if (currentFile) {
+      this.load(currentFile, autoPlay, currentTime)
+    }
   }
 
 
   /*
-   * Set the video element on the HTML engine
+   * Set the video element on the HTML player
    */
 
   setVideoElement(el) {
-    this._htmlEngine.setElement(el)
+    this._htmlPlayer.setElement(el)
   }
+
 
   /*
    * Get a file from the playlist
@@ -308,6 +333,24 @@ class Controller extends EventEmitter {
   getFile(uri) {
     const { playlist } = this.state
     return playlist[playlist.find(uri, f => f.uri === uri)]
+  }
+
+
+  /*
+   * Open file dialog
+   */
+
+  openFileDialog() {
+    ipc.send('open-file-dialog')
+  }
+
+
+  /*
+   * Load files requested by ipc event
+   */
+
+  _handleLoadFilesEvent(sender, files) {
+    this.addAll(files)
   }
 
 }

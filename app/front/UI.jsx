@@ -1,5 +1,6 @@
 import React from 'react'
 import { render } from 'react-dom'
+import CSSTG from 'react-addons-css-transition-group'
 
 import Icon from './components/icon'
 
@@ -14,10 +15,10 @@ class App extends React.Component {
     super(props)
     this.controller = this.props.controller
     this.state = this.controller.getState()
+    this.state.ui = {}
   }
 
   componentDidMount() {
-    this.controller.setVideoElement(this.refs.video)
     this.controller.on('update', () => {
       this.setState(this.controller.getState())
     })
@@ -28,15 +29,25 @@ class App extends React.Component {
   }
 
   _handlePlaylistClick() {
-    this.controller.addAndStart('https://www.youtube.com/watch?v=ct47O2EIpWE').catch(err => {
-      console.error(err, err.stack)
+    this.setState({
+      uiDialog: this.state.uiDialog === 'playlist' ? null : 'playlist'
     })
   }
 
   _handleCastClick() {
-    const cast = this.state.chromecasts[0]
-    const id = cast.host + cast.name
+    this.setState({
+      uiDialog: this.state.uiDialog === 'chromecasts' ? null : 'chromecasts'
+    })
+  }
+
+  _handleCastItemClick(id) {
+    this.setState({ uiDialog: null })
     this.controller.toggleCasting(id)
+  }
+
+  _handlePlaylistItemClick(file) {
+    this.setState({ uiDialog: null })
+    this.controller.load(file, true)
   }
 
   _handleFullscreenClick() {
@@ -53,6 +64,10 @@ class App extends React.Component {
 
   }
 
+  _handleAddMediaClick() {
+    this.controller.openFileDialog()
+  }
+
   _formatTime(totalSeconds) {
     const hours = (totalSeconds / 3600) | 0
     let mins = ((totalSeconds - hours * 3600) / 60) | 0
@@ -62,12 +77,55 @@ class App extends React.Component {
     return (hours ? hours + ':' : '') + mins + ':' + secs
   }
 
+  _renderPlaylist() {
+    const items = this.state.playlist.map((file, i) => {
+      const active = file === this.state.currentFile ? 'active' : ''
+      return (
+        <li key={i} onClick={this._handlePlaylistItemClick.bind(this, file)} className={active}>
+          <div className="playlist__item-icon">
+            {active ? <Icon icon="volume-up"/> : i + 1}
+          </div>
+          <div className="playlist__item-title">
+            {file.name}
+          </div>
+        </li>
+      )
+    })
+
+    return (
+      <div key={'playlist'} className="dialog playlist">
+        <ul>
+          {items}
+        </ul>
+        <div>
+          <button onClick={this._handleAddMediaClick.bind(this)}>Add media</button>
+        </div>
+      </div>
+    )
+  }
+
+  _renderChromecastDialog() {
+    const items = this.state.chromecasts.map((cast, i) => {
+      const active = cast.host + cast.name === this.state.casting ? 'active' : ''
+      return <li key={i} onClick={this._handleCastItemClick.bind(this, cast.host + cast.name)} className={active}>{cast.name}</li>
+    })
+
+    return (
+      <div key={'chromecasts'} className="dialog chromecasts">
+        <ul>
+          {items}
+        </ul>
+      </div>
+    )
+  }
+
   render() {
     const playIcon = this.state.status === this.controller.STATUS_PLAYING ? 'pause' : 'play'
     const title = this.state.currentFile ? this.state.currentFile.name : 'No file'
     const { currentTime, duration } = this.state
+    const updateSpeed = this.state.player ? this.state.player.POLL_FREQUENCY : 1000
     const progressStyle = {
-      transition: `width ${500}ms linear`,
+      transition: `width ${updateSpeed}ms linear`,
       width: currentTime / duration * 100 + '%'
     }
 
@@ -78,14 +136,23 @@ class App extends React.Component {
         const left = buffered.start(i) / duration * 100
         const width = (buffered.end(i) - buffered.start(i)) / duration * 100
         bufferedBars.push(
-          <div key={i} className="controls__timeline__buffered" style={{ left: left + '%', width: width + '%' }}></div>
+          <div key={i} className="controls__timeline__buffered" style={{ transition: `width ${updateSpeed}ms ease-in-out`, left: left + '%', width: width + '%' }}></div>
         )
       }
     }
 
+    let dialog
+    if (this.state.uiDialog === 'playlist') {
+      dialog = this._renderPlaylist()
+    } else if (this.state.uiDialog === 'chromecasts') {
+      dialog = this._renderChromecastDialog()
+    }
+
     const app = (
-      <div>
-        <video src={this.state.stream} ref="video"/>
+      <div className="ui">
+        <CSSTG transitionName="fade-up" transitionEnterTimeout={125} transitionLeaveTimeout={125}>
+          {dialog}
+        </CSSTG>
         <div className="controls">
           <div className="controls__timeline" onClick={this._handleSeek.bind(this)}>
             {bufferedBars}
@@ -102,8 +169,8 @@ class App extends React.Component {
             <div className="controls__metadata">
               {this._formatTime(currentTime)} / {this._formatTime(duration)}
             </div>
-            <button className={this.state.playlist.length ? 'playlist' : 'playlist-empty'} onClick={this._handlePlaylistClick.bind(this)}>
-              <Icon icon={this.state.playlist.length ? 'playlist' : 'playlist-empty'}/>
+            <button onClick={this._handlePlaylistClick.bind(this)}>
+              <Icon icon="playlist-empty"/>
             </button>
             <button onClick={this._handleCastClick.bind(this)}>
               <Icon icon={this.state.casting ? 'cast-connected' : 'cast'}/>
