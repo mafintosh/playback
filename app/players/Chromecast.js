@@ -8,22 +8,31 @@ class Chromecast extends EventEmitter {
   constructor(controller) {
     super()
     this.controller = controller
-
-    this._onStatusUpdate = this._onStatusUpdate.bind(this)
-    this._onMetadata = this._onMetadata.bind(this)
   }
 
   enable() {
-    this.status = {
-      currentTime: 0,
-      media: {
-        duration: 0
-      }
-    }
+    // TODO: Pass in cast deviceId
   }
 
   disable() {
-    if (this.device) { this.stop() }
+    if (this.device) {
+      this.stop()
+      this.device = null
+    }
+  }
+
+  load(file, stream, autoPlay = false, currentTime = 0) {
+    const device = this.device = this._getDevice()
+
+    device.play(stream, {
+      autoPlay,
+      title: file.name,
+      seek: currentTime
+    }, this._onMetadata.bind(this))
+
+    if (autoPlay) {
+      this._startPolling()
+    }
   }
 
   _getDevice() {
@@ -38,59 +47,60 @@ class Chromecast extends EventEmitter {
     return device
   }
 
-  load(file, stream, autoPlay = false, currentTime = 0) {
-    const device = this.device = this._getDevice()
+  _onMetadata(err, status) {
+    console.log('Cast onmetadata: ', status)
+    this.emit('metadata', {
+      duration: status.media.duration
+    })
+  }
 
-    device.play(stream, {
-      title: file.name,
-      autoPlay,
-      seek: currentTime
-    }, this._onMetadata)
+  _onStatus(err, status) {
+    if (!status) {
+      this.device = null
+      this._stopPolling()
+      this.emit('end')
+    } else {
+      this.emit('status', {
+        currentTime: status.currentTime
+      })
+    }
+  }
 
-    device.on('status', this._onStatusUpdate)
+  _startPolling() {
+    this._stopPolling()
     this.interval = setInterval(() => {
       if (!this.device) { return clearInterval(this.interval) }
-      this.device.status(this._onMetadata)
-    }, 1000)
+      this.device.status(this._onStatus.bind(this))
+    }, this.POLL_FREQUENCY)
   }
 
-  resume() {
-    this.device.resume()
-  }
-
-  pause() {
-    this.device.pause()
-  }
-
-  stop() {
-    this.device.stop()
-    this.device.removeListener('status', this._onMetadata)
-    this.device = null
+  _stopPolling() {
     clearInterval(this.interval)
   }
 
-  _onMetadata(err, data) {
-    this.status = data
+  resume() {
+    this._startPolling()
+    if (this.device) {
+      this.device.resume()
+    }
   }
 
-  _onStatusUpdate(status) {
-    Object.assign(this.status, status)
+  pause() {
+    this._stopPolling()
+    if (this.device) {
+      this.device.pause()
+    }
+  }
+
+  stop() {
+    this._stopPolling()
+    if (this.device) {
+      this.device.stop()
+    }
   }
 
   seekToSecond(second) {
     this.device.seek(second)
-  }
-
-  duration() {
-    return this.status.media.duration
-  }
-
-  currentTime() {
-    return this.status.currentTime
-  }
-
-  buffered() {
-    return []
   }
 
 }

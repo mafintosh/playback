@@ -11,7 +11,7 @@ class HTML5Video extends EventEmitter {
   }
 
   enable() {
-    // nothing
+    // TODO: Pass in video el
   }
 
   disable() {
@@ -20,50 +20,70 @@ class HTML5Video extends EventEmitter {
 
   load(file, stream, autoPlay = false, currentTime = 0) {
     this.stop()
+
+    const el = this.element
     const src = document.createElement('source')
     src.setAttribute('src', stream)
-    this.element.appendChild(src)
-    this.element.load()
-    this.element.currentTime = currentTime
+    el.appendChild(src)
+    el.load()
+    el.currentTime = currentTime
+
     if (autoPlay) {
-      this.element.play()
+      this._startPolling()
+      el.play()
     }
   }
 
+  _startPolling() {
+    this._stopPolling()
+    this.interval = setInterval(() => {
+      this.emit('status', {
+        currentTime: this.element.currentTime,
+        buffered: this.element.buffered
+      })
+    }, this.POLL_FREQUENCY)
+  }
+
+  _stopPolling() {
+    clearInterval(this.interval)
+  }
+
   resume() {
+    this._startPolling()
     this.element.play()
   }
 
   pause() {
+    this._stopPolling()
     this.element.pause()
   }
 
   stop() {
+    this._stopPolling()
     this.element.pause()
     this.element.load()
-    while (this.element.firstChild) {
-      this.element.removeChild(this.element.firstChild)
-    }
-  }
-
-  setElement(el) {
-    this.element = el
+    this.element.innerHTML = ''
   }
 
   seekToSecond(second) {
     this.element.currentTime = second
   }
 
-  duration() {
-    return this.element.duration || 0
-  }
+  setElement(el) {
+    this.element = el
 
-  currentTime() {
-    return this.element.currentTime || 0
-  }
+    el.addEventListener('loadedmetadata', () => {
+      this.emit('metadata', {
+        duration: el.duration,
+        height: el.videoHeight,
+        width: el.videoWidth
+      })
+    })
 
-  buffered() {
-    return this.element.buffered
+    el.addEventListener('ended', () => {
+      this._stopPolling()
+      this.emit('end')
+    })
   }
 
 }

@@ -6,7 +6,7 @@
   "dependencies": {
     "JSONStream": "^0.10.0",
     "babel-polyfill": "^6.3.14",
-    "chromecasts": "^1.2.1",
+    "chromecasts": "^1.7.1",
     "concat-stream": "^1.4.7",
     "dombo": "^3.2.0",
     "drag-and-drop-files": "0.0.1",

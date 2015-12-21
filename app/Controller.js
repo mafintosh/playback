@@ -50,8 +50,14 @@ class Controller extends EventEmitter {
   }
 
   _initPlayers() {
-    this._chromecastPlayer = new ChromecastPlayer(this)
-    this._htmlPlayer = new HTML5VideoPlayer(this)
+    const cp = this._chromecastPlayer = new ChromecastPlayer(this)
+    const hp = this._htmlPlayer = new HTML5VideoPlayer(this)
+    const list = [cp, hp]
+    list.forEach(p => {
+      p.on('end', this._handlePlayerEnd.bind(this))
+      p.on('metadata', this._handlePlayerMetadata.bind(this))
+      p.on('status', this._handlePlayerStatus.bind(this))
+    })
   }
 
   _onChromecastsUpdate() {
@@ -145,9 +151,6 @@ class Controller extends EventEmitter {
       stream
     })
     this.state.player.load(file, stream, autoPlay, currentTime)
-    if (autoPlay) {
-      this._startPollingPlayer()
-    }
   }
 
 
@@ -160,7 +163,6 @@ class Controller extends EventEmitter {
       status: this.STATUS_PLAYING
     })
     this.state.player.resume()
-    this._startPollingPlayer()
   }
 
 
@@ -173,7 +175,6 @@ class Controller extends EventEmitter {
       status: this.STATUS_PAUSED
     })
     this.state.player.pause()
-    this._stopPollingPlayer()
   }
 
 
@@ -188,7 +189,6 @@ class Controller extends EventEmitter {
       stream: null
     })
     this.state.player.stop()
-    this._stopPollingPlayer()
   }
 
 
@@ -205,6 +205,41 @@ class Controller extends EventEmitter {
 
 
   /*
+   * Handle when the player emits a status. Set currentTime and buffered list
+   */
+
+  _handlePlayerStatus(status) {
+    this.setState({
+      currentTime: status.currentTime,
+      buffered: status.buffered
+    })
+  }
+
+
+  /*
+   * Handle when the player emits metadata. Set the video duration, width, and height if available.
+   */
+
+  _handlePlayerMetadata(metadata) {
+    this.setState({
+      duration: metadata.duration,
+      videoWidth: metadata.width,
+      videoheight: metadata.height
+    })
+  }
+
+
+  /*
+   * Handle when the player has ended the current file. Start next in the playlist.
+   */
+
+  _handlePlayerEnd() {
+    this.setState({ currentTime: this.state.duration })
+    this.next()
+  }
+
+
+  /*
    * Play the next item in the playlist, if possible
    */
 
@@ -212,6 +247,7 @@ class Controller extends EventEmitter {
     const { currentFile, playlist } = this.state
     const currentIndex = playlist.indexOf(currentFile)
     const nextFile = playlist[currentIndex + 1]
+    this.stop()
     if (!nextFile) { return }
     this.load(nextFile, true)
   }
@@ -225,34 +261,9 @@ class Controller extends EventEmitter {
     const { currentFile, playlist } = this.state
     const currentIndex = playlist.indexOf(currentFile)
     const prevFile = playlist[currentIndex - 1]
+    this.stop()
     if (!prevFile) { return }
     this.load(prevFile, true)
-  }
-
-
-  /*
-   * Start polling the player for state updates
-   */
-
-  _startPollingPlayer() {
-    this._stopPollingPlayer()
-    this.pollInterval = setInterval(() => {
-      console.log('polling!')
-      this.setState({
-        currentTime: this.state.player.currentTime(),
-        duration: this.state.player.duration(),
-        buffered: this.state.player.buffered()
-      })
-    }, this.state.player.POLL_FREQUENCY)
-  }
-
-
-  /*
-   * Stop polling the player for state updates
-   */
-
-  _stopPollingPlayer() {
-    clearInterval(this.pollInterval)
   }
 
 
@@ -286,7 +297,9 @@ class Controller extends EventEmitter {
       this.stop()
     }
 
-    if (this.state.player) { this.state.player.disable() }
+    if (this.state.player) {
+      this.state.player.disable()
+    }
 
     let player
     if (type === this.PLAYER_CHROMECAST) {

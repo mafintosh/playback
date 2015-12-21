@@ -1,9 +1,9 @@
 import {
   app,
-  dialog
+  dialog,
   BrowserWindow,
   ipcMain as ipc,
-  default as electron,
+  default as electron
 } from 'electron'
 
 electron.crashReporter.start()
