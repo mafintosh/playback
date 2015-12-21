@@ -24,6 +24,19 @@ body {
   body:hover .dialog {
     right: 20px; }
 
+.btn {
+  margin: 0 6px 6px;
+  background: #323232;
+  color: #aaa;
+  padding: 8px 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 2px;
+  font-family: inherit; }
+  .btn:hover {
+    background: #3c3c3c;
+    color: #fff; }
+
 .dialog {
   position: fixed;
   bottom: 50px;
@@ -113,6 +126,25 @@ body {
       flex: 1; }
     .controls .controls__toolbar .controls__metadata {
       margin-right: 10px; }
+
+.empty-state {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; }
+  .empty-state .empty-state__heading {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.2);
+    margin-bottom: 20px; }
+  .empty-state .empty-state__icon {
+    border: 4px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    width: 150px;
+    height: 150px;
+    margin-bottom: 20px; }
 
 video {
   position: fixed;

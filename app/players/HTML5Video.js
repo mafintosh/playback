@@ -8,14 +8,34 @@ class HTML5Video extends EventEmitter {
   constructor(controller) {
     super()
     this.controller = controller
+    this._onMetadata = this._onMetadata.bind(this)
+    this._onEnd = this._onEnd.bind(this)
   }
 
-  enable() {
-    // TODO: Pass in video el
+  enable(opts) {
+    this.element = opts.element
+    this.element.addEventListener('loadedmetadata', this._onMetadata)
+    this.element.addEventListener('ended', this._onEnd)
   }
 
   disable() {
     this.stop()
+    this.element.removeEventListener('loadedmetadata', this._onMetadata)
+    this.element.removeEventListener('ended', this._onEnd)
+    this.element = null
+  }
+
+  _onMetadata() {
+    this.emit('metadata', {
+      duration: this.element.duration,
+      height: this.element.videoHeight,
+      width: this.element.videoWidth
+    })
+  }
+
+  _onEnd() {
+    this._stopPolling()
+    this.emit('end')
   }
 
   load(file, stream, autoPlay = false, currentTime = 0) {
@@ -60,30 +80,15 @@ class HTML5Video extends EventEmitter {
 
   stop() {
     this._stopPolling()
-    this.element.pause()
-    this.element.load()
-    this.element.innerHTML = ''
+    if (this.element) {
+      this.element.pause()
+      this.element.innerHTML = ''
+      this.element.load()
+    }
   }
 
   seekToSecond(second) {
     this.element.currentTime = second
-  }
-
-  setElement(el) {
-    this.element = el
-
-    el.addEventListener('loadedmetadata', () => {
-      this.emit('metadata', {
-        duration: el.duration,
-        height: el.videoHeight,
-        width: el.videoWidth
-      })
-    })
-
-    el.addEventListener('ended', () => {
-      this._stopPolling()
-      this.emit('end')
-    })
   }
 
 }

@@ -22,6 +22,11 @@ $playlist-item-hover-fg: #fff;
 $playlist-item-active-bg: rgb(50,50,50);
 $playlist-item-active-fg: #fff;
 
+$btn-bg: rgb(50,50,50);
+$btn-fg: #aaa;
+$btn-hover-bg: rgb(60,60,60);
+$btn-hover-fg: #fff;
+
 *, *:after, *:before {
   box-sizing: inherit;
 }
@@ -59,6 +64,22 @@ body {
     .dialog {
       right: 20px;
     }
+  }
+}
+
+.btn {
+  margin: 0 6px 6px;
+  background: $btn-bg;
+  color: $btn-fg;
+  padding: 8px 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 2px;
+  font-family: inherit;
+
+  &:hover {
+    background: $btn-hover-bg;
+    color: $btn-hover-fg;
   }
 }
 
@@ -188,6 +209,30 @@ body {
     .controls__metadata {
       margin-right: 10px;
     }
+  }
+}
+
+.empty-state {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  .empty-state__heading {
+    font-size: 16px;
+    color: rgba(255,255,255,.2);
+    margin-bottom: 20px;
+  }
+
+  .empty-state__icon {
+    border: 4px dashed rgba(255,255,255,.2);
+    border-radius: 20px;
+    width: 150px;
+    height: 150px;
+    margin-bottom: 20px;
   }
 }
 

@@ -268,19 +268,6 @@ class Controller extends EventEmitter {
 
 
   /*
-   * Toggle casting
-   */
-
-  toggleCasting(deviceId) {
-    if (this.state.casting) {
-      this.setPlayer(this.PLAYER_HTML5VIDEO, { casting: null })
-    } else {
-      this.setPlayer(this.PLAYER_CHROMECAST, { casting: deviceId })
-    }
-  }
-
-
-  /*
    * Set the player to use.
    *
    * Disables the current player
@@ -288,9 +275,8 @@ class Controller extends EventEmitter {
    * Continue where we left off
    */
 
-  setPlayer(type, additionalState = {}) {
-    const currentFile = this.state.currentFile
-    const currentTime = this.state.currentTime
+  setPlayer(type, playerOpts) {
+    const { currentFile, currentTime } = this.state
     const autoPlay = this.state.status === this.STATUS_PLAYING
 
     if (this.state.status !== this.STATUS_STOPPED) {
@@ -304,28 +290,18 @@ class Controller extends EventEmitter {
     let player
     if (type === this.PLAYER_CHROMECAST) {
       player = this._chromecastPlayer
+      player.enable(playerOpts)
+      this.setState({ player, casting: playerOpts.deviceId })
     } else if (type === this.PLAYER_HTML5VIDEO) {
       player = this._htmlPlayer
+      player.enable(playerOpts)
+      this.setState({ player, casting: null })
     }
-
-    player.enable()
-
-    this.setState(Object.assign({ player }, additionalState))
 
     if (currentFile) {
       this.load(currentFile, autoPlay, currentTime)
     }
   }
-
-
-  /*
-   * Set the video element on the HTML player
-   */
-
-  setVideoElement(el) {
-    this._htmlPlayer.setElement(el)
-  }
-
 
   /*
    * Get a file from the playlist
@@ -351,7 +327,12 @@ class Controller extends EventEmitter {
    */
 
   _handleLoadFilesEvent(sender, files) {
-    this.add(files)
+    const autoPlay = !this.state.playlist.length
+    if (autoPlay) {
+      this.addAndPlay(files)
+    } else {
+      this.add(files)
+    }
   }
 
 }

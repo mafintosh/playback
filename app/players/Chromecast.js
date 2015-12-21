@@ -10,8 +10,8 @@ class Chromecast extends EventEmitter {
     this.controller = controller
   }
 
-  enable() {
-    // TODO: Pass in cast deviceId
+  enable(opts) {
+    this.device = opts.device
   }
 
   disable() {
@@ -22,9 +22,7 @@ class Chromecast extends EventEmitter {
   }
 
   load(file, stream, autoPlay = false, currentTime = 0) {
-    const device = this.device = this._getDevice()
-
-    device.play(stream, {
+    this.device.play(stream, {
       autoPlay,
       title: file.name,
       seek: currentTime
@@ -33,18 +31,6 @@ class Chromecast extends EventEmitter {
     if (autoPlay) {
       this._startPolling()
     }
-  }
-
-  _getDevice() {
-    const deviceId = this.controller.state.casting
-    let device
-    this.controller.state.chromecasts.some(d => {
-      if (d.host + d.name === deviceId) {
-        device = d
-        return true
-      }
-    })
-    return device
   }
 
   _onMetadata(err, status) {
@@ -56,7 +42,6 @@ class Chromecast extends EventEmitter {
 
   _onStatus(err, status) {
     if (!status) {
-      this.device = null
       this._stopPolling()
       this.emit('end')
     } else {

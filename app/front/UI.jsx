@@ -51,9 +51,13 @@ class App extends React.Component {
     })
   }
 
-  _handleCastItemClick(id) {
+  _handleCastItemClick(device, id) {
     this.setState({ uiDialog: null })
-    this.controller.toggleCasting(id)
+    if (this.state.casting === id) {
+      this.controller.setPlayer(this.controller.PLAYER_HTML5VIDEO, { element: document.getElementById('video') })
+    } else {
+      this.controller.setPlayer(this.controller.PLAYER_CHROMECAST, { device, deviceId: id })
+    }
   }
 
   _handlePlaylistItemClick(file) {
@@ -118,7 +122,7 @@ class App extends React.Component {
   _renderChromecastDialog() {
     const items = this.state.chromecasts.map((cast, i) => {
       const active = cast.host + cast.name === this.state.casting ? 'active' : ''
-      return <li key={i} onClick={this._handleCastItemClick.bind(this, cast.host + cast.name)} className={active}>{cast.name}</li>
+      return <li key={i} onClick={this._handleCastItemClick.bind(this, cast, cast.host + cast.name)} className={active}>{cast.name}</li>
     })
 
     return (
@@ -159,11 +163,23 @@ class App extends React.Component {
       dialog = this._renderChromecastDialog()
     }
 
+    let emptyState
+    if (!this.state.playlist.length) {
+      emptyState = (
+        <div className="empty-state">
+          <div className="empty-state__heading">Drop media here</div>
+          <div className="empty-state__icon"></div>
+          <button onClick={this._handleAddMediaClick.bind(this)} className="btn empty-state__button">Add media</button>
+        </div>
+      )
+    }
+
     const app = (
       <div className="ui">
         <CSSTG transitionName="fade-up" transitionEnterTimeout={125} transitionLeaveTimeout={125}>
           {dialog}
         </CSSTG>
+        {emptyState}
         <div className="controls">
           <div className="controls__timeline" onClick={this._handleSeek.bind(this)}>
             {bufferedBars}
