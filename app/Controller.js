@@ -8,14 +8,14 @@ import youtubeLoader from './loaders/youtube'
 import magnetLoader from './loaders/magnet'
 import torrentLoader from './loaders/torrent'
 import httpLoader from './loaders/http'
-import ipsLoader from './loaders/ips'
+import ipfsLoader from './loaders/ipfs'
 
 import ChromecastPlayer from './players/Chromecast'
 import HTML5VideoPlayer from './players/HTML5Video'
 
 import Server from './Server'
 
-const loaders = [youtubeLoader, magnetLoader, torrentLoader, httpLoader, ipsLoader, fileLoader]
+const loaders = [youtubeLoader, magnetLoader, torrentLoader, httpLoader, ipfsLoader, fileLoader]
 
 class Controller extends EventEmitter {
 
