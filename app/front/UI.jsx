@@ -1,7 +1,8 @@
 import { ipcRenderer as ipc } from 'electron'
 
+import handleDrop from 'drag-and-drop-files'
 import React from 'react'
-import { render } from 'react-dom'
+import { render, findDOMNode } from 'react-dom'
 import CSSTG from 'react-addons-css-transition-group'
 
 import Icon from './components/icon'
@@ -25,9 +26,14 @@ class App extends React.Component {
     this.controller.on('update', () => {
       this.setState(this.controller.getState())
     })
+
+    handleDrop(findDOMNode(this), files => {
+      this._handleLoadFilesEvent(null, files.map(f => f.path))
+    })
   }
 
   _initListeners() {
+    ipc.on('load-files', this._handleLoadFilesEvent.bind(this))
     ipc.on('fullscreen-change', (sender, fullscreen) => {
       this.setState({
         fullscreen
@@ -65,10 +71,6 @@ class App extends React.Component {
     this.controller.load(file, true)
   }
 
-  _handleFullscreenClick() {
-    ipc.send('toggle-fullscreen')
-  }
-
   _handleSeek(e) {
     const percentage = e.clientX / window.innerWidth
     const time = this.state.duration * percentage
@@ -79,12 +81,25 @@ class App extends React.Component {
 
   }
 
+  _handleFullscreenClick() {
+    ipc.send('toggle-fullscreen')
+  }
+
   _handleAddMediaClick() {
-    this.controller.openFileDialog()
+    ipc.send('open-file-dialog')
   }
 
   _handleSubtitlesClick() {
     this.controller.toggleSubtitles()
+  }
+
+  _handleLoadFilesEvent(sender, files) {
+    const autoPlay = !this.state.playlist.length
+    if (autoPlay) {
+      this.controller.addAndPlay(files)
+    } else {
+      this.controller.add(files)
+    }
   }
 
   _formatTime(totalSeconds) {

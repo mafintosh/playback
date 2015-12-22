@@ -1,5 +1,4 @@
 import { EventEmitter } from 'events'
-import { ipcRenderer as ipc } from 'electron'
 import update from 'react-addons-update'
 import chromecasts from 'chromecasts'
 
@@ -30,8 +29,6 @@ class Controller extends EventEmitter {
     this.server = new Server(this, () => { this.emit('ready') })
     this._initChromecasts()
     this._initPlayers()
-
-    ipc.on('load-files', this._handleLoadFilesEvent.bind(this))
 
     this.setState({
       status: this.STATUS_STOPPED,
@@ -329,28 +326,6 @@ class Controller extends EventEmitter {
     return playlist[playlist.find(uri, f => f.uri === uri)]
   }
 
-
-  /*
-   * Open file dialog
-   */
-
-  openFileDialog() {
-    ipc.send('open-file-dialog')
-  }
-
-
-  /*
-   * Load files requested by ipc event
-   */
-
-  _handleLoadFilesEvent(sender, files) {
-    const autoPlay = !this.state.playlist.length
-    if (autoPlay) {
-      this.addAndPlay(files)
-    } else {
-      this.add(files)
-    }
-  }
 
 }
 
