@@ -7,13 +7,15 @@ import fileLoader from './loaders/file'
 import youtubeLoader from './loaders/youtube'
 import magnetLoader from './loaders/magnet'
 import torrentLoader from './loaders/torrent'
+import httpLoader from './loaders/http'
+import ipsLoader from './loaders/ips'
 
 import ChromecastPlayer from './players/Chromecast'
 import HTML5VideoPlayer from './players/HTML5Video'
 
 import Server from './Server'
 
-const loaders = [youtubeLoader, magnetLoader, torrentLoader, fileLoader]
+const loaders = [youtubeLoader, magnetLoader, torrentLoader, httpLoader, ipsLoader, fileLoader]
 
 class Controller extends EventEmitter {
 
