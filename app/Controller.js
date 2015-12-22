@@ -33,6 +33,7 @@ class Controller extends EventEmitter {
       status: this.STATUS_STOPPED,
       volume: 100,
       muted: false,
+      subtitles: false,
       casting: null,
       currentFile: null,
       stream: null,
@@ -98,6 +99,16 @@ class Controller extends EventEmitter {
     } else {
       this.pause()
     }
+  }
+
+  toggleSubtitles() {
+    const show = !this.state.subtitles
+    if (show) {
+      this.state.player.showSubtitles(this.state.currentFile)
+    } else {
+      this.state.player.hideSubtitles()
+    }
+    this.setState({ subtitles: show })
   }
 
 

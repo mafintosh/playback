@@ -83,6 +83,10 @@ class App extends React.Component {
     this.controller.openFileDialog()
   }
 
+  _handleSubtitlesClick() {
+    this.controller.toggleSubtitles()
+  }
+
   _formatTime(totalSeconds) {
     const hours = (totalSeconds / 3600) | 0
     let mins = ((totalSeconds - hours * 3600) / 60) | 0
@@ -176,6 +180,9 @@ class App extends React.Component {
       )
     }
 
+    const hasSubtitles = this.state.currentFile && this.state.currentFile.subtitles
+    const showingSubtitles = this.state.subtitles
+
     const app = (
       <div className={'ui ' + (this.state.status === this.controller.STATUS_PLAYING ? 'playing' : '')}>
         <CSSTG transitionName="fade-up" transitionEnterTimeout={125} transitionLeaveTimeout={125}>
@@ -198,11 +205,14 @@ class App extends React.Component {
             <div className="controls__metadata">
               {this._formatTime(currentTime)} / {this._formatTime(duration)}
             </div>
-            <button onClick={this._handlePlaylistClick.bind(this)}>
-              <Icon icon="playlist-empty"/>
+            <button className={(hasSubtitles ? '' : 'muted') + (showingSubtitles ? 'on' : '')} onClick={this._handleSubtitlesClick.bind(this)}>
+              <Icon icon="closed-caption"/>
             </button>
             <button onClick={this._handleCastClick.bind(this)}>
               <Icon icon={this.state.casting ? 'cast-connected' : 'cast'}/>
+            </button>
+            <button onClick={this._handlePlaylistClick.bind(this)}>
+              <Icon icon="playlist-empty"/>
             </button>
             <button onClick={this._handleFullscreenClick.bind(this)}>
               <Icon icon={this.state.fullscreen ? 'fullscreen-exit' : 'fullscreen'}/>

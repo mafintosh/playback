@@ -126,6 +126,10 @@ body {
         color: #579A57; }
       .controls .controls__toolbar button:disabled {
         opacity: .4; }
+      .controls .controls__toolbar button.muted {
+        opacity: .4; }
+      .controls .controls__toolbar button.on {
+        color: #579A57; }
     .controls .controls__toolbar .controls__title {
       margin-left: 10px;
       flex: 1; }

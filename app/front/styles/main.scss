@@ -4,6 +4,7 @@ $primary: #579A57;
 $controls-bg: rgba(0, 0, 0, 0.84);
 $controls-fg: #aaa;
 $controls-icon-color: #fff;
+$controls-icon-on-color: $primary;
 $controls-icon-color-hover: $primary;
 $controls-timeline-height: 10px;
 $controls-timeline-bg: rgba(218, 218, 218, 0.12);
@@ -202,7 +203,15 @@ body {
       }
 
       &:disabled {
-        opacity: .4
+        opacity: .4;
+      }
+
+      &.muted {
+        opacity: .4;
+      }
+
+      &.on {
+        color: $controls-icon-on-color;
       }
     }
 

@@ -59,15 +59,20 @@ class HTML5Video extends EventEmitter {
   }
 
   showSubtitles(file) {
-    const track = document.createElement('track')
-    track.setAttribute('default', 'default')
-    track.setAttribute('src', file.subtitlesUrl)
-    track.setAttribute('label', 'Subtitles')
-    track.setAttribute('kind', 'subtitles')
-    this.element.appendChild(track)
+    if (this.element.querySelector('track')) {
+      this.element.querySelector('track').mode = 'showing'
+    } else {
+      const track = document.createElement('track')
+      track.setAttribute('default', 'default')
+      track.setAttribute('src', file.subtitlesUrl)
+      track.setAttribute('label', 'Subtitles')
+      track.setAttribute('kind', 'subtitles')
+      this.element.appendChild(track)
+    }
   }
 
   hideSubtitles() {
+    this.element.querySelector('track').mode = 'hidden'
     this.element.removeChild(this.element.querySelector('track'))
   }
 
