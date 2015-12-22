@@ -10,6 +10,7 @@ import {
 electron.crashReporter.start()
 
 let win
+let sleepId
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -17,8 +18,10 @@ app.on('window-all-closed', () => {
   }
 })
 
-app.on('quit', () => {
-  powerSaveBlocker.stop(app.sleepId)
+app.on('will-quit', () => {
+  if (sleepId) {
+    powerSaveBlocker.stop(sleepId)
+  }
 })
 
 app.on('ready', () => {
@@ -65,11 +68,12 @@ ipc.on('maximize', function () {
 })
 
 ipc.on('prevent-sleep', function () {
-  app.sleepId = powerSaveBlocker.start('prevent-display-sleep')
+  sleepId = powerSaveBlocker.start('prevent-display-sleep')
 })
 
 ipc.on('allow-sleep', function () {
-  powerSaveBlocker.stop(app.sleepId)
+  powerSaveBlocker.stop(sleepId)
+  sleepId = null
 })
 
 ipc.on('resize', function (e, message) {
