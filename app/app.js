@@ -3,6 +3,7 @@ import {
   dialog,
   BrowserWindow,
   ipcMain as ipc,
+  powerSaveBlocker,
   default as electron
 } from 'electron'
 
@@ -14,6 +15,10 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
+})
+
+app.on('quit', () => {
+  powerSaveBlocker.stop(app.sleepId)
 })
 
 app.on('ready', () => {
@@ -57,6 +62,14 @@ ipc.on('minimize', function () {
 
 ipc.on('maximize', function () {
   win.maximize()
+})
+
+ipc.on('prevent-sleep', function () {
+  app.sleepId = powerSaveBlocker.start('prevent-display-sleep')
+})
+
+ipc.on('allow-sleep', function () {
+  powerSaveBlocker.stop(app.sleepId)
 })
 
 ipc.on('resize', function (e, message) {

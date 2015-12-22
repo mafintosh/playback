@@ -12,6 +12,8 @@ import ipfsLoader from './loaders/ipfs'
 import ChromecastPlayer from './players/Chromecast'
 import HTML5VideoPlayer from './players/HTML5Video'
 
+import { ipcRenderer as ipc } from 'electron'
+
 import Server from './Server'
 
 const loaders = [youtubeLoader, magnetLoader, torrentLoader, httpLoader, ipfsLoader, fileLoader]
@@ -163,6 +165,8 @@ class Controller extends EventEmitter {
    */
 
   load(file, autoPlay = false, currentTime = 0, showSubtitles = true) {
+    if (this.state.status !== this.STATUS_STOPPED) { this.stop() }
+
     const stream = this.server.getPath() + '/' + encodeURIComponent(file.uri)
     this.setState({
       status: autoPlay ? this.STATUS_PLAYING : this.STATUS_PAUSED,
@@ -171,6 +175,10 @@ class Controller extends EventEmitter {
       stream
     })
     this.state.player.load(file, autoPlay, currentTime, showSubtitles)
+
+    if (autoPlay) {
+      ipc.send('prevent-sleep')
+    }
   }
 
 
@@ -181,6 +189,7 @@ class Controller extends EventEmitter {
   resume() {
     this.setState({ status: this.STATUS_PLAYING })
     this.state.player.resume()
+    ipc.send('prevent-sleep')
   }
 
 
@@ -191,6 +200,7 @@ class Controller extends EventEmitter {
   pause() {
     this.setState({ status: this.STATUS_PAUSED })
     this.state.player.pause()
+    ipc.send('allow-sleep')
   }
 
 
@@ -205,6 +215,7 @@ class Controller extends EventEmitter {
       stream: null
     })
     this.state.player.stop()
+    ipc.send('allow-sleep')
   }
 
 
@@ -249,7 +260,35 @@ class Controller extends EventEmitter {
 
   _handlePlayerEnd() {
     this.setState({ currentTime: this.state.duration })
-    this.next()
+    if (this.getNext()) {
+      this.next()
+    } else {
+      this.stop()
+    }
+  }
+
+
+  /*
+   * Return the next item in the playlist, if it exists
+   */
+
+  getNext() {
+    const { currentFile, playlist } = this.state
+    const currentIndex = playlist.indexOf(currentFile)
+    const nextFile = playlist[currentIndex + 1]
+    return nextFile
+  }
+
+
+  /*
+   * Return the previous item in the playlist, if it exists
+   */
+
+  getPrevious() {
+    const { currentFile, playlist } = this.state
+    const currentIndex = playlist.indexOf(currentFile)
+    const prevFile = playlist[currentIndex - 1]
+    return prevFile
   }
 
 
@@ -258,11 +297,8 @@ class Controller extends EventEmitter {
    */
 
   next() {
-    const { currentFile, playlist } = this.state
-    const currentIndex = playlist.indexOf(currentFile)
-    const nextFile = playlist[currentIndex + 1]
-    this.stop()
-    if (!nextFile) { return }
+    const nextFile = this.getNext()
+    if (!nextFile) return
     this.load(nextFile, true)
   }
 
@@ -272,11 +308,8 @@ class Controller extends EventEmitter {
    */
 
   previous() {
-    const { currentFile, playlist } = this.state
-    const currentIndex = playlist.indexOf(currentFile)
-    const prevFile = playlist[currentIndex - 1]
-    this.stop()
-    if (!prevFile) { return }
+    const prevFile = this.getPrevious()
+    if (!prevFile) return
     this.load(prevFile, true)
   }
 
