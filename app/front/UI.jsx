@@ -205,7 +205,7 @@ class App extends React.Component {
             <div className="controls__timeline__progress" style={progressStyle}></div>
           </div>
           <div className="controls__toolbar">
-            <button disabled={!this.state.stream} onClick={this._handleTogglePlayClick.bind(this)}>
+            <button disabled={!this.state.currentFile} onClick={this._handleTogglePlayClick.bind(this)}>
               <Icon icon={playIcon}/>
             </button>
             <button onClick={this._handleVolumeClick.bind(this)}>

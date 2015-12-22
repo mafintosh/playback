@@ -39,7 +39,6 @@ class Controller extends EventEmitter {
       subtitles: false,
       casting: null,
       currentFile: null,
-      stream: null,
       currentTime: 0,
       duration: 0,
       playlist: [],
@@ -101,8 +100,6 @@ class Controller extends EventEmitter {
    */
 
   togglePlay() {
-    if (!this.state.stream) { return }
-
     if (this.state.status !== this.STATUS_PLAYING) {
       this.resume()
     } else {
@@ -167,12 +164,10 @@ class Controller extends EventEmitter {
   load(file, autoPlay = false, currentTime = 0, showSubtitles = true) {
     if (this.state.status !== this.STATUS_STOPPED) { this.stop() }
 
-    const stream = this.server.getPath() + '/' + encodeURIComponent(file.uri)
     this.setState({
       status: autoPlay ? this.STATUS_PLAYING : this.STATUS_PAUSED,
       currentFile: file,
-      currentTime,
-      stream
+      currentTime
     })
     this.state.player.load(file, autoPlay, currentTime, showSubtitles)
 
@@ -211,8 +206,7 @@ class Controller extends EventEmitter {
   stop() {
     this.setState({
       status: this.STATUS_STOPPED,
-      currentFile: null,
-      stream: null
+      currentFile: null
     })
     this.state.player.stop()
     ipc.send('allow-sleep')
