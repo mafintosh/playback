@@ -49,7 +49,7 @@ class HTML5Video extends EventEmitter {
     el.currentTime = currentTime
 
     if (showSubtitles && file.subtitles) {
-      this.showSubtitles(file.subtitles)
+      this.showSubtitles(stream + '/subtitles')
     }
 
     if (autoPlay) {
@@ -58,10 +58,10 @@ class HTML5Video extends EventEmitter {
     }
   }
 
-  showSubtitles(buf) {
+  showSubtitles(url) {
     const track = document.createElement('track')
     track.setAttribute('default', 'default')
-    track.setAttribute('src', 'data:text/vtt;base64,' + buf.toString('base64'))
+    track.setAttribute('src', url)
     track.setAttribute('label', 'Subtitles')
     track.setAttribute('kind', 'subtitles')
     this.element.appendChild(track)

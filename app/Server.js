@@ -15,13 +15,31 @@ class Server {
 
   route(req, res) {
     if (req.headers.origin) res.setHeader('Access-Control-Allow-Origin', req.headers.origin)
-    if (req.url === '/subtitles') return this.handleSubtitles(req, res)
     if (req.url === '/follow') return this.handleFollow(req, res)
+    if (req.url.endsWith('/subtitles')) return this.handleSubtitles(req, res)
     return this.handleFile(req, res)
   }
 
   handleSubtitles(req, res) {
-    console.log(req, res)
+    const uri = decodeURIComponent(req.url.split('/')[1])
+    const file = this.controller.getFile(uri)
+
+    if (!file) {
+      res.statusCode = 404
+      res.end()
+      return
+    }
+
+    const buf = file.subtitles
+
+    if (buf) {
+      res.setHeader('Content-Type', 'text/vtt; charset=utf-8')
+      res.setHeader('Content-Length', buf.length)
+      res.end(buf)
+    } else {
+      res.statusCode = 404
+      res.end()
+    }
   }
 
   handleFollow(req, res) {
@@ -29,7 +47,7 @@ class Server {
   }
 
   handleFile(req, res) {
-    const uri = decodeURIComponent(req.url.slice(1))
+    const uri = decodeURIComponent(req.url.split('/')[1])
     const file = this.controller.getFile(uri)
 
     if (!file) {
