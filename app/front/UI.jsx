@@ -35,9 +35,7 @@ class App extends React.Component {
   _initListeners() {
     ipc.on('load-files', this._handleLoadFilesEvent.bind(this))
     ipc.on('fullscreen-change', (sender, fullscreen) => {
-      this.setState({
-        fullscreen
-      })
+      this.setState({ fullscreen })
     })
   }
 
@@ -46,15 +44,16 @@ class App extends React.Component {
   }
 
   _handlePlaylistClick() {
-    this.setState({
-      uiDialog: this.state.uiDialog === 'playlist' ? null : 'playlist'
-    })
+    this.setState({ uiDialog: this.state.uiDialog === 'playlist' ? null : 'playlist' })
   }
 
   _handleCastClick() {
-    this.setState({
-      uiDialog: this.state.uiDialog === 'chromecasts' ? null : 'chromecasts'
-    })
+    this.controller.updateChromecasts()
+    this.setState({ uiDialog: this.state.uiDialog === 'chromecasts' ? null : 'chromecasts' })
+  }
+
+  _handleRefreshChromecastsClick() {
+    this.controller.updateChromecasts()
   }
 
   _handleCastItemClick(device, id) {
@@ -116,21 +115,15 @@ class App extends React.Component {
       const active = file === this.state.currentFile ? 'active' : ''
       return (
         <li key={i} onClick={this._handlePlaylistItemClick.bind(this, file)} className={active}>
-          <div className="playlist__item-icon">
-            {active ? <Icon icon="volume-up"/> : i + 1}
-          </div>
-          <div className="playlist__item-title">
-            {file.name}
-          </div>
+          <div className="playlist__item-icon">{active ? <Icon icon="volume-up"/> : i + 1}</div>
+          <div className="playlist__item-title">{file.name}</div>
         </li>
       )
     })
 
     return (
       <div key={'playlist'} className="dialog playlist">
-        <ul>
-          {items}
-        </ul>
+        <ul>{items}</ul>
         <div>
           <button onClick={this._handleAddMediaClick.bind(this)}>Add media</button>
         </div>
@@ -139,16 +132,18 @@ class App extends React.Component {
   }
 
   _renderChromecastDialog() {
-    const items = this.state.chromecasts.map((cast, i) => {
+    let items = this.state.chromecasts.map((cast, i) => {
       const active = cast.host + cast.name === this.state.casting ? 'active' : ''
       return <li key={i} onClick={this._handleCastItemClick.bind(this, cast, cast.host + cast.name)} className={active}>{cast.name}</li>
     })
 
+    if (!items.length) {
+      items = [<li key={-1} onClick={this._handleRefreshChromecastsClick.bind(this)}>No chromecasts found. Click to refresh.</li>]
+    }
+
     return (
       <div key={'chromecasts'} className="dialog chromecasts">
-        <ul>
-          {items}
-        </ul>
+        <ul>{items}</ul>
       </div>
     )
   }
@@ -220,7 +215,7 @@ class App extends React.Component {
             <div className="controls__metadata">
               {this._formatTime(currentTime)} / {this._formatTime(duration)}
             </div>
-            <button className={(hasSubtitles ? '' : 'muted') + (showingSubtitles ? 'on' : '')} onClick={this._handleSubtitlesClick.bind(this)}>
+            <button disabled={!hasSubtitles} className={(hasSubtitles ? '' : 'muted') + (showingSubtitles ? 'on' : '')} onClick={this._handleSubtitlesClick.bind(this)}>
               <Icon icon="closed-caption"/>
             </button>
             <button onClick={this._handleCastClick.bind(this)}>

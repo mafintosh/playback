@@ -48,7 +48,9 @@ class Controller extends EventEmitter {
 
   _initChromecasts() {
     this.chromecasts = chromecasts()
-    this.chromecasts.on('update', this._onChromecastsUpdate.bind(this))
+    this.chromecasts.on('update', () => {
+      this.setState({ chromecasts: this.chromecasts.players })
+    })
   }
 
   _initPlayers() {
@@ -62,11 +64,15 @@ class Controller extends EventEmitter {
     })
   }
 
-  _onChromecastsUpdate() {
-    this.setState({
-      chromecasts: this.chromecasts.players
-    })
+
+  /*
+   * Refresh chromecasts list
+   */
+
+  updateChromecasts() {
+    this.chromecasts.update()
   }
+
 
   /*
    * Update state
@@ -173,9 +179,7 @@ class Controller extends EventEmitter {
    */
 
   resume() {
-    this.setState({
-      status: this.STATUS_PLAYING
-    })
+    this.setState({ status: this.STATUS_PLAYING })
     this.state.player.resume()
   }
 
@@ -185,9 +189,7 @@ class Controller extends EventEmitter {
    */
 
   pause() {
-    this.setState({
-      status: this.STATUS_PAUSED
-    })
+    this.setState({ status: this.STATUS_PAUSED })
     this.state.player.pause()
   }
 
@@ -212,9 +214,7 @@ class Controller extends EventEmitter {
 
   seekToSecond(second) {
     this.state.player.seekToSecond(second)
-    this.setState({
-      currentTime: second
-    })
+    this.setState({ currentTime: second })
   }
 
 

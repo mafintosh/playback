@@ -51,7 +51,8 @@ body {
   background: rgba(20, 20, 20, 0.9);
   color: #aaa;
   display: flex;
-  flex-direction: column; }
+  flex-direction: column;
+  z-index: 2; }
   .dialog > ul {
     margin: 0;
     padding: 6px;
