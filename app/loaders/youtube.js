@@ -7,34 +7,6 @@ module.exports = {
     return /youtube\.com\/watch/i.test(uri)
   },
 
-  _getYoutubeData(url) {
-    return new Promise((resolve, reject) => {
-      ytdl.getInfo(url, (err, info) => {
-        if (err) return reject(err)
-
-        const formats = info.formats
-
-        formats.sort((a, b) => {
-          return +b.itag - +a.itag
-        })
-
-        let vidFmt
-        formats.some(function (fmt) {
-          ['46', '45', '44', '43', '38', '37', '22', '18'].some(itag => {
-            if (fmt.itag === itag) {
-              vidFmt = fmt
-              return
-            }
-          })
-        })
-
-        if (!vidFmt) return reject(new Error('No suitable video format found'))
-
-        return resolve({ info, fmt: vidFmt })
-      })
-    })
-  },
-
   load(uri) {
     return new Promise((resolve, reject) => {
       const file = { uri }
@@ -63,6 +35,34 @@ module.exports = {
           }
           resolve(file)
         })
+      })
+    })
+  },
+
+  _getYoutubeData(url) {
+    return new Promise((resolve, reject) => {
+      ytdl.getInfo(url, (err, info) => {
+        if (err) return reject(err)
+
+        const formats = info.formats
+
+        formats.sort((a, b) => {
+          return +b.itag - +a.itag
+        })
+
+        let vidFmt
+        formats.some(function (fmt) {
+          ['46', '45', '44', '43', '38', '37', '22', '18'].some(itag => {
+            if (fmt.itag === itag) {
+              vidFmt = fmt
+              return
+            }
+          })
+        })
+
+        if (!vidFmt) return reject(new Error('No suitable video format found'))
+
+        return resolve({ info, fmt: vidFmt })
       })
     })
   }

@@ -5,12 +5,6 @@ import concat from 'concat-stream'
 import path from 'path'
 
 module.exports = {
-
-
-  /*
-   * Match anything
-   */
-
   test() {
     return true
   },
@@ -29,7 +23,7 @@ module.exports = {
         file.length = stat.size
         file.name = path.basename(filePath)
         file.createReadStream = opts => fs.createReadStream(filePath, opts)
-        return this.getSubtitles(filePath)
+        return this._getSubtitles(filePath)
       }).then(subtitles => {
         file.subtitles = subtitles
         return file
@@ -41,7 +35,7 @@ module.exports = {
    * Try to open a subtitle
    */
 
-  tryLoadingSubtitle(subtitlePath) {
+  _tryLoadingSubtitle(subtitlePath) {
     return new Promise((resolve) => {
       qfs.exists(subtitlePath).then(exists => {
         if (exists) {
@@ -60,14 +54,14 @@ module.exports = {
    * Attempt to get subtitles relative to the filePath
    */
 
-  getSubtitles(filePath) {
+  _getSubtitles(filePath) {
     const basename = filePath.substr(0, filePath.lastIndexOf('.'))
     const extensions = ['srt', 'vtt']
     const next = () => {
       const ext = extensions.shift()
       if (!ext) return Promise.resolve()
 
-      return this.tryLoadingSubtitle(basename + '.' + ext).then(data => {
+      return this._tryLoadingSubtitle(basename + '.' + ext).then(data => {
         if (!data) { return next() }
         return Promise.resolve(data)
       })
