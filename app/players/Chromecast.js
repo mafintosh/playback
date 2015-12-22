@@ -21,16 +21,28 @@ class Chromecast extends EventEmitter {
     }
   }
 
-  load(file, stream, autoPlay = false, currentTime = 0) {
-    this.device.play(stream, {
+  load(file, autoPlay = false, currentTime = 0, showSubtitles = false) {
+    this.device.play(file.streamUrl, {
       autoPlay,
       title: file.name,
-      seek: currentTime
+      seek: currentTime,
+      autoSubtitles: showSubtitles,
+      subtitles: [file.subtitlesUrl]
     }, this._onMetadata.bind(this))
 
     if (autoPlay) {
       this._startPolling()
     }
+  }
+
+  showSubtitles(file) {
+    if (file.subtitles) {
+      this.device.subtitles(1)
+    }
+  }
+
+  hideSubtitles() {
+    this.device.subtitles(false)
   }
 
   _onMetadata(err, status) {

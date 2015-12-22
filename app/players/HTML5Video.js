@@ -38,18 +38,18 @@ class HTML5Video extends EventEmitter {
     this.emit('end')
   }
 
-  load(file, stream, autoPlay = false, currentTime = 0, showSubtitles = false) {
+  load(file, autoPlay = false, currentTime = 0, showSubtitles = false) {
     this.stop()
 
     const el = this.element
     const src = document.createElement('source')
-    src.setAttribute('src', stream)
+    src.setAttribute('src', file.streamUrl)
     el.appendChild(src)
     el.load()
     el.currentTime = currentTime
 
     if (showSubtitles && file.subtitles) {
-      this.showSubtitles(stream + '/subtitles')
+      this.showSubtitles(file)
     }
 
     if (autoPlay) {
@@ -58,10 +58,10 @@ class HTML5Video extends EventEmitter {
     }
   }
 
-  showSubtitles(url) {
+  showSubtitles(file) {
     const track = document.createElement('track')
     track.setAttribute('default', 'default')
-    track.setAttribute('src', url)
+    track.setAttribute('src', file.subtitlesUrl)
     track.setAttribute('label', 'Subtitles')
     track.setAttribute('kind', 'subtitles')
     this.element.appendChild(track)

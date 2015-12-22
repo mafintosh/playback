@@ -114,6 +114,8 @@ class Controller extends EventEmitter {
       loaders.some(loader => {
         if (loader.test(uri)) {
           proms.push(loader.load(uri).then(file => {
+            file.streamUrl = this.server.getPath() + '/' + encodeURIComponent(file.uri)
+            file.subtitlesUrl = file.streamUrl + '/subtitles'
             this.setState(update(this.state, { playlist: { $push: [file] } }))
             return file
           }))
@@ -142,7 +144,7 @@ class Controller extends EventEmitter {
    * Load a file
    */
 
-  load(file, autoPlay = false, currentTime = 0) {
+  load(file, autoPlay = false, currentTime = 0, showSubtitles = true) {
     const stream = this.server.getPath() + '/' + encodeURIComponent(file.uri)
     this.setState({
       status: autoPlay ? this.STATUS_PLAYING : this.STATUS_PAUSED,
@@ -150,7 +152,7 @@ class Controller extends EventEmitter {
       currentTime,
       stream
     })
-    this.state.player.load(file, stream, autoPlay, currentTime)
+    this.state.player.load(file, autoPlay, currentTime, showSubtitles)
   }
 
 
