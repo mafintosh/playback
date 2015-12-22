@@ -38,7 +38,7 @@ class HTML5Video extends EventEmitter {
     this.emit('end')
   }
 
-  load(file, stream, autoPlay = false, currentTime = 0) {
+  load(file, stream, autoPlay = false, currentTime = 0, showSubtitles = false) {
     this.stop()
 
     const el = this.element
@@ -48,10 +48,27 @@ class HTML5Video extends EventEmitter {
     el.load()
     el.currentTime = currentTime
 
+    if (showSubtitles && file.subtitles) {
+      this.showSubtitles(file.subtitles)
+    }
+
     if (autoPlay) {
       this._startPolling()
       el.play()
     }
+  }
+
+  showSubtitles(buf) {
+    const track = document.createElement('track')
+    track.setAttribute('default', 'default')
+    track.setAttribute('src', 'data:text/vtt;base64,' + buf.toString('base64'))
+    track.setAttribute('label', 'Subtitles')
+    track.setAttribute('kind', 'subtitles')
+    this.element.appendChild(track)
+  }
+
+  hideSubtitles() {
+    this.element.removeChild(this.element.querySelector('track'))
   }
 
   _startPolling() {
