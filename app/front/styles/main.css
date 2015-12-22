@@ -9,32 +9,37 @@ body {
   margin: 0;
   cursor: default;
   box-sizing: border-box; }
-  body .ui {
-    transition: opacity 250ms ease-in-out;
+
+.ui {
+  transition: opacity 250ms ease-in-out;
+  position: fixed;
+  height: 100%;
+  width: 100%; }
+  .ui.playing {
     opacity: 0; }
-  body .controls {
-    bottom: -50px; }
-  body .dialog {
-    transition: right 250ms ease-in-out;
-    right: -20px; }
-  body:hover .ui {
-    opacity: 1; }
-  body:hover .controls {
-    bottom: 0; }
-  body:hover .dialog {
-    right: 20px; }
+    .ui.playing .controls {
+      bottom: -50px; }
+    .ui.playing .dialog {
+      transition: right 250ms ease-in-out;
+      right: -20px; }
+    .ui.playing:hover {
+      opacity: 1; }
+      .ui.playing:hover .controls {
+        bottom: 0; }
+      .ui.playing:hover .dialog {
+        right: 20px; }
 
 .btn {
   margin: 0 6px 6px;
-  background: #323232;
-  color: #aaa;
+  background: #579A57;
+  color: #fff;
   padding: 8px 16px;
   font-weight: 600;
   border: none;
   border-radius: 2px;
   font-family: inherit; }
   .btn:hover {
-    background: #3c3c3c;
+    background: #74b074;
     color: #fff; }
 
 .dialog {
@@ -134,16 +139,15 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center; }
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.2); }
   .empty-state .empty-state__heading {
     font-size: 16px;
-    color: rgba(255, 255, 255, 0.2);
     margin-bottom: 20px; }
   .empty-state .empty-state__icon {
     border: 4px dashed rgba(255, 255, 255, 0.2);
     border-radius: 20px;
-    width: 150px;
-    height: 150px;
+    padding: 80px;
     margin-bottom: 20px; }
 
 video {

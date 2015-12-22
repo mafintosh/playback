@@ -168,14 +168,16 @@ class App extends React.Component {
       emptyState = (
         <div className="empty-state">
           <div className="empty-state__heading">Drop media here</div>
-          <div className="empty-state__icon"></div>
+          <div className="empty-state__icon">
+            <Icon icon="file-download" size="48"/>
+          </div>
           <button onClick={this._handleAddMediaClick.bind(this)} className="btn empty-state__button">Add media</button>
         </div>
       )
     }
 
     const app = (
-      <div className="ui">
+      <div className={'ui ' + (this.state.status === this.controller.STATUS_PLAYING ? 'playing' : '')}>
         <CSSTG transitionName="fade-up" transitionEnterTimeout={125} transitionLeaveTimeout={125}>
           {dialog}
         </CSSTG>

@@ -22,9 +22,9 @@ $playlist-item-hover-fg: #fff;
 $playlist-item-active-bg: rgb(50,50,50);
 $playlist-item-active-fg: #fff;
 
-$btn-bg: rgb(50,50,50);
-$btn-fg: #aaa;
-$btn-hover-bg: rgb(60,60,60);
+$btn-bg: $primary;
+$btn-fg: #fff;
+$btn-hover-bg: lighten($primary, 10%);
 $btn-hover-fg: #fff;
 
 *, *:after, *:before {
@@ -39,33 +39,38 @@ body {
   margin: 0;
   cursor: default;
   box-sizing: border-box;
+}
 
-  .ui {
-    transition: opacity 250ms ease-in-out;
-    opacity: 0;
-  }
+.ui {
+  transition: opacity 250ms ease-in-out;
+  position: fixed;
+  height: 100%;
+  width: 100%;
 
-  .controls {
-    bottom: -50px;
-  }
+  &.playing {
+  opacity: 0;
 
-  .dialog {
-    transition: right 250ms ease-in-out;
-    right: -20px;
-  }
-
-  &:hover {
-    .ui {
-      opacity: 1;
-    }
     .controls {
-      bottom: 0;
+      bottom: -50px;
     }
+
     .dialog {
-      right: 20px;
+      transition: right 250ms ease-in-out;
+      right: -20px;
+    }
+
+    &:hover {
+      opacity: 1;
+      .controls {
+        bottom: 0;
+      }
+      .dialog {
+        right: 20px;
+      }
     }
   }
 }
+
 
 .btn {
   margin: 0 6px 6px;
@@ -220,18 +225,17 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  color: rgba(255,255,255,.2);
 
   .empty-state__heading {
     font-size: 16px;
-    color: rgba(255,255,255,.2);
     margin-bottom: 20px;
   }
 
   .empty-state__icon {
     border: 4px dashed rgba(255,255,255,.2);
     border-radius: 20px;
-    width: 150px;
-    height: 150px;
+    padding: 80px;
     margin-bottom: 20px;
   }
 }
