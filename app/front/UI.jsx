@@ -38,13 +38,15 @@ class App extends React.Component {
     document.getElementById('video').addEventListener('click', () => {
       this.setState({ uiDialog: null })
     })
+
+    document.addEventListener('paste', e => {
+      this._handleLoadFilesEvent(null, e.clipboardData.getData('text').split('\n'))
+    })
   }
 
   _initListeners() {
     ipc.on('load-files', this._handleLoadFilesEvent.bind(this))
-    ipc.on('fullscreen-change', (sender, fullscreen) => {
-      this.setState({ fullscreen })
-    })
+    ipc.on('fullscreen-change', (sender, fullscreen) => { this.setState({ fullscreen }) })
   }
 
   _handleTogglePlayClick() {
@@ -112,6 +114,11 @@ class App extends React.Component {
     } else {
       this.controller.add(files)
     }
+  }
+
+  _handleTimelineMouseMove(e) {
+    const left = e.clientX
+    this.setState({ uiTimelineTooltipPosition: left })
   }
 
   _formatTime(totalSeconds) {
@@ -211,6 +218,16 @@ class App extends React.Component {
       )
     }
 
+    let timelineTooltip
+    if (this.state.uiTimelineTooltipPosition) {
+      const minLeft = 25
+      const maxRight = window.innerWidth - 25
+      const value = this._formatTime(this.state.uiTimelineTooltipPosition / window.innerWidth * duration)
+      timelineTooltip = (
+        <div className="controls__timeline__tooltip" style={{ left: Math.min(maxRight, Math.max(minLeft, this.state.uiTimelineTooltipPosition)) + 'px' }}>{value}</div>
+      )
+    }
+
     const hasSubtitles = this.state.currentFile && this.state.currentFile.subtitles
     const showingSubtitles = this.state.subtitles
 
@@ -221,7 +238,8 @@ class App extends React.Component {
         </CSSTG>
         {emptyState}
         <div className="controls">
-          <div className="controls__timeline" onClick={this._handleSeek.bind(this)}>
+          <div className="controls__timeline" onMouseMove={this._handleTimelineMouseMove.bind(this)} onClick={this._handleSeek.bind(this)} ref="timeline">
+            {timelineTooltip}
             {bufferedBars}
             <div className="controls__timeline__progress" style={progressStyle}></div>
           </div>

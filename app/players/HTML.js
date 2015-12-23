@@ -52,7 +52,7 @@ class HTMLPlayer extends EventEmitter {
     }
 
     if (autoPlay) {
-      el.play()
+      this.resume()
     }
   }
 

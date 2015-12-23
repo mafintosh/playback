@@ -315,7 +315,7 @@ class Controller extends EventEmitter {
 
 
   /*
-   * Remove an item from the playlist by index. If it's the currently playing file, play the next
+   * Remove an item from the playlist by index. If it's the currently playing file, play the next or stop if it's the last
    */
 
   remove(index) {
