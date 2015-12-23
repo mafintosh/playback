@@ -68,6 +68,12 @@ body {
   }
 }
 
+video {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
 .btn {
   background: $btn-bg;
   color: $btn-fg;
@@ -289,13 +295,6 @@ body {
     margin-bottom: 20px;
   }
 }
-
-video {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-}
-
 
 .fade-up-enter {
   transform-origin: bottom right;

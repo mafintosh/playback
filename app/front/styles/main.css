@@ -24,6 +24,11 @@ body {
 .ui.stopped .controls > .controls__timeline:hover > .controls__timeline__tooltip {
   opacity: 0; }
 
+video {
+  position: fixed;
+  width: 100%;
+  height: 100%; }
+
 .btn {
   background: #579A57;
   color: #fff;
@@ -180,11 +185,6 @@ body {
     border-radius: 20px;
     padding: 80px;
     margin-bottom: 20px; }
-
-video {
-  position: fixed;
-  width: 100%;
-  height: 100%; }
 
 .fade-up-enter {
   transform-origin: bottom right;
