@@ -103,6 +103,10 @@ body {
     list-style: none;
     flex: 1;
 
+    &:empty {
+      padding: 6px 0 0 0;
+    }
+
     > li {
       padding: 10px 6px;
       overflow: hidden;

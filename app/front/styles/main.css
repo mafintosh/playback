@@ -53,6 +53,8 @@ body {
     padding: 6px;
     list-style: none;
     flex: 1; }
+    .dialog > ul:empty {
+      padding: 6px 0 0 0; }
     .dialog > ul > li {
       padding: 10px 6px;
       overflow: hidden;
