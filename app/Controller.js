@@ -167,6 +167,7 @@ class Controller extends EventEmitter {
     this.setState({
       status: autoPlay ? this.STATUS_PLAYING : this.STATUS_PAUSED,
       currentFile: file,
+      duration: 0,
       currentTime
     })
     this.state.player.load(file, autoPlay, currentTime, showSubtitles)
@@ -206,6 +207,8 @@ class Controller extends EventEmitter {
   stop() {
     this.setState({
       status: this.STATUS_STOPPED,
+      currentTime: 0,
+      duration: 0,
       currentFile: null
     })
     this.state.player.stop()
@@ -253,7 +256,6 @@ class Controller extends EventEmitter {
    */
 
   _handlePlayerEnd() {
-    this.setState({ currentTime: this.state.duration })
     if (this.getNext()) {
       this.next()
     } else {
@@ -269,8 +271,10 @@ class Controller extends EventEmitter {
   getNext() {
     const { currentFile, playlist } = this.state
     const currentIndex = playlist.indexOf(currentFile)
-    const nextFile = playlist[currentIndex + 1]
-    return nextFile
+    if (currentIndex > -1) {
+      const nextFile = playlist[currentIndex + 1]
+      return nextFile
+    }
   }
 
 
@@ -281,30 +285,52 @@ class Controller extends EventEmitter {
   getPrevious() {
     const { currentFile, playlist } = this.state
     const currentIndex = playlist.indexOf(currentFile)
-    const prevFile = playlist[currentIndex - 1]
-    return prevFile
+    if (currentIndex > -1) {
+      const prevFile = playlist[currentIndex - 1]
+      return prevFile
+    }
   }
 
 
   /*
-   * Play the next item in the playlist, if possible
+   * Load the next item in the playlist. Autoplay if we're already playing
    */
 
   next() {
     const nextFile = this.getNext()
     if (!nextFile) return
-    this.load(nextFile, true)
+    this.load(nextFile, this.state.status === this.STATUS_PLAYING)
   }
 
 
   /*
-   * Play the previous item in the playlist, if possible
+   * Load the previous item in the playlist. Autoplay if we're already playing
    */
 
   previous() {
     const prevFile = this.getPrevious()
     if (!prevFile) return
-    this.load(prevFile, true)
+    this.load(prevFile, this.state.status === this.STATUS_PLAYING)
+  }
+
+
+  /*
+   * Remove an item from the playlist by index. If it's the currently playing file, play the next
+   */
+
+  remove(index) {
+    const file = this.state.playlist[index]
+    if (file) {
+      const { currentFile } = this.state
+      if (file === currentFile) {
+        if (this.getNext()) {
+          this.next()
+        } else {
+          this.stop()
+        }
+      }
+      this.setState(update(this.state, { playlist: { $splice: [[index, 1]] } }))
+    }
   }
 
 
@@ -318,7 +344,6 @@ class Controller extends EventEmitter {
 
   setPlayer(type, playerOpts) {
     const { currentFile, currentTime } = this.state
-    const autoPlay = this.state.status === this.STATUS_PLAYING
 
     if (this.state.status !== this.STATUS_STOPPED) {
       this.stop()
@@ -340,6 +365,7 @@ class Controller extends EventEmitter {
     }
 
     if (currentFile) {
+      const autoPlay = this.state.status === this.STATUS_PLAYING
       this.load(currentFile, autoPlay, currentTime)
     }
   }

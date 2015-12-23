@@ -27,7 +27,7 @@ body {
       .ui.playing:hover .controls {
         bottom: 0; }
       .ui.playing:hover .dialog {
-        right: 20px; }
+        right: 10px; }
 
 .btn {
   margin: 0 6px 6px;
@@ -44,8 +44,8 @@ body {
 
 .dialog {
   position: fixed;
-  bottom: 50px;
-  right: 25px;
+  bottom: 55px;
+  right: 10px;
   max-height: calc(100% - 100px);
   width: 400px;
   background: rgba(20, 20, 20, 0.9);
@@ -73,9 +73,20 @@ body {
         color: #999; }
       .dialog > ul > li > .playlist__item-title {
         flex: 1; }
+      .dialog > ul > li > .playlist__item-action {
+        width: 0;
+        opacity: 0;
+        overflow: hidden;
+        transition: opacity 125ms ease-in-out, width 125ms ease-in-out, color 125ms ease-in-out;
+        color: rgba(255, 255, 255, 0.2); }
       .dialog > ul > li:hover {
         background-color: #191919;
         color: #fff; }
+        .dialog > ul > li:hover > .playlist__item-action {
+          width: 28px;
+          opacity: 1; }
+          .dialog > ul > li:hover > .playlist__item-action:hover {
+            color: #fff; }
       .dialog > ul > li.active {
         background-color: #323232;
         color: #fff; }

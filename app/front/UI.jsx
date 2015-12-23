@@ -56,18 +56,23 @@ class App extends React.Component {
     this.controller.updateChromecasts()
   }
 
-  _handleCastItemClick(device, id) {
+  _handleCastItemClick(device, deviceId) {
     this.setState({ uiDialog: null })
-    if (this.state.casting === id) {
+    if (this.state.casting === deviceId) {
       this.controller.setPlayer(this.controller.PLAYER_HTML5VIDEO, { element: document.getElementById('video') })
     } else {
-      this.controller.setPlayer(this.controller.PLAYER_CHROMECAST, { device, deviceId: id })
+      this.controller.setPlayer(this.controller.PLAYER_CHROMECAST, { device, deviceId })
     }
   }
 
   _handlePlaylistItemClick(file) {
     this.setState({ uiDialog: null })
     this.controller.load(file, true)
+  }
+
+  _handleRemoveItemClick(file, index, e) {
+    e.stopPropagation()
+    this.controller.remove(index)
   }
 
   _handleSeek(e) {
@@ -117,6 +122,7 @@ class App extends React.Component {
         <li key={i} onClick={this._handlePlaylistItemClick.bind(this, file)} className={active}>
           <div className="playlist__item-icon">{active ? <Icon icon="volume-up"/> : i + 1}</div>
           <div className="playlist__item-title">{file.name}</div>
+          <div className="playlist__item-action" onClick={this._handleRemoveItemClick.bind(this, file, i)}><Icon icon="highlight-remove"/></div>
         </li>
       )
     })
@@ -155,7 +161,7 @@ class App extends React.Component {
     const updateSpeed = this.state.player ? this.state.player.POLL_FREQUENCY : 1000
     const progressStyle = {
       transition: `width ${updateSpeed}ms linear`,
-      width: currentTime / duration * 100 + '%'
+      width: duration ? currentTime / duration * 100 + '%' : '0'
     }
 
     const bufferedBars = []

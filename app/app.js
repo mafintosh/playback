@@ -10,7 +10,21 @@ import {
 electron.crashReporter.start()
 
 let win
-let sleepId
+
+const allowSleep = () => {
+  if (typeof app.sleepId !== 'undefined') {
+    console.log('Allowing sleep')
+    powerSaveBlocker.stop(app.sleepId)
+    delete app.sleepId
+  }
+}
+
+const preventSleep = () => {
+  if (typeof app.sleepId === 'undefined') {
+    console.log('Preventing sleep')
+    app.sleepId = powerSaveBlocker.start('prevent-display-sleep')
+  }
+}
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -19,9 +33,7 @@ app.on('window-all-closed', () => {
 })
 
 app.on('will-quit', () => {
-  if (sleepId) {
-    powerSaveBlocker.stop(sleepId)
-  }
+  allowSleep()
 })
 
 app.on('ready', () => {
@@ -68,12 +80,11 @@ ipc.on('maximize', function () {
 })
 
 ipc.on('prevent-sleep', function () {
-  sleepId = powerSaveBlocker.start('prevent-display-sleep')
+  preventSleep()
 })
 
 ipc.on('allow-sleep', function () {
-  powerSaveBlocker.stop(sleepId)
-  sleepId = null
+  allowSleep()
 })
 
 ipc.on('resize', function (e, message) {

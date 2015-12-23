@@ -66,7 +66,7 @@ body {
         bottom: 0;
       }
       .dialog {
-        right: 20px;
+        right: 10px;
       }
     }
   }
@@ -92,8 +92,8 @@ body {
 
 .dialog {
   position: fixed;
-  bottom: 50px;
-  right: 25px;
+  bottom: 55px;
+  right: 10px;
   max-height: calc(100% - 100px);
   width: 400px;
   background: $playlist-bg;
@@ -128,9 +128,26 @@ body {
         flex: 1;
       }
 
+      > .playlist__item-action {
+        width: 0;
+        opacity: 0;
+        overflow: hidden;
+        transition: opacity 125ms ease-in-out, width 125ms ease-in-out, color 125ms ease-in-out;
+        color: rgba(255,255,255,.2);
+      }
+
       &:hover {
         background-color: $playlist-item-hover-bg;
         color: $playlist-item-hover-fg;
+
+        > .playlist__item-action {
+          width: 28px;
+          opacity: 1;
+
+          &:hover {
+            color: #fff;
+          }
+        }
       }
 
       &.active {
