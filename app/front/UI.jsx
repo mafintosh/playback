@@ -33,7 +33,7 @@ class App extends React.Component {
       this._handleLoadFilesEvent(null, files.map(f => f.path))
     })
 
-    handleIdle(el, 2000, 'hide')
+    handleIdle(el, 2500, 'hide')
 
     document.getElementById('video').addEventListener('click', () => {
       this.setState({ uiDialog: null })
@@ -108,6 +108,7 @@ class App extends React.Component {
   }
 
   _handleLoadFilesEvent(sender, files) {
+    this.setState({ uiDialog: null })
     const autoPlay = !this.state.playlist.length
     if (autoPlay) {
       this.controller.addAndPlay(files)
