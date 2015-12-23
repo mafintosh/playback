@@ -15,13 +15,11 @@ class Chromecast extends EventEmitter {
   }
 
   disable() {
-    if (this.device) {
-      this.stop()
-      this.device = null
-    }
+    this.device = null
   }
 
   load(file, autoPlay = false, currentTime = 0, showSubtitles = false) {
+    this.active = true
     this.device.play(file.streamUrl, {
       autoPlay,
       title: file.name,
@@ -35,10 +33,8 @@ class Chromecast extends EventEmitter {
     }
   }
 
-  showSubtitles(file) {
-    if (file.subtitles) {
-      this.device.subtitles(1)
-    }
+  showSubtitles() {
+    this.device.subtitles(1)
   }
 
   hideSubtitles() {
@@ -46,27 +42,22 @@ class Chromecast extends EventEmitter {
   }
 
   _onMetadata(err, status) {
-    console.log('Cast onmetadata: ', status)
-    this.emit('metadata', {
-      duration: status.media.duration
-    })
+    this.emit('metadata', { duration: status.media.duration })
   }
 
   _onStatus(err, status) {
     if (!status) {
       this._stopPolling()
+      this.active = false
       this.emit('end')
     } else {
-      this.emit('status', {
-        currentTime: status.currentTime
-      })
+      this.emit('status', { currentTime: status.currentTime })
     }
   }
 
   _startPolling() {
     this._stopPolling()
     this.interval = setInterval(() => {
-      if (!this.device) { return clearInterval(this.interval) }
       this.device.status(this._onStatus.bind(this))
     }, this.POLL_FREQUENCY)
   }
@@ -77,21 +68,18 @@ class Chromecast extends EventEmitter {
 
   resume() {
     this._startPolling()
-    if (this.device) {
-      this.device.resume()
-    }
+    this.device.resume()
   }
 
   pause() {
     this._stopPolling()
-    if (this.device) {
-      this.device.pause()
-    }
+    this.device.pause()
   }
 
   stop() {
     this._stopPolling()
-    if (this.device) {
+    if (this.active) {
+      this.active = false
       this.device.stop()
     }
   }

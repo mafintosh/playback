@@ -48,12 +48,11 @@ class HTML5Video extends EventEmitter {
     el.load()
     el.currentTime = currentTime
 
-    if (showSubtitles && file.subtitles) {
+    if (showSubtitles) {
       this.showSubtitles(file)
     }
 
     if (autoPlay) {
-      this._startPolling()
       el.play()
     }
   }
