@@ -107,6 +107,11 @@ class Controller extends EventEmitter {
     }
   }
 
+
+  /*
+   * Toggle showing subtitles
+   */
+
   toggleSubtitles() {
     const show = !this.state.subtitles
     if (show) {
@@ -119,7 +124,7 @@ class Controller extends EventEmitter {
 
 
   /*
-   * Add URI(s) to the playlist
+   * Add URI(s) to the playlist. This loads them and returns a promise that resolves when all files are loaded
    */
 
   add(uris) {
@@ -256,11 +261,7 @@ class Controller extends EventEmitter {
    */
 
   _handlePlayerEnd() {
-    if (this.getNext()) {
-      this.next()
-    } else {
-      this.stop()
-    }
+    this.next()
   }
 
 
@@ -298,7 +299,7 @@ class Controller extends EventEmitter {
 
   next() {
     const nextFile = this.getNext()
-    if (!nextFile) return
+    if (!nextFile) return this.stop()
     this.load(nextFile, this.state.status === this.STATUS_PLAYING)
   }
 
@@ -309,7 +310,7 @@ class Controller extends EventEmitter {
 
   previous() {
     const prevFile = this.getPrevious()
-    if (!prevFile) return
+    if (!prevFile) return this.stop()
     this.load(prevFile, this.state.status === this.STATUS_PLAYING)
   }
 
@@ -323,11 +324,7 @@ class Controller extends EventEmitter {
     if (file) {
       const { currentFile } = this.state
       if (file === currentFile) {
-        if (this.getNext()) {
-          this.next()
-        } else {
-          this.stop()
-        }
+        this.next()
       }
       this.setState(update(this.state, { playlist: { $splice: [[index, 1]] } }))
     }
