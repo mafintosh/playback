@@ -19,7 +19,6 @@ class HTMLPlayer extends EventEmitter {
   }
 
   disable() {
-    this.stop()
     this.element.removeEventListener('loadedmetadata', this._onMetadata)
     this.element.removeEventListener('ended', this._onEnd)
     this.element = null
