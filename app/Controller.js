@@ -344,6 +344,7 @@ class Controller extends EventEmitter {
 
   setPlayer(type, playerOpts) {
     const { currentFile, currentTime } = this.state
+    const autoPlay = this.state.status === this.STATUS_PLAYING
 
     if (this.state.status !== this.STATUS_STOPPED) {
       this.stop()
@@ -365,7 +366,6 @@ class Controller extends EventEmitter {
     }
 
     if (currentFile) {
-      const autoPlay = this.state.status === this.STATUS_PLAYING
       this.load(currentFile, autoPlay, currentTime)
     }
   }
