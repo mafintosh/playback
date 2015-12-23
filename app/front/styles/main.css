@@ -4,7 +4,7 @@
 body {
   background: black;
   overflow: hidden;
-  font-family: "Helvetica Neue";
+  font-family: Arial;
   font-size: 13px;
   margin: 0;
   cursor: default;
@@ -12,25 +12,16 @@ body {
 
 .ui {
   transition: opacity 250ms ease-in-out;
-  position: fixed;
-  height: 100%;
-  width: 100%; }
-  .ui.playing {
-    opacity: 0; }
-    .ui.playing .controls {
-      bottom: -50px; }
-    .ui.playing .dialog {
-      transition: right 250ms ease-in-out;
-      right: -20px; }
-    .ui.playing:hover {
-      opacity: 1; }
-      .ui.playing:hover .controls {
-        bottom: 0; }
-      .ui.playing:hover .dialog {
-        right: 10px; }
+  position: fixed; }
+
+.ui.hide:not(.stopped) {
+  opacity: 0; }
+  .ui.hide:not(.stopped) .controls {
+    bottom: -50px; }
+  .ui.hide:not(.stopped) .dialog {
+    right: -20px; }
 
 .btn {
-  margin: 0 6px 6px;
   background: #579A57;
   color: #fff;
   padding: 8px 16px;
@@ -48,11 +39,12 @@ body {
   right: 10px;
   max-height: calc(100% - 100px);
   width: 400px;
-  background: rgba(20, 20, 20, 0.9);
+  background: rgba(20, 20, 20, 0.95);
   color: #aaa;
   display: flex;
   flex-direction: column;
-  z-index: 2; }
+  z-index: 2;
+  transition: right 250ms ease-in-out; }
   .dialog > ul {
     margin: 0;
     padding: 6px;
@@ -80,7 +72,7 @@ body {
         transition: opacity 125ms ease-in-out, width 125ms ease-in-out, color 125ms ease-in-out;
         color: rgba(255, 255, 255, 0.2); }
       .dialog > ul > li:hover {
-        background-color: #191919;
+        background-color: rgba(255, 255, 255, 0.05);
         color: #fff; }
         .dialog > ul > li:hover > .playlist__item-action {
           width: 28px;
@@ -88,22 +80,12 @@ body {
           .dialog > ul > li:hover > .playlist__item-action:hover {
             color: #fff; }
       .dialog > ul > li.active {
-        background-color: #323232;
+        background-color: rgba(255, 255, 255, 0.15);
         color: #fff; }
   .dialog > div {
-    text-align: right; }
-  .dialog > div > button {
-    margin: 0 6px 6px;
-    background: #323232;
-    color: #aaa;
-    padding: 8px 16px;
-    font-weight: 600;
-    border: none;
-    border-radius: 2px;
-    font-family: inherit; }
-    .dialog > div > button:hover {
-      background: #3c3c3c;
-      color: #fff; }
+    padding: 0 6px 6px 6px; }
+  .dialog > div > .btn {
+    width: 100%; }
 
 .controls {
   position: fixed;

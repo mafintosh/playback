@@ -8,7 +8,6 @@
     "babel-polyfill": "^6.3.14",
     "chromecasts": "^1.7.1",
     "concat-stream": "^1.4.7",
-    "dombo": "^3.2.0",
     "drag-and-drop-files": "0.0.1",
     "duplexify": "^3.2.0",
     "end-of-stream": "^1.1.0",
@@ -42,6 +41,7 @@
     "eslint": "^1.10.3",
     "eslint-config-airbnb": "^2.1.1",
     "eslint-plugin-react": "^3.11.3",
+    "lodash.debounce": "^3.1.1",
     "node-sass": "^3.4.2"
   },
   "bin": {

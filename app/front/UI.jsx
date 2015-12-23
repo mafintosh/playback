@@ -6,6 +6,7 @@ import { render, findDOMNode } from 'react-dom'
 import CSSTG from 'react-addons-css-transition-group'
 
 import Icon from './components/icon'
+import handleIdle from './utils/mouseidle.js'
 
 class App extends React.Component {
 
@@ -21,14 +22,21 @@ class App extends React.Component {
     this._initListeners()
   }
 
-
   componentDidMount() {
     this.controller.on('update', () => {
       this.setState(this.controller.getState())
     })
 
-    handleDrop(findDOMNode(this), files => {
+    const el = findDOMNode(this)
+
+    handleDrop(el, files => {
       this._handleLoadFilesEvent(null, files.map(f => f.path))
+    })
+
+    handleIdle(el, 2000, 'hide')
+
+    document.getElementById('video').addEventListener('click', () => {
+      this.setState({ uiDialog: null })
     })
   }
 
@@ -118,9 +126,20 @@ class App extends React.Component {
   _renderPlaylist() {
     const items = this.state.playlist.map((file, i) => {
       const active = file === this.state.currentFile ? 'active' : ''
+      const playing = this.state.status === this.controller.STATUS_PLAYING
+      let icon
+      if (active) {
+        if (playing) {
+          icon = <Icon icon="volume-up"/>
+        } else {
+          icon = <Icon icon="pause"/>
+        }
+      } else {
+        icon = i + 1
+      }
       return (
         <li key={i} onClick={this._handlePlaylistItemClick.bind(this, file)} className={active}>
-          <div className="playlist__item-icon">{active ? <Icon icon="volume-up"/> : i + 1}</div>
+          <div className="playlist__item-icon">{icon}</div>
           <div className="playlist__item-title">{file.name}</div>
           <div className="playlist__item-action" onClick={this._handleRemoveItemClick.bind(this, file, i)}><Icon icon="highlight-remove"/></div>
         </li>
@@ -131,7 +150,7 @@ class App extends React.Component {
       <div key={'playlist'} className="dialog playlist">
         <ul>{items}</ul>
         <div>
-          <button onClick={this._handleAddMediaClick.bind(this)}>Add media</button>
+          <button className="btn" onClick={this._handleAddMediaClick.bind(this)}>Add media</button>
         </div>
       </div>
     )
@@ -200,7 +219,7 @@ class App extends React.Component {
     const showingSubtitles = this.state.subtitles
 
     const app = (
-      <div className={'ui ' + (this.state.status === this.controller.STATUS_PLAYING ? 'playing' : '')}>
+      <div className={'ui ' + (this.state.status === this.controller.STATUS_STOPPED ? 'stopped' : '')}>
         <CSSTG transitionName="fade-up" transitionEnterTimeout={125} transitionLeaveTimeout={125}>
           {dialog}
         </CSSTG>

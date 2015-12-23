@@ -1,5 +1,5 @@
 $body-bg: black;
-$body-font: 'Helvetica Neue';
+$body-font: Arial;
 $primary: #579A57;
 $controls-bg: rgba(0, 0, 0, 0.84);
 $controls-fg: #aaa;
@@ -11,16 +11,16 @@ $controls-timeline-bg: rgba(218, 218, 218, 0.12);
 $controls-timeline-progress-bg: $primary;
 $controls-timeline-buffered-bg: rgba(218, 218, 218, 0.12);
 
-$playlist-bg: rgba(20,20,20,.9);
+$playlist-bg: rgba(20,20,20,.95);
 $playlist-fg: $controls-fg;
-$playlist-button-bg: rgb(50,50,50);
-$playlist-button-fg: #aaa;
-$playlist-button-hover-bg: rgb(60,60,60);
+$playlist-button-bg: $primary;
+$playlist-button-fg: #fff;
+$playlist-button-hover-bg: lighten($primary, 10%);
 $playlist-button-hover-fg: #fff;
 $playlist-item-icon-fg: #999;
-$playlist-item-hover-bg: rgb(25,25,25);
+$playlist-item-hover-bg: rgba(255,255,255,.05);
 $playlist-item-hover-fg: #fff;
-$playlist-item-active-bg: rgb(50,50,50);
+$playlist-item-active-bg: rgba(255,255,255,.15);
 $playlist-item-active-fg: #fff;
 
 $btn-bg: $primary;
@@ -45,36 +45,22 @@ body {
 .ui {
   transition: opacity 250ms ease-in-out;
   position: fixed;
-  height: 100%;
-  width: 100%;
+}
 
-  &.playing {
+.ui.hide:not(.stopped) {
   opacity: 0;
 
-    .controls {
-      bottom: -50px;
-    }
+  .controls {
+    bottom: -50px;
+  }
 
-    .dialog {
-      transition: right 250ms ease-in-out;
-      right: -20px;
-    }
-
-    &:hover {
-      opacity: 1;
-      .controls {
-        bottom: 0;
-      }
-      .dialog {
-        right: 10px;
-      }
-    }
+  .dialog {
+    right: -20px;
   }
 }
 
 
 .btn {
-  margin: 0 6px 6px;
   background: $btn-bg;
   color: $btn-fg;
   padding: 8px 16px;
@@ -101,6 +87,7 @@ body {
   display: flex;
   flex-direction: column;
   z-index: 2;
+  transition: right 250ms ease-in-out;
 
   > ul {
     margin: 0;
@@ -158,23 +145,11 @@ body {
   }
 
   > div {
-    text-align: right;
+    padding: 0 6px 6px 6px;
   }
 
-  > div > button {
-    margin: 0 6px 6px;
-    background: $playlist-button-bg;
-    color: $playlist-button-fg;
-    padding: 8px 16px;
-    font-weight: 600;
-    border: none;
-    border-radius: 2px;
-    font-family: inherit;
-
-    &:hover {
-      background: $playlist-button-hover-bg;
-      color: $playlist-button-hover-fg;
-    }
+  > div > .btn {
+    width: 100%;
   }
 }
 
