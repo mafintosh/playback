@@ -67,7 +67,7 @@ class App extends React.Component {
   _handleCastItemClick(device, deviceId) {
     this.setState({ uiDialog: null })
     if (this.state.casting === deviceId) {
-      this.controller.setPlayer(this.controller.PLAYER_HTML5VIDEO, { element: document.getElementById('video') })
+      this.controller.setPlayer(this.controller.PLAYER_HTML, { element: document.getElementById('video') })
     } else {
       this.controller.setPlayer(this.controller.PLAYER_CHROMECAST, { device, deviceId })
     }
@@ -126,17 +126,13 @@ class App extends React.Component {
   _renderPlaylist() {
     const items = this.state.playlist.map((file, i) => {
       const active = file === this.state.currentFile ? 'active' : ''
-      const playing = this.state.status === this.controller.STATUS_PLAYING
       let icon
       if (active) {
-        if (playing) {
-          icon = <Icon icon="volume-up"/>
-        } else {
-          icon = <Icon icon="pause"/>
-        }
+        icon = <Icon icon="play"/>
       } else {
         icon = i + 1
       }
+
       return (
         <li key={i} onClick={this._handlePlaylistItemClick.bind(this, file)} className={active}>
           <div className="playlist__item-icon">{icon}</div>

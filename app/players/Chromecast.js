@@ -25,7 +25,7 @@ class Chromecast extends EventEmitter {
       title: file.name,
       seek: currentTime,
       autoSubtitles: showSubtitles,
-      subtitles: [file.subtitlesUrl]
+      subtitles: file.subtitlesUrl ? [file.subtitlesUrl] : []
     }, this._onMetadata.bind(this))
 
     if (autoPlay) {

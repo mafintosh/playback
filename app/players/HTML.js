@@ -1,9 +1,9 @@
 import { EventEmitter } from 'events'
 
-class HTML5Video extends EventEmitter {
+class HTMLPlayer extends EventEmitter {
 
   static POLL_FREQUENCY = 1000
-  get POLL_FREQUENCY() { return HTML5Video.POLL_FREQUENCY }
+  get POLL_FREQUENCY() { return HTMLPlayer.POLL_FREQUENCY }
 
   constructor(controller) {
     super()
@@ -114,4 +114,4 @@ class HTML5Video extends EventEmitter {
 
 }
 
-module.exports = HTML5Video
+module.exports = HTMLPlayer

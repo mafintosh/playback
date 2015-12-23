@@ -12,7 +12,7 @@ const uris = argv._
 
 controller.on('ready', () => {
   UI.init(controller, () => {
-    controller.setPlayer(controller.PLAYER_HTML5VIDEO, { element: document.getElementById('video') })
+    controller.setPlayer(controller.PLAYER_HTML, { element: document.getElementById('video') })
     if (uris.length) {
       controller.addAndPlay(uris)
     }

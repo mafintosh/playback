@@ -10,7 +10,7 @@ import httpLoader from './loaders/http'
 import ipfsLoader from './loaders/ipfs'
 
 import ChromecastPlayer from './players/Chromecast'
-import HTML5VideoPlayer from './players/HTML5Video'
+import HTMLPlayer from './players/HTML'
 
 import { ipcRenderer as ipc } from 'electron'
 
@@ -23,7 +23,7 @@ class Controller extends EventEmitter {
   get STATUS_STOPPED() { return 'stopped' }
   get STATUS_PAUSED() { return 'paused' }
   get STATUS_PLAYING() { return 'playing' }
-  get PLAYER_HTML5VIDEO() { return 'html5video '}
+  get PLAYER_HTML() { return 'html '}
   get PLAYER_CHROMECAST() { return 'chromecast '}
 
   constructor() {
@@ -56,7 +56,7 @@ class Controller extends EventEmitter {
 
   _initPlayers() {
     const cp = this._chromecastPlayer = new ChromecastPlayer(this)
-    const hp = this._htmlPlayer = new HTML5VideoPlayer(this)
+    const hp = this._htmlPlayer = new HTMLPlayer(this)
     const list = [cp, hp]
     list.forEach(p => {
       p.on('end', this._handlePlayerEnd.bind(this))
@@ -161,7 +161,7 @@ class Controller extends EventEmitter {
    * Load a file
    */
 
-  load(file, autoPlay = false, currentTime = 0, showSubtitles = true) {
+  load(file, autoPlay = false, currentTime = 0, showSubtitles = false) {
     if (this.state.status !== this.STATUS_STOPPED) { this.stop() }
 
     this.setState({
@@ -359,7 +359,7 @@ class Controller extends EventEmitter {
       player = this._chromecastPlayer
       player.enable(playerOpts)
       this.setState({ player, casting: playerOpts.deviceId })
-    } else if (type === this.PLAYER_HTML5VIDEO) {
+    } else if (type === this.PLAYER_HTML) {
       player = this._htmlPlayer
       player.enable(playerOpts)
       this.setState({ player, casting: null })
