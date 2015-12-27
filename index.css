@@ -413,6 +413,30 @@ body:hover #overlay, body:hover .titlebar {
 
 }
 
+#controls-brightness-slider {
+  -webkit-appearance: none;
+  background: #727374;
+  width: 50px;
+  height: 4px;
+  border-radius: 0px;
+  float: right;
+  margin-top: 12px;
+  margin-left: 5px;
+}
+
+#controls-brightness-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  background-color: #31A357;
+  opacity: 1.0;
+  width: 9px;
+  height: 9px;
+  border-radius: 4.5px;
+}
+
+#controls-brightness-slider:focus {
+  outline: none;
+}
+
 #settings-popup span label {
   font-size: 15px;
 }

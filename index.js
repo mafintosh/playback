@@ -47,7 +47,6 @@ var render = function () {
   });
   var val = vals.join(' ');
   el.style.webkitFilter = val;
-  document.querySelector('output').textContent = '-webkit-filter: ' + (val ? val : 'none') + ';';
 }
 
 var printError = function (err) {
@@ -212,6 +211,7 @@ $('#controls-timeline').on('mouseout', function (e) {
 })
 
 var isVolumeSliderClicked = false
+var isBrightnessSliderClicked = false
 
 function updateAudioVolume(value) {
   media.volume(value)
@@ -239,6 +239,28 @@ $('#controls-volume-slider').on('mouseup', function (e) {
   updateAudioVolume(volume.value)
   updateVolumeSlider(volume)
   isVolumeSliderClicked = false
+})
+
+function updateBrightnessSlider(brightness) {
+  var val = brightness.value * 10;
+  brightness.style.background = '-webkit-gradient(linear, left top, right top, color-stop(' + val.toString() + '%, #31A357), color-stop(' + val.toString() + '%, #727374))'
+}
+
+$('#controls-brightness-slider').on('mousemove', function (e) {
+  if (isBrightnessSliderClicked) {
+    var brightness = $('#controls-brightness-slider')[0]
+    updateBrightnessSlider(brightness)
+  }
+})
+
+$('#controls-brightness-slider').on('mousedown', function (e) {
+  isBrightnessSliderClicked = true
+})
+
+$('#controls-brightness-slider').on('mouseup', function (e) {
+  var brightness = $('#controls-brightness-slider')[0]
+  updateBrightnessSlider(brightness)
+  isBrightnessSliderClicked = false
 })
 
 $(document).on('keydown', function (e) {
@@ -676,6 +698,3 @@ $('#controls-volume-slider')[0].setAttribute("value", 0.5)
 $('#controls-volume-slider')[0].setAttribute("min", 0)
 $('#controls-volume-slider')[0].setAttribute("max", 1)
 $('#controls-volume-slider')[0].setAttribute("step", 0.05)
-
-var debugMenu = require('debug-menu');
-debugMenu.install(); 
