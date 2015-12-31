@@ -1,3 +1,5 @@
+@import 'titlebar';
+
 $body-bg: black;
 $body-font: Arial;
 $primary: #579A57;
@@ -300,6 +302,7 @@ video {
       border: none;
       outline: none;
       color: $controls-icon-color;
+      transition: color 125ms ease-in-out;
 
       &:hover:not(:disabled) {
         color: $controls-icon-color-hover;

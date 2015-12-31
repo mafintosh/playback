@@ -39,6 +39,7 @@ app.on('will-quit', () => {
 app.on('ready', () => {
   win = new BrowserWindow({
     title: 'playback',
+    frame: false,
     width: 860,
     height: 470
   })
@@ -67,27 +68,27 @@ ipc.on('toggle-fullscreen', () => {
   win.setFullScreen(!win.isFullScreen())
 })
 
-ipc.on('focus', function () {
+ipc.on('focus', () => {
   win.focus()
 })
 
-ipc.on('minimize', function () {
+ipc.on('minimize', () => {
   win.minimize()
 })
 
-ipc.on('maximize', function () {
+ipc.on('maximize', () => {
   win.maximize()
 })
 
-ipc.on('prevent-sleep', function () {
+ipc.on('prevent-sleep', () => {
   preventSleep()
 })
 
-ipc.on('allow-sleep', function () {
+ipc.on('allow-sleep', () => {
   allowSleep()
 })
 
-ipc.on('resize', function (e, message) {
+ipc.on('resize', (e, message) => {
   if (win.isMaximized()) return
   const wid = win.getSize()[0]
   const hei = (wid / message.ratio) | 0

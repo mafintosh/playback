@@ -7,6 +7,7 @@ import Slider from 'react-slider'
 import CSSTG from 'react-addons-css-transition-group'
 
 import Icon from './components/icon'
+import Titlebar from './components/titlebar'
 import handleIdle from './utils/mouseidle.js'
 
 class App extends React.Component {
@@ -270,6 +271,7 @@ class App extends React.Component {
       <div className={'ui ' + (this.state.status === this.controller.STATUS_STOPPED ? 'stopped' : '')}>
         {loading}
         {emptyState}
+        <Titlebar isFullscreen={this.state.fullscreen}/>
         <CSSTG transitionName="fade-up" transitionEnterTimeout={125} transitionLeaveTimeout={125}>
           {dialog}
         </CSSTG>
@@ -298,7 +300,7 @@ class App extends React.Component {
             <button disabled={!hasSubtitles} className={(hasSubtitles ? '' : 'muted') + (showingSubtitles ? 'on' : '')} onClick={this._handleSubtitlesClick.bind(this)}>
               <Icon icon="closed-caption"/>
             </button>
-            <button onClick={this._handleCastClick.bind(this)}>
+            <button className={this.state.chromecasts.length ? '' : 'muted'} onClick={this._handleCastClick.bind(this)}>
               <Icon icon={this.state.casting ? 'cast-connected' : 'cast'}/>
             </button>
             <button onClick={this._handlePlaylistClick.bind(this)}>

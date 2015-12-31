@@ -1,0 +1,103 @@
+.titlebar {
+  position: fixed;
+  width: 100%;
+  height: 22px;
+  background-color: rgba(0, 0, 0, 0.84);
+  display: flex;
+  align-items: center;
+}
+
+.titlebar__stoplight {
+  line-height: 0;
+  display: flex;
+}
+
+.titlebar__stoplight svg {
+  fill: #000;
+  opacity: 0;
+}
+
+.titlebar__stoplight:hover {
+
+  .titlebar__fullscreen-svg,
+  .titlebar__minimize-svg,
+  .titlebar__fullscreen-svg {
+    opacity: .5;
+  }
+
+  .titlebar__close-svg {
+    opacity: .75;
+  }
+}
+
+.titlebar__stoplight__close,
+.titlebar__stoplight__minimize,
+.titlebar__stoplight__fullscreen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin: 0 0 0 8px;
+  line-height: 0;
+  -webkit-app-region: no-drag;
+  -webkit-user-select: none;
+  position: relative;
+
+  &:after {
+    content: "";
+    position: absolute;
+    height: 12px;
+    width: 12px;
+    top: 0;
+    left: 0;
+    transform: scale(.92, .92);
+    box-shadow: 0 0 0 .5px rgba(0,0,0,.2);
+    border-radius: 50%;
+  }
+}
+
+.titlebar__fullscreen-svg {
+  width: 6px;
+  height: 6px;
+}
+
+.titlebar__maximize-svg {
+  width: 8px;
+  height: 8px;
+}
+
+.titlebar__minimize-svg {
+  width: 8px;
+  height: 8px;
+}
+
+.titlebar__close-svg {
+  width: 6px;
+  height: 6px;
+}
+
+.titlebar__stoplight__close {
+  background-color: #fc635d;
+}
+
+.titlebar__stoplight__close:active {
+  background-color: #bd4a46;
+}
+
+.titlebar__stoplight__minimize {
+  background-color: #fcbc41;
+}
+
+.titlebar__stoplight__minimize:active {
+  background-color: #be8e30;
+}
+
+.titlebar__stoplight__fullscreen {
+  background-color: #35cd4b;
+}
+
+.titlebar__stoplight__fullscreen:active {
+  background-color: #279a37;
+}
