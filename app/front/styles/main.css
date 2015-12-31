@@ -74,7 +74,10 @@ video {
         margin-right: 6px;
         color: #999; }
       .dialog > ul > li > .playlist__item-title {
-        flex: 1; }
+        flex: 1;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden; }
       .dialog > ul > li > .playlist__item-action {
         width: 0;
         opacity: 0;
@@ -120,7 +123,7 @@ video {
       height: 10px;
       background-color: rgba(218, 218, 218, 0.12); }
     .controls .controls__timeline > .controls__timeline__tooltip {
-      background: #579A57;
+      background: rgba(0, 0, 0, 0.95);
       border-radius: 3px;
       padding: 4px 8px;
       color: #fff;
@@ -129,8 +132,8 @@ video {
       position: absolute;
       z-index: 100;
       opacity: 0;
-      transition: transform 250ms ease-in-out, opacity 250ms ease-in-out;
-      transform: translate(-50%, -34px); }
+      transition: opacity 250ms ease-in-out;
+      transform: translate(-50%, -28px); }
       .controls .controls__timeline > .controls__timeline__tooltip:after {
         width: 0;
         height: 0;
@@ -138,12 +141,11 @@ video {
         left: 50%;
         border-left: 6px solid transparent;
         border-right: 6px solid transparent;
-        border-top: 6px solid #579A57;
+        border-top: 6px solid rgba(0, 0, 0, 0.95);
         content: "";
         margin-left: -6px;
         position: absolute; }
     .controls .controls__timeline:hover .controls__timeline__tooltip {
-      transform: translate(-50%, -28px);
       opacity: 1; }
   .controls .controls__toolbar {
     padding: 6px;
@@ -167,6 +169,58 @@ video {
       flex: 1; }
     .controls .controls__toolbar .controls__metadata {
       margin-right: 10px; }
+    .controls .controls__toolbar .controls__toolbar__volume {
+      display: inline-block;
+      position: relative; }
+      .controls .controls__toolbar .controls__toolbar__volume:hover .controls__toolbar__volume__slider {
+        opacity: 1;
+        visibility: visible;
+        transition-delay: 0s; }
+    .controls .controls__toolbar .controls__toolbar__volume__slider {
+      position: absolute;
+      opacity: 0;
+      visibility: hidden;
+      transition: visibility 0s ease-in-out 250ms, opacity 250ms ease-in-out;
+      transform: rotate(270deg);
+      transform-origin: top left;
+      margin-left: 4px;
+      bottom: 0;
+      z-index: 100;
+      border-radius: 2px;
+      background-color: rgba(20, 20, 20, 0.95); }
+      .controls .controls__toolbar .controls__toolbar__volume__slider .controls__toolbar__volume__slider-wrapper {
+        width: 100px;
+        height: 26px;
+        position: relative;
+        margin: 0 6px; }
+        .controls .controls__toolbar .controls__toolbar__volume__slider .controls__toolbar__volume__slider-wrapper > .controls__toolbar__volume__slider__value {
+          position: absolute;
+          height: 6px;
+          top: 50%;
+          margin-top: -3px;
+          background: #579A57;
+          pointer-events: none; }
+        .controls .controls__toolbar .controls__toolbar__volume__slider .controls__toolbar__volume__slider-wrapper > input {
+          -webkit-appearance: none;
+          width: 100%;
+          height: 100%;
+          background: none;
+          outline: none;
+          position: relative;
+          z-index: 1;
+          margin: 0; }
+          .controls .controls__toolbar .controls__toolbar__volume__slider .controls__toolbar__volume__slider-wrapper > input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            border: none;
+            height: 16px;
+            position: relative;
+            width: 4px;
+            top: -5px;
+            border-radius: 0;
+            background: #fff; }
+          .controls .controls__toolbar .controls__toolbar__volume__slider .controls__toolbar__volume__slider-wrapper > input::-webkit-slider-runnable-track {
+            height: 6px;
+            background-color: rgba(0, 0, 0, 0.3); }
 
 .empty-state {
   position: fixed;

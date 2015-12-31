@@ -15,7 +15,6 @@ class App extends React.Component {
   }
 
   constructor(props) {
-    console.log('constructed UI')
     super(props)
     this.controller = this.props.controller
     this.state = this.controller.getState()
@@ -28,6 +27,7 @@ class App extends React.Component {
     })
 
     const el = findDOMNode(this)
+    const videoElement = document.getElementById('video')
 
     handleDrop(el, files => {
       this._handleLoadFilesEvent(null, files.map(f => f.path))
@@ -35,8 +35,19 @@ class App extends React.Component {
 
     handleIdle(el, 2500, 'hide')
 
-    document.getElementById('video').addEventListener('click', () => {
+    videoElement.addEventListener('click', () => {
       this.setState({ uiDialog: null })
+    })
+
+    document.addEventListener('keydown', e => {
+      if (e.keyCode === 27) return this._handleFullscreenClick()
+      if (e.keyCode === 13 && e.metaKey) return this._handleFullscreenClick()
+      if (e.keyCode === 13 && e.shiftKey) return this._handleFullscreenClick()
+      if (e.keyCode === 32) return this._handleTogglePlayClick()
+    })
+
+    videoElement.addEventListener('dblclick', () => {
+      this._handleFullscreenClick()
     })
 
     document.addEventListener('paste', e => {
@@ -69,7 +80,7 @@ class App extends React.Component {
   _handleCastItemClick(device, deviceId) {
     this.setState({ uiDialog: null })
     if (this.state.casting === deviceId) {
-      this.controller.setPlayer(this.controller.PLAYER_HTML, { element: document.getElementById('video') })
+      this.controller.setPlayer(this.controller.PLAYER_HTML, { element: this.state.videoElement })
     } else {
       this.controller.setPlayer(this.controller.PLAYER_CHROMECAST, { device, deviceId })
     }
@@ -92,7 +103,12 @@ class App extends React.Component {
   }
 
   _handleVolumeClick() {
+    this.controller.setMuted(!this.state.muted)
+  }
 
+  _handleVolumeChange(e) {
+    const val = e.target.value / 100
+    this.controller.setVolume(val)
   }
 
   _handleFullscreenClick() {
@@ -109,6 +125,7 @@ class App extends React.Component {
 
   _handleLoadFilesEvent(sender, files) {
     this.setState({ uiDialog: null })
+
     const autoPlay = !this.state.playlist.length
     if (autoPlay) {
       this.controller.addAndPlay(files)
@@ -232,6 +249,15 @@ class App extends React.Component {
     const hasSubtitles = this.state.currentFile && this.state.currentFile.subtitles
     const showingSubtitles = this.state.subtitles
 
+    let volumeIcon
+    if (this.state.volume > 0.5) {
+      volumeIcon = 'volume-up'
+    } else if (this.state.volume > 0) {
+      volumeIcon = 'volume-down'
+    } else {
+      volumeIcon = 'volume-off'
+    }
+
     const app = (
       <div className={'ui ' + (this.state.status === this.controller.STATUS_STOPPED ? 'stopped' : '')}>
         <CSSTG transitionName="fade-up" transitionEnterTimeout={125} transitionLeaveTimeout={125}>
@@ -248,9 +274,17 @@ class App extends React.Component {
             <button disabled={!this.state.currentFile} onClick={this._handleTogglePlayClick.bind(this)}>
               <Icon icon={playIcon}/>
             </button>
-            <button onClick={this._handleVolumeClick.bind(this)}>
-              <Icon icon="volume-up"/>
-            </button>
+            <div className="controls__toolbar__volume">
+              <button onClick={this._handleVolumeClick.bind(this)}>
+                <Icon icon={volumeIcon}/>
+              </button>
+              <div className="controls__toolbar__volume__slider">
+                <div className="controls__toolbar__volume__slider-wrapper">
+                  <div style={{ width: this.state.volume * 100 + '%' }} className="controls__toolbar__volume__slider__value"/>
+                  <input type="range" onChange={this._handleVolumeChange.bind(this)} value={this.state.volume * 100}/>
+                </div>
+              </div>
+            </div>
             <div className="controls__title">{title}</div>
             <div className="controls__metadata">
               {this._formatTime(currentTime)} / {this._formatTime(duration)}

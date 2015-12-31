@@ -74,6 +74,14 @@ class HTMLPlayer extends EventEmitter {
     this.element.removeChild(this.element.querySelector('track'))
   }
 
+  setVolume(value) {
+    this.element.volume = value
+  }
+
+  setMuted(muted) {
+    this.element.muted = muted
+  }
+
   _startPolling() {
     this._stopPolling()
     this.interval = setInterval(() => {

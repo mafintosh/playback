@@ -11,7 +11,7 @@ $controls-timeline-bg: rgba(218, 218, 218, 0.12);
 $controls-timeline-progress-bg: $primary;
 $controls-timeline-buffered-bg: rgba(218, 218, 218, 0.12);
 
-$controls-timeline-tooltip-bg: $primary;
+$controls-timeline-tooltip-bg: rgba(0,0,0,.95);
 $controls-timeline-tooltip-fg: #fff;
 
 $playlist-bg: rgba(20,20,20,.95);
@@ -131,6 +131,9 @@ video {
 
       > .playlist__item-title {
         flex: 1;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
       }
 
       > .playlist__item-action {
@@ -209,8 +212,8 @@ video {
       position: absolute;
       z-index: 100;
       opacity: 0;
-      transition: transform 250ms ease-in-out, opacity 250ms ease-in-out, ;
-      transform: translate(-50%, -34px);
+      transition: opacity 250ms ease-in-out;
+      transform: translate(-50%, -28px);
 
       &:after {
         width: 0;
@@ -228,7 +231,6 @@ video {
 
     &:hover {
       .controls__timeline__tooltip {
-        transform: translate(-50%, -28px);
         opacity: 1;
       }
     }
@@ -269,6 +271,76 @@ video {
 
     .controls__metadata {
       margin-right: 10px;
+    }
+
+    .controls__toolbar__volume {
+      display: inline-block;
+      position: relative;
+
+      &:hover {
+        .controls__toolbar__volume__slider {
+          opacity: 1;
+          visibility: visible;
+          transition-delay:0s;
+        }
+      }
+    }
+
+    .controls__toolbar__volume__slider {
+      position: absolute;
+      opacity: 0;
+      visibility: hidden;
+      transition:visibility 0s ease-in-out 250ms, opacity 250ms ease-in-out;
+      transform: rotate(270deg);
+      transform-origin: top left;
+      margin-left: 4px;
+      bottom: 0;
+      z-index: 100;
+      border-radius: 2px;
+      background-color: $playlist-bg;
+
+      .controls__toolbar__volume__slider-wrapper {
+        width: 100px;
+        height: 26px;
+        position: relative;
+        margin: 0 6px;
+
+        > .controls__toolbar__volume__slider__value {
+          position: absolute;
+          height: 6px;
+          top: 50%;
+          margin-top: -3px;
+          background: $primary;
+          pointer-events: none;
+        }
+
+        > input {
+          -webkit-appearance: none;
+          width: 100%;
+          height: 100%;
+          background: none;
+          outline: none;
+          position: relative;
+          z-index: 1;
+          margin: 0;
+
+          &::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            border: none;
+            height: 16px;
+            position: relative;
+            width: 4px;
+            top: -5px;
+            border-radius: 0;
+            background: #fff;
+          }
+
+          &::-webkit-slider-runnable-track {
+            height: 6px;
+            background-color: rgba(0,0,0,.3);
+          }
+        }
+      }
     }
   }
 }

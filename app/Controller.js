@@ -34,7 +34,7 @@ class Controller extends EventEmitter {
 
     this.setState({
       status: this.STATUS_STOPPED,
-      volume: 100,
+      volume: 1,
       muted: false,
       subtitles: false,
       casting: null,
@@ -366,6 +366,27 @@ class Controller extends EventEmitter {
       this.load(currentFile, autoPlay, currentTime)
     }
   }
+
+
+  /*
+   * Set the volume
+   */
+
+  setVolume(volume) {
+    this.state.player.setVolume(volume)
+    this.setState({ volume })
+  }
+
+
+  /*
+   * Set muted
+   */
+
+  setMuted(muted) {
+    this.state.player.setMuted(muted)
+    this.setState({ muted })
+  }
+
 
   /*
    * Get a file from the playlist
