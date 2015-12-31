@@ -80,6 +80,10 @@ ipc.on('maximize', () => {
   win.maximize()
 })
 
+ipc.on('close', () => {
+  app.quit()
+})
+
 ipc.on('prevent-sleep', () => {
   preventSleep()
 })

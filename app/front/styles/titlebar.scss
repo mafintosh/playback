@@ -5,6 +5,8 @@
   background-color: rgba(0, 0, 0, 0.84);
   display: flex;
   align-items: center;
+  top: 0;
+  transition: top 250ms ease-in-out;
 }
 
 .titlebar__stoplight {
@@ -21,7 +23,7 @@
 
   .titlebar__fullscreen-svg,
   .titlebar__minimize-svg,
-  .titlebar__fullscreen-svg {
+  .titlebar__maximize-svg {
     opacity: .5;
   }
 

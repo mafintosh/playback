@@ -116,6 +116,18 @@ class App extends React.Component {
     ipc.send('toggle-fullscreen')
   }
 
+  _handleMaximizeClick() {
+    ipc.send('maximize')
+  }
+
+  _handleMinimizeClick() {
+    ipc.send('minimize')
+  }
+
+  _handleCloseClick() {
+    ipc.send('close')
+  }
+
   _handleAddMediaClick() {
     ipc.send('open-file-dialog')
   }
@@ -271,7 +283,7 @@ class App extends React.Component {
       <div className={'ui ' + (this.state.status === this.controller.STATUS_STOPPED ? 'stopped' : '')}>
         {loading}
         {emptyState}
-        <Titlebar isFullscreen={this.state.fullscreen}/>
+        <Titlebar onFullscreen={this._handleFullscreenClick.bind(this)} onClose={this._handleCloseClick.bind(this)} onMaximize={this._handleMaximizeClick.bind(this)} onMinimize={this._handleMinimizeClick.bind(this)} isFullscreen={this.state.fullscreen}/>
         <CSSTG transitionName="fade-up" transitionEnterTimeout={125} transitionLeaveTimeout={125}>
           {dialog}
         </CSSTG>

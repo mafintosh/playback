@@ -4,7 +4,9 @@
   height: 22px;
   background-color: rgba(0, 0, 0, 0.84);
   display: flex;
-  align-items: center; }
+  align-items: center;
+  top: 0;
+  transition: top 250ms ease-in-out; }
 
 .titlebar__stoplight {
   line-height: 0;
@@ -16,7 +18,7 @@
 
 .titlebar__stoplight:hover .titlebar__fullscreen-svg,
 .titlebar__stoplight:hover .titlebar__minimize-svg,
-.titlebar__stoplight:hover .titlebar__fullscreen-svg {
+.titlebar__stoplight:hover .titlebar__maximize-svg {
   opacity: .5; }
 
 .titlebar__stoplight:hover .titlebar__close-svg {
@@ -105,6 +107,8 @@ body {
     bottom: -50px; }
   .ui.hide:not(.stopped) .dialog {
     right: -20px; }
+  .ui.hide:not(.stopped) .titlebar {
+    top: -30px; }
 
 .ui.stopped .controls > .controls__timeline:hover > .controls__timeline__tooltip {
   opacity: 0; }
