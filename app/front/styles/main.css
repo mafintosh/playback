@@ -25,9 +25,13 @@ body {
   opacity: 0; }
 
 video {
+  -webkit-app-region: drag;
   position: fixed;
   width: 100%;
   height: 100%; }
+
+.ui, .controls, .dialog {
+  -webkit-app-region: no-drag; }
 
 .btn {
   background: #579A57;
@@ -109,18 +113,31 @@ video {
   color: #aaa;
   transition: opacity 250ms ease-in-out, bottom 250ms ease-in-out; }
   .controls .controls__timeline {
-    height: 10px;
+    height: 6px;
     width: 100%;
     background: rgba(218, 218, 218, 0.12);
     position: relative;
-    z-index: 1; }
+    z-index: 1;
+    top: 0;
+    margin-top: 0;
+    transition: height 125ms ease-in-out, top 125ms ease-in-out, margin-top 125ms ease-in-out; }
+    .controls .controls__timeline:before {
+      content: "";
+      position: absolute;
+      top: -4px;
+      bottom: -4px;
+      width: 100%; }
+    .controls .controls__timeline:hover {
+      height: 10px;
+      top: 2px;
+      margin-top: -2px; }
     .controls .controls__timeline > .controls__timeline__progress {
       position: absolute;
-      height: 10px;
+      height: 100%;
       background-color: #579A57; }
     .controls .controls__timeline > .controls__timeline__buffered {
       position: absolute;
-      height: 10px;
+      height: 100%;
       background-color: rgba(218, 218, 218, 0.12); }
     .controls .controls__timeline > .controls__timeline__tooltip {
       background: rgba(0, 0, 0, 0.95);
@@ -134,6 +151,17 @@ video {
       opacity: 0;
       transition: opacity 250ms ease-in-out;
       transform: translate(-50%, -28px); }
+      .controls .controls__timeline > .controls__timeline__tooltip:before {
+        transition: height 125ms ease-in-out;
+        content: "";
+        width: 2px;
+        height: 6px;
+        background-color: rgba(255, 255, 255, 0.5);
+        left: calc(50% - 1px);
+        top: 28px;
+        display: block;
+        position: absolute;
+        z-index: 1; }
       .controls .controls__timeline > .controls__timeline__tooltip:after {
         width: 0;
         height: 0;
@@ -147,6 +175,8 @@ video {
         position: absolute; }
     .controls .controls__timeline:hover .controls__timeline__tooltip {
       opacity: 1; }
+      .controls .controls__timeline:hover .controls__timeline__tooltip:before {
+        height: 10px; }
   .controls .controls__toolbar {
     padding: 6px;
     display: flex;
@@ -165,7 +195,10 @@ video {
       .controls .controls__toolbar button.on {
         color: #579A57; }
     .controls .controls__toolbar .controls__title {
-      flex: 1; }
+      flex: 1;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis; }
     .controls .controls__toolbar .controls__metadata {
       margin-right: 10px; }
     .controls .controls__toolbar .controls__toolbar__volume {
@@ -197,6 +230,16 @@ video {
       z-index: 100;
       border-radius: 2px;
       padding: 0 4px; }
+
+.toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  background: rgba(20, 20, 20, 0.95);
+  color: #fff;
+  padding: 20px 30px;
+  transform: translate(-50%, -50%);
+  z-index: 1000; }
 
 .slider {
   position: relative;

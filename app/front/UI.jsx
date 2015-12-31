@@ -103,7 +103,7 @@ class App extends React.Component {
     this.controller.seekToSecond(time)
   }
 
-  _handleVolumeClick() {
+  _handleVolumeIconClick() {
     this.controller.setMuted(!this.state.muted)
   }
 
@@ -251,20 +251,28 @@ class App extends React.Component {
     const showingSubtitles = this.state.subtitles
 
     let volumeIcon
-    if (this.state.volume > 0.5) {
+    if (this.state.volume === 0 || this.state.muted) {
+      volumeIcon = 'volume-off'
+    } else if (this.state.volume > 0.5) {
       volumeIcon = 'volume-up'
     } else if (this.state.volume > 0) {
       volumeIcon = 'volume-down'
-    } else {
-      volumeIcon = 'volume-off'
+    }
+
+    let loading
+    if (this.state.loading) {
+      loading = (
+        <div className="toast">Loading...</div>
+      )
     }
 
     const app = (
       <div className={'ui ' + (this.state.status === this.controller.STATUS_STOPPED ? 'stopped' : '')}>
+        {loading}
+        {emptyState}
         <CSSTG transitionName="fade-up" transitionEnterTimeout={125} transitionLeaveTimeout={125}>
           {dialog}
         </CSSTG>
-        {emptyState}
         <div className="controls">
           <div className="controls__timeline" onMouseMove={this._handleTimelineMouseMove.bind(this)} onClick={this._handleSeek.bind(this)} ref="timeline">
             {timelineTooltip}
@@ -276,7 +284,7 @@ class App extends React.Component {
               <Icon icon={playIcon}/>
             </button>
             <div className="controls__toolbar__volume">
-              <button onClick={this._handleVolumeClick.bind(this)}>
+              <button onClick={this._handleVolumeIconClick.bind(this)}>
                 <Icon icon={volumeIcon}/>
               </button>
               <div className="controls__toolbar__volume__slider">
