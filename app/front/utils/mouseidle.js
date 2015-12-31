@@ -9,12 +9,20 @@ module.exports = (elem, timeout, className) => {
     elem.classList.remove(className)
   }
 
-  const listener = () => {
+  const listener = (e) => {
+    hide.cancel()
     show()
+    if (!elem.contains(e.target)) {
+      hide()
+    }
+  }
+
+  const mouseout = () => {
     hide()
   }
 
-  window.addEventListener('mousemove', listener)
-  window.addEventListener('mousedown', listener)
-  window.addEventListener('mouseup', listener)
+  document.addEventListener('mousemove', listener)
+  document.addEventListener('mousedown', listener)
+  document.addEventListener('mouseup', listener)
+  document.addEventListener('mouseout', mouseout)
 }

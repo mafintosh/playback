@@ -3,6 +3,7 @@ import { ipcRenderer as ipc } from 'electron'
 import handleDrop from 'drag-and-drop-files'
 import React from 'react'
 import { render, findDOMNode } from 'react-dom'
+import Slider from 'react-slider'
 import CSSTG from 'react-addons-css-transition-group'
 
 import Icon from './components/icon'
@@ -40,7 +41,7 @@ class App extends React.Component {
     })
 
     document.addEventListener('keydown', e => {
-      if (e.keyCode === 27) return this._handleFullscreenClick()
+      if (e.keyCode === 27 && this.state.fullscreen) return this._handleFullscreenClick()
       if (e.keyCode === 13 && e.metaKey) return this._handleFullscreenClick()
       if (e.keyCode === 13 && e.shiftKey) return this._handleFullscreenClick()
       if (e.keyCode === 32) return this._handleTogglePlayClick()
@@ -106,9 +107,8 @@ class App extends React.Component {
     this.controller.setMuted(!this.state.muted)
   }
 
-  _handleVolumeChange(e) {
-    const val = e.target.value / 100
-    this.controller.setVolume(val)
+  _handleVolumeChange(val) {
+    this.controller.setVolume(val / 100)
   }
 
   _handleFullscreenClick() {
@@ -135,8 +135,7 @@ class App extends React.Component {
   }
 
   _handleTimelineMouseMove(e) {
-    const left = e.clientX
-    this.setState({ uiTimelineTooltipPosition: left })
+    this.setState({ uiTimelineTooltipPosition: e.clientX })
   }
 
   _formatTime(totalSeconds) {
@@ -195,13 +194,15 @@ class App extends React.Component {
   }
 
   render() {
-    const playIcon = this.state.status === this.controller.STATUS_PLAYING ? 'pause' : 'play'
+    const playing = this.state.status === this.controller.STATUS_PLAYING
+    const playIcon = playing ? 'pause' : 'play'
     const title = this.state.currentFile ? this.state.currentFile.name : 'No file'
     const { currentTime, duration } = this.state
-    const updateSpeed = this.state.player ? this.state.player.POLL_FREQUENCY : 1000
+    const updateSpeed = playing ? this.state.player.POLL_FREQUENCY : 0
+    const progressTime = playing ? currentTime : currentTime
     const progressStyle = {
       transition: `width ${updateSpeed}ms linear`,
-      width: duration ? currentTime / duration * 100 + '%' : '0'
+      width: duration ? progressTime / duration * 100 + '%' : '0'
     }
 
     const bufferedBars = []
@@ -279,10 +280,7 @@ class App extends React.Component {
                 <Icon icon={volumeIcon}/>
               </button>
               <div className="controls__toolbar__volume__slider">
-                <div className="controls__toolbar__volume__slider-wrapper">
-                  <div style={{ width: this.state.volume * 100 + '%' }} className="controls__toolbar__volume__slider__value"/>
-                  <input type="range" onChange={this._handleVolumeChange.bind(this)} value={this.state.volume * 100}/>
-                </div>
+               <Slider value={this.state.volume * 100} onChange={this._handleVolumeChange.bind(this)} withBars />
               </div>
             </div>
             <div className="controls__title">{title}</div>

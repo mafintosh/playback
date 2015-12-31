@@ -31,6 +31,15 @@ $btn-fg: #fff;
 $btn-hover-bg: lighten($primary, 10%);
 $btn-hover-fg: #fff;
 
+$slider-height: 26px;
+$slider-bar-height: 4px;
+$slider-width: 75px;
+$slider-bar-bg: rgba(255,255,255,.1);
+$slider-bar-active-bg: $primary;
+$slider-handle-bg: #fff;
+$slider-handle-width: 4px;
+$slider-handle-height: 20px;
+
 *, *:after, *:before {
   box-sizing: inherit;
 }
@@ -265,7 +274,6 @@ video {
     }
 
     .controls__title {
-      margin-left: 10px;
       flex: 1;
     }
 
@@ -278,70 +286,65 @@ video {
       position: relative;
 
       &:hover {
+        // hit target
+        &:before {
+          content: "";
+          position: absolute;
+          left: 0;
+          right: -100px;
+          top: -20px;
+          bottom: -10px;
+        }
+
+        > button {
+          position: relative;
+          z-index: 1;
+        }
+
         .controls__toolbar__volume__slider {
           opacity: 1;
-          visibility: visible;
-          transition-delay:0s;
+          width: $slider-width + 4px;
+          padding: 0 4px;
+          margin-right: 16px;
         }
       }
     }
 
     .controls__toolbar__volume__slider {
-      position: absolute;
+      margin-right: 0;
+      display: inline-block;
+      vertical-align: middle;
       opacity: 0;
-      visibility: hidden;
-      transition:visibility 0s ease-in-out 250ms, opacity 250ms ease-in-out;
-      transform: rotate(270deg);
-      transform-origin: top left;
-      margin-left: 4px;
-      bottom: 0;
+      width: 0;
+      overflow: hidden;
+      transition: width 250ms ease-in-out, opacity 250ms ease-in-out, margin-right 250ms ease-in-out;
       z-index: 100;
       border-radius: 2px;
-      background-color: $playlist-bg;
-
-      .controls__toolbar__volume__slider-wrapper {
-        width: 100px;
-        height: 26px;
-        position: relative;
-        margin: 0 6px;
-
-        > .controls__toolbar__volume__slider__value {
-          position: absolute;
-          height: 6px;
-          top: 50%;
-          margin-top: -3px;
-          background: $primary;
-          pointer-events: none;
-        }
-
-        > input {
-          -webkit-appearance: none;
-          width: 100%;
-          height: 100%;
-          background: none;
-          outline: none;
-          position: relative;
-          z-index: 1;
-          margin: 0;
-
-          &::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            border: none;
-            height: 16px;
-            position: relative;
-            width: 4px;
-            top: -5px;
-            border-radius: 0;
-            background: #fff;
-          }
-
-          &::-webkit-slider-runnable-track {
-            height: 6px;
-            background-color: rgba(0,0,0,.3);
-          }
-        }
-      }
+      padding: 0 4px;
     }
+  }
+}
+
+.slider {
+  position: relative;
+  width: $slider-width;
+  height: $slider-height;
+
+  > .bar {
+    top: ($slider-height - $slider-bar-height) / 2;
+    height: $slider-bar-height;
+    background-color: $slider-bar-bg;
+
+    &.bar-0 {
+      background-color: $slider-bar-active-bg;
+    }
+  }
+
+  > .handle {
+    height: $slider-handle-height;
+    top: ($slider-height - $slider-handle-height) / 2;
+    width: $slider-handle-width;
+    background: $slider-handle-bg;
   }
 }
 

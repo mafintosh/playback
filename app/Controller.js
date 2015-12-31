@@ -214,7 +214,8 @@ class Controller extends EventEmitter {
       status: this.STATUS_STOPPED,
       currentTime: 0,
       duration: 0,
-      currentFile: null
+      currentFile: null,
+      buffered: null
     })
     this.state.player.stop()
     ipc.send('allow-sleep')
@@ -369,7 +370,7 @@ class Controller extends EventEmitter {
 
 
   /*
-   * Set the volume
+   * Set the volume (0-1)
    */
 
   setVolume(volume) {

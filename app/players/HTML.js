@@ -2,7 +2,7 @@ import { EventEmitter } from 'events'
 
 class HTMLPlayer extends EventEmitter {
 
-  static POLL_FREQUENCY = 1000
+  static POLL_FREQUENCY = 200
   get POLL_FREQUENCY() { return HTMLPlayer.POLL_FREQUENCY }
 
   constructor(controller) {

@@ -165,62 +165,54 @@ video {
       .controls .controls__toolbar button.on {
         color: #579A57; }
     .controls .controls__toolbar .controls__title {
-      margin-left: 10px;
       flex: 1; }
     .controls .controls__toolbar .controls__metadata {
       margin-right: 10px; }
     .controls .controls__toolbar .controls__toolbar__volume {
       display: inline-block;
       position: relative; }
+      .controls .controls__toolbar .controls__toolbar__volume:hover:before {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: -100px;
+        top: -20px;
+        bottom: -10px; }
+      .controls .controls__toolbar .controls__toolbar__volume:hover > button {
+        position: relative;
+        z-index: 1; }
       .controls .controls__toolbar .controls__toolbar__volume:hover .controls__toolbar__volume__slider {
         opacity: 1;
-        visibility: visible;
-        transition-delay: 0s; }
+        width: 79px;
+        padding: 0 4px;
+        margin-right: 16px; }
     .controls .controls__toolbar .controls__toolbar__volume__slider {
-      position: absolute;
+      margin-right: 0;
+      display: inline-block;
+      vertical-align: middle;
       opacity: 0;
-      visibility: hidden;
-      transition: visibility 0s ease-in-out 250ms, opacity 250ms ease-in-out;
-      transform: rotate(270deg);
-      transform-origin: top left;
-      margin-left: 4px;
-      bottom: 0;
+      width: 0;
+      overflow: hidden;
+      transition: width 250ms ease-in-out, opacity 250ms ease-in-out, margin-right 250ms ease-in-out;
       z-index: 100;
       border-radius: 2px;
-      background-color: rgba(20, 20, 20, 0.95); }
-      .controls .controls__toolbar .controls__toolbar__volume__slider .controls__toolbar__volume__slider-wrapper {
-        width: 100px;
-        height: 26px;
-        position: relative;
-        margin: 0 6px; }
-        .controls .controls__toolbar .controls__toolbar__volume__slider .controls__toolbar__volume__slider-wrapper > .controls__toolbar__volume__slider__value {
-          position: absolute;
-          height: 6px;
-          top: 50%;
-          margin-top: -3px;
-          background: #579A57;
-          pointer-events: none; }
-        .controls .controls__toolbar .controls__toolbar__volume__slider .controls__toolbar__volume__slider-wrapper > input {
-          -webkit-appearance: none;
-          width: 100%;
-          height: 100%;
-          background: none;
-          outline: none;
-          position: relative;
-          z-index: 1;
-          margin: 0; }
-          .controls .controls__toolbar .controls__toolbar__volume__slider .controls__toolbar__volume__slider-wrapper > input::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            border: none;
-            height: 16px;
-            position: relative;
-            width: 4px;
-            top: -5px;
-            border-radius: 0;
-            background: #fff; }
-          .controls .controls__toolbar .controls__toolbar__volume__slider .controls__toolbar__volume__slider-wrapper > input::-webkit-slider-runnable-track {
-            height: 6px;
-            background-color: rgba(0, 0, 0, 0.3); }
+      padding: 0 4px; }
+
+.slider {
+  position: relative;
+  width: 75px;
+  height: 26px; }
+  .slider > .bar {
+    top: 11px;
+    height: 4px;
+    background-color: rgba(255, 255, 255, 0.1); }
+    .slider > .bar.bar-0 {
+      background-color: #579A57; }
+  .slider > .handle {
+    height: 20px;
+    top: 3px;
+    width: 4px;
+    background: #fff; }
 
 .empty-state {
   position: fixed;

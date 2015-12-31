@@ -23,6 +23,7 @@
     "react-addons-css-transition-group": "^0.14.3",
     "react-addons-update": "^0.14.3",
     "react-dom": "^0.14.3",
+    "react-slider": "^0.6.0",
     "request": "^2.54.0",
     "roboto-fontface": "^0.4.2",
     "srt-to-vtt": "^1.0.2",
