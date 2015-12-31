@@ -128,6 +128,8 @@ class Controller extends EventEmitter {
    */
 
   add(uris) {
+    this.setState({ loading: true })
+
     let list = uris
     if (!uris.slice) list = [uris]
 
@@ -146,7 +148,10 @@ class Controller extends EventEmitter {
       })
     })
 
-    return Promise.all(proms)
+    return Promise.all(proms).then(files => {
+      this.setState({ loading: false })
+      return files
+    })
   }
 
 
