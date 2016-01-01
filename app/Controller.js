@@ -41,6 +41,8 @@ class Controller extends EventEmitter {
       currentFile: null,
       currentTime: 0,
       duration: 0,
+      videoWidth: 0,
+      videoHeight: 0,
       playlist: [],
       chromecasts: [],
       player: null
@@ -220,7 +222,9 @@ class Controller extends EventEmitter {
       currentTime: 0,
       duration: 0,
       currentFile: null,
-      buffered: null
+      buffered: null,
+      videoWidth: 0,
+      videoHeight: 0
     })
     this.state.player.stop()
     ipc.send('allow-sleep')
@@ -257,7 +261,7 @@ class Controller extends EventEmitter {
     this.setState({
       duration: metadata.duration,
       videoWidth: metadata.width,
-      videoheight: metadata.height
+      videoHeight: metadata.height
     })
   }
 
