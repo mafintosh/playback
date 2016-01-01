@@ -10,22 +10,19 @@ import Icon from './components/icon'
 import Titlebar from './components/titlebar'
 import handleIdle from './utils/mouseidle.js'
 
-class App extends React.Component {
+const App = React.createClass({
 
-  static propTypes = {
+  propTypes: {
     controller: React.PropTypes.object.isRequired
-  }
+  },
 
-  constructor(props) {
-    super(props)
-    this.controller = this.props.controller
-    this.state = this.controller.getState()
-    this._initListeners()
-  }
+  getInitialState() {
+    return this.props.controller.getState()
+  },
 
   componentDidMount() {
-    this.controller.on('update', () => {
-      this.setState(this.controller.getState())
+    this.props.controller.on('update', () => {
+      this.setState(this.props.controller.getState())
     })
 
     const el = findDOMNode(this)
@@ -55,101 +52,108 @@ class App extends React.Component {
     document.addEventListener('paste', e => {
       this._handleLoadFilesEvent(null, e.clipboardData.getData('text').split('\n'))
     })
-  }
 
-  _initListeners() {
-    ipc.on('load-files', this._handleLoadFilesEvent.bind(this))
+    ipc.on('load-files', this._handleLoadFilesEvent)
     ipc.on('fullscreen-change', (sender, fullscreen) => { this.setState({ fullscreen }) })
-  }
+  },
+
+  componentWillUpdate(nextProps, nextState) {
+    if (nextState.videoWidth && this.state.videoWidth !== nextState.videoWidth) {
+      ipc.send('resize', {
+        width: nextState.videoWidth,
+        height: nextState.videoHeight
+      })
+    }
+  },
 
   _handleTogglePlayClick() {
-    this.controller.togglePlay()
-  }
+    this.props.controller.togglePlay()
+  },
 
   _handlePlaylistClick() {
     this.setState({ uiDialog: this.state.uiDialog === 'playlist' ? null : 'playlist' })
-  }
+  },
 
   _handleCastClick() {
-    this.controller.updateChromecasts()
+    this.props.controller.updateChromecasts()
     this.setState({ uiDialog: this.state.uiDialog === 'chromecasts' ? null : 'chromecasts' })
-  }
+  },
 
   _handleRefreshChromecastsClick() {
-    this.controller.updateChromecasts()
-  }
+    this.props.controller.updateChromecasts()
+  },
 
   _handleCastItemClick(device, deviceId) {
     this.setState({ uiDialog: null })
     if (this.state.casting === deviceId) {
-      this.controller.setPlayer(this.controller.PLAYER_HTML, { element: this.state.videoElement })
+      this.props.controller.setPlayer(this.props.controller.PLAYER_HTML, { element: this.state.videoElement })
     } else {
-      this.controller.setPlayer(this.controller.PLAYER_CHROMECAST, { device, deviceId })
+      this.props.controller.setPlayer(this.props.controller.PLAYER_CHROMECAST, { device, deviceId })
     }
-  }
+  },
 
   _handlePlaylistItemClick(file) {
     this.setState({ uiDialog: null })
-    this.controller.load(file, true)
-  }
+    this.props.controller.load(file, true)
+  },
 
   _handleRemoveItemClick(file, index, e) {
     e.stopPropagation()
-    this.controller.remove(index)
-  }
+    this.props.controller.remove(index)
+  },
 
   _handleSeek(e) {
     const percentage = e.clientX / window.innerWidth
     const time = this.state.duration * percentage
-    this.controller.seekToSecond(time)
-  }
+    this.props.controller.seekToSecond(time)
+  },
 
   _handleVolumeIconClick() {
-    this.controller.setMuted(!this.state.muted)
-  }
+    this.props.controller.setMuted(!this.state.muted)
+  },
 
   _handleVolumeChange(val) {
-    this.controller.setVolume(val / 100)
-  }
+    this.props.controller.setVolume(val / 100)
+  },
 
   _handleFullscreenClick() {
     ipc.send('toggle-fullscreen')
-  }
+  },
 
   _handleMaximizeClick() {
     ipc.send('maximize')
-  }
+  },
 
   _handleMinimizeClick() {
     ipc.send('minimize')
-  }
+  },
 
   _handleCloseClick() {
     ipc.send('close')
-  }
+  },
 
   _handleAddMediaClick() {
     ipc.send('open-file-dialog')
-  }
+  },
 
   _handleSubtitlesClick() {
-    this.controller.toggleSubtitles()
-  }
+    this.props.controller.toggleSubtitles()
+  },
 
   _handleLoadFilesEvent(sender, files) {
     this.setState({ uiDialog: null })
 
     const autoPlay = !this.state.playlist.length
     if (autoPlay) {
-      this.controller.addAndPlay(files)
+      this.props.controller.addAndPlay(files)
     } else {
-      this.controller.add(files)
+      this.props.controller.add(files)
     }
-  }
+  },
 
   _handleTimelineMouseMove(e) {
     this.setState({ uiTimelineTooltipPosition: e.clientX })
-  }
+  },
 
   _formatTime(totalSeconds) {
     const hours = (totalSeconds / 3600) | 0
@@ -158,7 +162,7 @@ class App extends React.Component {
     if (mins < 10) mins = '0' + mins
     if (secs < 10) secs = '0' + secs
     return (hours ? hours + ':' : '') + mins + ':' + secs
-  }
+  },
 
   _renderPlaylist() {
     const items = this.state.playlist.map((file, i) => {
@@ -183,11 +187,11 @@ class App extends React.Component {
       <div key={'playlist'} className="dialog playlist">
         <ul>{items}</ul>
         <div>
-          <button className="btn" onClick={this._handleAddMediaClick.bind(this)}>Add media</button>
+          <button className="btn" onClick={this._handleAddMediaClick}>Add media</button>
         </div>
       </div>
     )
-  }
+  },
 
   _renderChromecastDialog() {
     let items = this.state.chromecasts.map((cast, i) => {
@@ -196,7 +200,7 @@ class App extends React.Component {
     })
 
     if (!items.length) {
-      items = [<li key={-1} onClick={this._handleRefreshChromecastsClick.bind(this)}>No chromecasts found. Click to refresh.</li>]
+      items = [<li key={-1} onClick={this._handleRefreshChromecastsClick}>No chromecasts found. Click to refresh.</li>]
     }
 
     return (
@@ -204,10 +208,10 @@ class App extends React.Component {
         <ul>{items}</ul>
       </div>
     )
-  }
+  },
 
   render() {
-    const playing = this.state.status === this.controller.STATUS_PLAYING
+    const playing = this.state.status === this.props.controller.STATUS_PLAYING
     const playIcon = playing ? 'pause' : 'play'
     const title = this.state.currentFile ? this.state.currentFile.name : 'No file'
     const { currentTime, duration } = this.state
@@ -245,7 +249,7 @@ class App extends React.Component {
           <div className="empty-state__icon">
             <Icon icon="file-download" size="48"/>
           </div>
-          <button onClick={this._handleAddMediaClick.bind(this)} className="btn empty-state__button">Add media</button>
+          <button onClick={this._handleAddMediaClick} className="btn empty-state__button">Add media</button>
         </div>
       )
     }
@@ -280,45 +284,45 @@ class App extends React.Component {
     }
 
     const app = (
-      <div className={'ui ' + (this.state.status === this.controller.STATUS_STOPPED ? 'stopped' : '')}>
+      <div className={'ui ' + (this.state.status === this.props.controller.STATUS_STOPPED ? 'stopped' : '')}>
         {loading}
         {emptyState}
-        <Titlebar onFullscreen={this._handleFullscreenClick.bind(this)} onClose={this._handleCloseClick.bind(this)} onMaximize={this._handleMaximizeClick.bind(this)} onMinimize={this._handleMinimizeClick.bind(this)} isFullscreen={this.state.fullscreen}/>
+        <Titlebar onFullscreen={this._handleFullscreenClick} onClose={this._handleCloseClick} onMaximize={this._handleMaximizeClick} onMinimize={this._handleMinimizeClick} isFullscreen={this.state.fullscreen}/>
         <CSSTG transitionName="fade-up" transitionEnterTimeout={125} transitionLeaveTimeout={125}>
           {dialog}
         </CSSTG>
         <div className="controls">
-          <div className="controls__timeline" onMouseMove={this._handleTimelineMouseMove.bind(this)} onClick={this._handleSeek.bind(this)} ref="timeline">
+          <div className="controls__timeline" onMouseMove={this._handleTimelineMouseMove} onClick={this._handleSeek} ref="timeline">
             {timelineTooltip}
             {bufferedBars}
             <div className="controls__timeline__progress" style={progressStyle}></div>
           </div>
           <div className="controls__toolbar">
-            <button disabled={!this.state.currentFile} onClick={this._handleTogglePlayClick.bind(this)}>
+            <button disabled={!this.state.currentFile} onClick={this._handleTogglePlayClick}>
               <Icon icon={playIcon}/>
             </button>
             <div className="controls__toolbar__volume">
-              <button onClick={this._handleVolumeIconClick.bind(this)}>
+              <button onClick={this._handleVolumeIconClick}>
                 <Icon icon={volumeIcon}/>
               </button>
               <div className="controls__toolbar__volume__slider">
-               <Slider value={this.state.volume * 100} onChange={this._handleVolumeChange.bind(this)} withBars />
+               <Slider value={this.state.volume * 100} onChange={this._handleVolumeChange} withBars />
               </div>
             </div>
             <div className="controls__title">{title}</div>
             <div className="controls__metadata">
               {this._formatTime(currentTime)} / {this._formatTime(duration)}
             </div>
-            <button disabled={!hasSubtitles} className={(hasSubtitles ? '' : 'muted') + (showingSubtitles ? 'on' : '')} onClick={this._handleSubtitlesClick.bind(this)}>
+            <button disabled={!hasSubtitles} className={(hasSubtitles ? '' : 'muted') + (showingSubtitles ? 'on' : '')} onClick={this._handleSubtitlesClick}>
               <Icon icon="closed-caption"/>
             </button>
-            <button className={this.state.chromecasts.length ? '' : 'muted'} onClick={this._handleCastClick.bind(this)}>
+            <button className={this.state.chromecasts.length ? '' : 'muted'} onClick={this._handleCastClick}>
               <Icon icon={this.state.casting ? 'cast-connected' : 'cast'}/>
             </button>
-            <button onClick={this._handlePlaylistClick.bind(this)}>
+            <button onClick={this._handlePlaylistClick}>
               <Icon icon="playlist-empty"/>
             </button>
-            <button onClick={this._handleFullscreenClick.bind(this)}>
+            <button onClick={this._handleFullscreenClick}>
               <Icon icon={this.state.fullscreen ? 'fullscreen-exit' : 'fullscreen'}/>
             </button>
           </div>
@@ -327,7 +331,7 @@ class App extends React.Component {
     )
     return app
   }
-}
+})
 
 module.exports = {
   init: (controller, cb) => {

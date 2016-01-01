@@ -1,4 +1,4 @@
 require('babel-register')({
-  presets: ['es2015', 'stage-0']
+  plugins: ['transform-es2015-modules-commonjs', 'transform-es2015-destructuring', 'transform-es2015-parameters', 'transform-class-properties']
 })
 require('./app/app.js')

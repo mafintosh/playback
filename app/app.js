@@ -94,7 +94,6 @@ ipc.on('allow-sleep', () => {
 
 ipc.on('resize', (e, message) => {
   if (win.isMaximized()) return
-  const wid = win.getSize()[0]
-  const hei = (wid / message.ratio) | 0
-  win.setSize(wid, hei)
+  const width = win.getSize()[0]
+  win.setSize(width, message.height / message.width * width | 0)
 })

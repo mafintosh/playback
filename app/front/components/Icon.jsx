@@ -1,23 +1,21 @@
 import React from 'react'
 
-class Icon extends React.Component {
+const Icon = React.createClass({
 
-  static propTypes = {
+  propTypes: {
     icon: React.PropTypes.string.isRequired,
     size: React.PropTypes.oneOfType([
       React.PropTypes.string,
       React.PropTypes.number
     ]),
     style: React.PropTypes.object
-  }
+  },
 
-  static defaultProps = {
-    size: 24
-  }
-
-  _mergeStyles(...args) {
-    return Object.assign({}, ...args)
-  }
+  getDefaultProps() {
+    return {
+      size: 24
+    }
+  },
 
   _renderGraphic() {
     switch (this.props.icon) {
@@ -84,7 +82,7 @@ class Icon extends React.Component {
       default:
         return
     }
-  }
+  },
 
   render() {
     const styles = {
@@ -95,11 +93,11 @@ class Icon extends React.Component {
     }
 
     return (
-      <svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" fit style={this._mergeStyles(styles, this.props.style)}>
+      <svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" fit style={styles}>
         {this._renderGraphic()}
       </svg>
     )
   }
-}
+})
 
 module.exports = Icon

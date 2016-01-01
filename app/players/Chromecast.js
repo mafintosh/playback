@@ -2,8 +2,7 @@ import { EventEmitter } from 'events'
 
 class Chromecast extends EventEmitter {
 
-  static POLL_FREQUENCY = 1000
-  get POLL_FREQUENCY() { return Chromecast.POLL_FREQUENCY }
+  POLL_FREQUENCY = 1000
 
   constructor(controller) {
     super()
@@ -67,8 +66,8 @@ class Chromecast extends EventEmitter {
   }
 
   resume() {
-    this._startPolling()
     this.device.resume()
+    this._startPolling()
   }
 
   pause() {
