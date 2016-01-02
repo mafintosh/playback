@@ -325,11 +325,12 @@ video {
   position: fixed;
   top: 50%;
   left: 50%;
-  background: rgba(20, 20, 20, 0.95);
-  color: #fff;
-  padding: 20px 30px;
+  background: #fff;
+  color: #579A57;
+  padding: 12px 24px;
   transform: translate(-50%, -50%);
-  z-index: 1000; }
+  z-index: 1000;
+  box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.5); }
 
 .slider {
   position: relative;

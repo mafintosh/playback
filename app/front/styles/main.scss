@@ -17,8 +17,8 @@ $controls-timeline-buffered-bg: rgba(218, 218, 218, 0.12);
 $controls-timeline-tooltip-bg: rgba(0,0,0,.95);
 $controls-timeline-tooltip-fg: #fff;
 
-$toast-bg: rgba(20,20,20,.95);
-$toast-fg: #fff;
+$toast-bg: #fff;
+$toast-fg: $primary;
 
 $playlist-bg: rgba(20,20,20,.95);
 $playlist-fg: $controls-fg;
@@ -386,9 +386,10 @@ video {
   left: 50%;
   background: $toast-bg;
   color: $toast-fg;
-  padding: 20px 30px;
+  padding: 12px 24px;
   transform: translate(-50%, -50%);
   z-index: 1000;
+  box-shadow: 0px 1px 6px rgba(0,0,0,.5);
 }
 
 .slider {

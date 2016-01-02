@@ -165,7 +165,7 @@ const App = React.createClass({
   },
 
   _renderPlaylist() {
-    const items = this.state.playlist.map((file, i) => {
+    let items = this.state.playlist.map((file, i) => {
       const active = file === this.state.currentFile ? 'active' : ''
       let icon
       if (active) {
@@ -182,6 +182,10 @@ const App = React.createClass({
         </li>
       )
     })
+
+    if (!items.length) {
+      items = <li><div className="playlist__item-title">Play queue empty</div></li>
+    }
 
     return (
       <div key={'playlist'} className="dialog playlist">
