@@ -1,0 +1,25 @@
+{
+  "name": "playback",
+  "description": "Video player build using atom-shell and node.js",
+  "main": "app.js",
+  "authors": [
+    "Mathias Buus (@mafintosh)"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/mafintosh/playback",
+  "moduleType": [
+    "node"
+  ],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "lib",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "octicons": "2.0.0",
+    "roboto-fontface": "~0.4.3"
+  }
+}

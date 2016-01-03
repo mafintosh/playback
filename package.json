@@ -24,6 +24,7 @@
     "ytdl-core": "^0.5.1"
   },
   "devDependencies": {
+    "bower": "^1.7.2",
     "electron-packager": "^5.1.1",
     "electron-prebuilt": "0.35.4"
   },
@@ -32,6 +33,7 @@
   },
   "scripts": {
     "rebuild": "npm rebuild --runtime=electron --target=0.35.4 --disturl=https://atom.io/download/atom-shell",
+    "prestart": "bower i",
     "start": "electron app.js",
     "dev": "electron app.js test.mp4",
     "mac-bundle": "electron-packager . Playback --platform=darwin --arch=x64 --version=0.35.4 --ignore=node_modules/electron-prebuilt && cp info.plist Playback-darwin-x64/Playback.app/Contents/Info.plist && cp icon.icns Playback-darwin-x64/Playback.app/Contents/Resources/atom.icns",
