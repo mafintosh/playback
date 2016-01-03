@@ -15,7 +15,7 @@
     "minimist": "^1.1.1",
     "multicast-dns": "^2.0.0",
     "network-address": "^1.0.0",
-    "octicons": "^2.4.1",
+    "octicons": "2.4.1",
     "pump": "^1.0.0",
     "range-parser": "^1.0.2",
     "request": "^2.54.0",
