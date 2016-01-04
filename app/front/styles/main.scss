@@ -67,6 +67,7 @@ body {
 
 .ui.hide:not(.stopped) {
   opacity: 0;
+  cursor: none;
 
   .controls {
     bottom: -50px;
