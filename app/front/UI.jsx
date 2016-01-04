@@ -74,11 +74,11 @@ const App = React.createClass({
     this.props.controller.togglePlay()
   },
 
-  _handlePlaylistClick() {
+  _handlePlaylistIconClick() {
     this.setState({ uiDialog: this.state.uiDialog === 'playlist' ? null : 'playlist' })
   },
 
-  _handleCastClick() {
+  _handleChromecastIconClick() {
     this.props.controller.updateChromecasts()
     this.setState({ uiDialog: this.state.uiDialog === 'chromecasts' ? null : 'chromecasts' })
   },
@@ -101,7 +101,7 @@ const App = React.createClass({
     this.props.controller.load(file, true)
   },
 
-  _handleRemoveItemClick(file, index, e) {
+  _handlePlaylistRemoveItemClick(file, index, e) {
     e.stopPropagation()
     this.props.controller.remove(index)
   },
@@ -147,11 +147,20 @@ const App = React.createClass({
   _handleLoadFilesEvent(sender, files) {
     this.setState({ uiDialog: null })
 
-    const autoPlay = !this.state.playlist.length
-    if (autoPlay) {
-      this.props.controller.addAndPlay(files)
-    } else {
-      this.props.controller.add(files)
+    const subtitles = files.some(f => {
+      if (f.match(/\.(srt|vtt)$/i)) {
+        this.props.controller.addSubtitles(f)
+        return true
+      }
+    })
+
+    if (!subtitles) {
+      const autoPlay = !this.state.playlist.length
+      if (autoPlay) {
+        this.props.controller.addAndPlay(files)
+      } else {
+        this.props.controller.add(files)
+      }
     }
   },
 
@@ -182,7 +191,7 @@ const App = React.createClass({
         <li key={i} onClick={this._handlePlaylistItemClick.bind(this, file)} className={active}>
           <div className="playlist__item-icon">{icon}</div>
           <div className="playlist__item-title">{file.name}</div>
-          <div className="playlist__item-action" onClick={this._handleRemoveItemClick.bind(this, file, i)}><Icon icon="highlight-remove"/></div>
+          <div className="playlist__item-action" onClick={this._handlePlaylistRemoveItemClick.bind(this, file, i)}><Icon icon="highlight-remove"/></div>
         </li>
       )
     })
@@ -273,7 +282,7 @@ const App = React.createClass({
     }
 
     const hasSubtitles = this.state.currentFile && this.state.currentFile.subtitles
-    const showingSubtitles = this.state.subtitles
+    const showingSubtitles = this.state.showSubtitles
 
     let volumeIcon
     if (this.state.volume === 0 || this.state.muted) {
@@ -324,10 +333,10 @@ const App = React.createClass({
             <button disabled={!hasSubtitles} className={(hasSubtitles ? '' : 'muted') + (showingSubtitles ? 'on' : '')} onClick={this._handleSubtitlesClick}>
               <Icon icon="closed-caption"/>
             </button>
-            <button className={this.state.chromecasts.length ? '' : 'muted'} onClick={this._handleCastClick}>
+            <button className={this.state.chromecasts.length ? '' : 'muted'} onClick={this._handleChromecastIconClick}>
               <Icon icon={this.state.casting ? 'cast-connected' : 'cast'}/>
             </button>
-            <button onClick={this._handlePlaylistClick}>
+            <button onClick={this._handlePlaylistIconClick}>
               <Icon icon="playlist-empty"/>
             </button>
             <button onClick={this._handleFullscreenClick}>

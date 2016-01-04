@@ -83,7 +83,7 @@ class Controller extends EventEmitter {
 
   setState(state) {
     this.state = Object.assign({}, this.state || {}, state)
-    console.log('Setting state', state, this.state)
+    console.log('Setting state', this.state)
     this.emit('update', this.state)
   }
 
@@ -98,7 +98,7 @@ class Controller extends EventEmitter {
 
 
   /*
-   * Toggle the playing state
+   * Toggle playing
    */
 
   togglePlay() {
@@ -115,13 +115,31 @@ class Controller extends EventEmitter {
    */
 
   toggleSubtitles() {
-    const show = !this.state.subtitles
+    const show = !this.state.showSubtitles
     if (show) {
       this.state.player.showSubtitles(this.state.currentFile)
     } else {
       this.state.player.hideSubtitles()
     }
-    this.setState({ subtitles: show })
+    this.setState({ showSubtitles: show })
+  }
+
+
+  /*
+   * Add subtitles to currentFile
+   */
+
+  addSubtitles(path) {
+    if (this.state.currentFile) {
+      this.setState({ loading: true })
+      fileLoader.loadSubtitle(path).then(data => {
+        this.state.currentFile.subtitles = data
+        if (this.state.showSubtitles) {
+          this.state.player.showSubtitles(this.state.currentFile)
+        }
+        this.setState({ loading: false })
+      })
+    }
   }
 
 
@@ -182,6 +200,7 @@ class Controller extends EventEmitter {
       duration: 0,
       currentTime
     })
+
     this.state.player.load(file, autoPlay, currentTime, showSubtitles)
 
     if (autoPlay) {
@@ -315,7 +334,7 @@ class Controller extends EventEmitter {
 
 
   /*
-   * Go to the previous track, or the beginning of the current track
+   * Go to the previous track, or the beginning of the current track if the currentTime is > 10
    */
 
   previous() {

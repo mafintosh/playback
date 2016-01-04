@@ -46,9 +46,7 @@ module.exports = {
 
         const formats = info.formats
 
-        formats.sort((a, b) => {
-          return +b.itag - +a.itag
-        })
+        formats.sort((a, b) => +b.itag - +a.itag)
 
         let vidFmt
         formats.some(function (fmt) {

@@ -32,10 +32,10 @@ module.exports = {
 
 
   /*
-   * Try to open a subtitle
+   * Load a subtitle
    */
 
-  _tryLoadingSubtitle(subtitlePath) {
+  loadSubtitle(subtitlePath) {
     return new Promise((resolve) => {
       qfs.exists(subtitlePath).then(exists => {
         if (exists) {
@@ -61,7 +61,7 @@ module.exports = {
       const ext = extensions.shift()
       if (!ext) return Promise.resolve()
 
-      return this._tryLoadingSubtitle(basename + '.' + ext).then(data => {
+      return this.loadSubtitle(basename + '.' + ext).then(data => {
         if (!data) { return next() }
         return Promise.resolve(data)
       })
