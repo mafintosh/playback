@@ -55,6 +55,10 @@ const App = React.createClass({
 
     ipc.on('load-files', this._handleLoadFilesEvent)
     ipc.on('fullscreen-change', (sender, fullscreen) => { this.setState({ fullscreen }) })
+
+    ipc.on('togglePlay', () => { this.props.controller.togglePlay() })
+    ipc.on('next', () => { this.props.controller.next() })
+    ipc.on('previous', () => { this.props.controller.previous() })
   },
 
   componentWillUpdate(nextProps, nextState) {

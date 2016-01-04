@@ -4,6 +4,7 @@ import {
   BrowserWindow,
   ipcMain as ipc,
   powerSaveBlocker,
+  globalShortcut,
   default as electron
 } from 'electron'
 
@@ -50,13 +51,12 @@ app.on('ready', () => {
     win = null
   })
 
-  win.on('enter-full-screen', () => {
-    win.send('fullscreen-change', true)
-  })
+  win.on('enter-full-screen', () => { win.send('fullscreen-change', true) })
+  win.on('leave-full-screen', () => { win.send('fullscreen-change', false) })
 
-  win.on('leave-full-screen', () => {
-    win.send('fullscreen-change', false)
-  })
+  globalShortcut.register('mediaplaypause', () => { win.send('togglePlay') })
+  globalShortcut.register('medianexttrack', () => { win.send('next') })
+  globalShortcut.register('mediaprevioustrack', () => { win.send('previous') })
 })
 
 ipc.on('open-file-dialog', () => {
