@@ -315,13 +315,18 @@ class Controller extends EventEmitter {
 
 
   /*
-   * Load the previous item in the playlist. Autoplay if we're already playing
+   * Go to the previous track, or the beginning of the current track
    */
 
   previous() {
     const prevFile = this.getPrevious()
-    if (!prevFile) return this.stop()
-    this.load(prevFile, this.state.status === this.STATUS_PLAYING)
+    if (this.state.currentTime > 10) {
+      this.seekToSecond(0)
+    } else if (!prevFile) {
+      this.stop()
+    } else {
+      this.load(prevFile, this.state.status === this.STATUS_PLAYING)
+    }
   }
 
 
