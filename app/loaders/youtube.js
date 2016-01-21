@@ -14,8 +14,9 @@ module.exports = {
 
       this._getYoutubeData(url).then(data => {
         const fmt = data.fmt
-        const vidUrl = fmt.url
+        let vidUrl = fmt.url
         const info = data.info
+
         request({ method: 'HEAD', url: vidUrl }, (err, resp) => {
           if (err) return reject(err)
 
@@ -25,12 +26,10 @@ module.exports = {
           file.name = info.title
 
           file.createReadStream = (opts = {}) => {
+            console.log('createReadStream', opts)
             const stream = duplex()
-            this._getYoutubeData(url).then(data2 => {
-              let vidUrl2 = data2.fmt.url
-              if (opts.start || opts.end) vidUrl2 += '&range=' + ([opts.start || 0, opts.end || len].join('-'))
-              stream.setReadable(request(vidUrl2))
-            }).catch(err2 => reject(err2))
+            if (opts.start || opts.end) vidUrl += '&range=' + ([opts.start || 0, opts.end || len].join('-'))
+            stream.setReadable(request(vidUrl))
             return stream
           }
           resolve(file)
@@ -46,9 +45,11 @@ module.exports = {
 
         const filtered = info.formats
           .sort((a, b) => +(a.resolution > b.resolution) || +(a.resolution === b.resolution) - 1)
-          .filter(f => f.container === 'mp4' || f.container === 'webm')
+          .filter(f => f.audioEncoding && (f.container === 'mp4' || f.container === 'webm'))
 
-        const vidFmt = filtered[0]
+        const vidFmt = filtered[filtered.length - 1]
+
+        console.log('Choosing youtube video format: ', vidFmt.container, vidFmt.resolution)
         if (!vidFmt) return reject(new Error('No suitable video format found'))
 
         return resolve({ info, fmt: vidFmt })
