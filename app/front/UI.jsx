@@ -220,7 +220,7 @@ const UI = React.createClass({
 
     const players = (
       <ul>
-        <li className={this.state.player === 'webchimera' ? 'active' : ''} onClick={this._handlePlayerClick.bind(this, 'webchimera')}>Play with WebChimera(libVLC)</li>
+        <li className={this.state.player === 'webchimera' ? 'active' : ''} onClick={this._handlePlayerClick.bind(this, 'webchimera')}>Play with WebChimera (libVLC)</li>
         <li className={this.state.player === 'html' ? 'active' : ''} onClick={this._handlePlayerClick.bind(this, 'html')}>Play with HTML</li>
       </ul>
     )
@@ -235,15 +235,12 @@ const UI = React.createClass({
 
   _renderBuffers() {
     const bufferedBars = []
-    const buffered = this.state.buffered
-    if (buffered && buffered.length) {
-      for (let i = 0; i < buffered.length; i++) {
-        const left = buffered.start(i) / this.state.duration * 100
-        const width = (buffered.end(i) - buffered.start(i)) / this.state.duration * 100
+    if (this.state.buffered) {
+      this.state.buffered.forEach((b, i) => {
         bufferedBars.push(
-          <div key={i} className="controls__timeline__buffered" style={{ transition: `width 250ms ease-in-out`, left: left + '%', width: width + '%' }}></div>
+          <div key={i} className="controls__timeline__buffered" style={{ transition: `width 250ms ease-in-out`, left: b.left + '%', width: b.width + '%' }}></div>
         )
-      }
+      })
     }
     return bufferedBars
   },
@@ -329,6 +326,15 @@ const UI = React.createClass({
       volumeIcon = 'volume-down'
     }
 
+    let bufferingIcon
+    if (this.state.buffering) {
+      bufferingIcon = (
+        <div className="controls__buffering">
+          Buffering
+        </div>
+      )
+    }
+
     const app = (
       <div className={'ui ' + (this.state.status === 'stopped' ? 'stopped' : '')}>
         {loading}
@@ -359,6 +365,7 @@ const UI = React.createClass({
             <div className="controls__metadata">
               {this._formatTime(currentTime)} / {this._formatTime(duration)}
             </div>
+            {bufferingIcon}
             <button disabled={!hasSubtitles} className={(hasSubtitles ? '' : 'muted') + (showingSubtitles ? 'on' : '')} onClick={this._handleSubtitlesClick}>
               <Icon icon="closed-caption"/>
             </button>

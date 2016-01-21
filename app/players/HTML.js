@@ -20,6 +20,8 @@ class HTMLPlayer {
 
     this.element.addEventListener('loadedmetadata', this._onMetadata)
     this.element.addEventListener('ended', this._onEnd)
+    this.element.addEventListener('waiting', this._onWaitingChange.bind(this, 'waiting'))
+    this.element.addEventListener('playing', this._onWaitingChange.bind(this, 'playing'))
   }
 
   enablePlayer() {
@@ -28,6 +30,12 @@ class HTMLPlayer {
 
   disablePlayer() {
     this.element.style.display = 'none'
+  }
+
+  _onWaitingChange(state) {
+    this.emitter.emit('playerStatus', {
+      buffering: state === 'waiting'
+    })
   }
 
   _onMetadata() {
@@ -46,9 +54,16 @@ class HTMLPlayer {
   _startPolling() {
     this._stopPolling()
     this.interval = setInterval(() => {
+      const buffers = []
+      for (let i = 0; i < this.element.buffered.length; i++) {
+        buffers.push({
+          left: this.element.buffered.start(i) / this.element.duration * 100,
+          width: (this.element.buffered.end(i) - this.element.buffered.start(i)) / this.element.duration * 100
+        })
+      }
       this.emitter.emit('playerStatus', {
         currentTime: this.element.currentTime,
-        buffered: this.element.buffered
+        buffered: buffers
       })
     }, this.POLL_FREQUENCY)
   }

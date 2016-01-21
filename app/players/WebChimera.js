@@ -34,7 +34,9 @@ class WebChimera {
     }
 
     this._onEnd = this._onEnd.bind(this)
+    this._onBuffer = this._onBuffer.bind(this)
     this._onWindowResize = this._onWindowResize.bind(this)
+    this.player.onBuffering = this._onBuffer
     this.player.onEndReached = this._onEnd
   }
 
@@ -46,6 +48,12 @@ class WebChimera {
   disablePlayer() {
     window.removeEventListener('resize', this._onWindowResize)
     this.element.style.display = 'none'
+  }
+
+  _onBuffer(percent) {
+    this.emitter.emit('playerStatus', {
+      buffering: percent !== 100
+    })
   }
 
   _onWindowResize() {

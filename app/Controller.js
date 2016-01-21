@@ -254,6 +254,7 @@ class Controller extends EventEmitter {
       currentTime: 0,
       duration: 0,
       currentFile: null,
+      buffering: false,
       buffered: null,
       videoWidth: 0,
       videoHeight: 0
@@ -307,7 +308,8 @@ class Controller extends EventEmitter {
 
   playerStatus(status) {
     this.setState({
-      currentTime: status.currentTime,
+      currentTime: status.currentTime || this.state.currentTime,
+      buffering: status.buffering,
       buffered: status.buffered
     })
   }

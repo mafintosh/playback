@@ -81,7 +81,7 @@ app.on('ready', () => {
     controller.REMOTE_SEND.forEach(f => {
       controller.on(f, (...args) => {
         const newArgs = [controller.state.player].concat(args)
-        console.log(`Sending ipc event '${f}' with args`)
+        console.log(`Sending ipc event '${f}'`)
         win.webContents.send(f, ...newArgs)
       })
     })
@@ -89,7 +89,7 @@ app.on('ready', () => {
     // Remote IPC Receive
     controller.REMOTE_RECEIVE.forEach(f => {
       ipc.on(f, (sender, ...args) => {
-        console.log(`Received ipc commmand '${f}' with args`)
+        console.log(`Received ipc event '${f}'`)
         controller[f].apply(controller, args)
       })
     })
