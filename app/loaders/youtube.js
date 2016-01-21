@@ -14,7 +14,7 @@ module.exports = {
 
       this._getYoutubeData(url).then(data => {
         const fmt = data.fmt
-        let vidUrl = fmt.url
+        const vidUrl = fmt.url
         const info = data.info
 
         request({ method: 'HEAD', url: vidUrl }, (err, resp) => {
@@ -26,10 +26,12 @@ module.exports = {
           file.name = info.title
 
           file.createReadStream = (opts = {}) => {
-            console.log('createReadStream', opts)
             const stream = duplex()
-            if (opts.start || opts.end) vidUrl += '&range=' + ([opts.start || 0, opts.end || len].join('-'))
-            stream.setReadable(request(vidUrl))
+            this._getYoutubeData(url).then(data2 => {
+              let vidUrl2 = data2.fmt.url
+              if (opts.start || opts.end) vidUrl2 += '&range=' + ([opts.start || 0, opts.end || len].join('-'))
+              stream.setReadable(request(vidUrl2))
+            }).catch(err2 => reject(err2))
             return stream
           }
           resolve(file)
