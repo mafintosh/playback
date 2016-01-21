@@ -34,15 +34,40 @@ class WebChimera {
     }
 
     this._onEnd = this._onEnd.bind(this)
+    this._onWindowResize = this._onWindowResize.bind(this)
     this.player.onEndReached = this._onEnd
   }
 
   enablePlayer() {
+    window.addEventListener('resize', this._onWindowResize)
     this.element.style.display = 'block'
   }
 
   disablePlayer() {
+    window.removeEventListener('resize', this._onWindowResize)
     this.element.style.display = 'none'
+  }
+
+  _onWindowResize() {
+    const preferredWidth = this.element.width
+    const preferredHeight = this.element.height
+    const ratio = preferredWidth / preferredHeight
+    const maxWidth = this.element.offsetParent.offsetWidth
+    const maxHeight = this.element.offsetParent.offsetHeight
+    const currentRatio = maxWidth / maxHeight
+
+    let outputHeight
+    let outputWidth
+    if (ratio > currentRatio) {
+      outputHeight = Math.round(maxWidth / ratio)
+      outputWidth = maxWidth
+    } else {
+      outputWidth = Math.round(maxHeight * ratio)
+      outputHeight = maxHeight
+    }
+
+    this.element.style.width = outputWidth + 'px'
+    this.element.style.height = outputHeight + 'px'
   }
 
   _onEnd() {
