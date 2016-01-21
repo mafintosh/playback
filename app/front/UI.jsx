@@ -260,7 +260,7 @@ const UI = React.createClass({
 
   _renderEmptyState() {
     let emptyState
-    if (!this.state.playlist.length) {
+    if (!this.state.playlist.length && !this.state.loading) {
       emptyState = (
         <div className="empty-state">
           <div className="empty-state__heading">Drop media here</div>
@@ -291,7 +291,9 @@ const UI = React.createClass({
     let loading
     if (this.state.loading) {
       loading = (
-        <div className="toast">Loading...</div>
+        <div className="toast-container">
+          <div className="toast">Loading...</div>
+        </div>
       )
     }
     return loading
