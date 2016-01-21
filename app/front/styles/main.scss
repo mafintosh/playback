@@ -90,11 +90,26 @@ body {
   }
 }
 
-video, canvas {
+video {
   -webkit-app-region: drag;
   position: fixed;
   width: 100%;
   height: 100%;
+}
+
+.canvas-container {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+canvas {
+  -webkit-app-region: drag;
+  width: 100%;
+  max-height: 100%;
 }
 
 .ui, .controls, .dialog {
@@ -438,28 +453,27 @@ video, canvas {
     border-radius: 20px;
     padding: 80px;
     margin-bottom: 20px;
+    background-image: url(../images/popcorn.gif);
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-color: #fff;
   }
 }
 
-.fade-up-enter {
-  transform-origin: bottom right;
+.fade-in-enter {
   opacity: 0.01;
-  // transform: scale(.75,.75) translate(0, 50%);
 }
 
-.fade-up-enter.fade-up-enter-active {
+.fade-in-enter.fade-in-enter-active {
   opacity: 1;
-  // transform: scale(1,1) translate(0, 0);
-  transition: opacity 125ms ease-in-out, transform 125ms ease-in-out, right 125ms ease-in-out;
+  transition: opacity 125ms ease-in-out, right 125ms ease-in-out;
 }
 
-.fade-up-leave {
+.fade-in-leave {
   opacity: 1;
-  transform-origin: bottom right;
 }
 
-.fade-up-leave.fade-up-leave-active {
+.fade-in-leave.fade-in-leave-active {
   opacity: 0.01;
-  // transform: scale(.75,.75) translate(0, 50%);
-  transition: opacity 125ms ease-in-out, transform 125ms ease-in-out, right 125ms ease-in-out;
+  transition: opacity 125ms ease-in-out, right 125ms ease-in-out;
 }
