@@ -44,20 +44,11 @@ module.exports = {
       ytdl.getInfo(url, (err, info) => {
         if (err) return reject(err)
 
-        const formats = info.formats
+        const filtered = info.formats
+          .sort((a, b) => +(a.resolution > b.resolution) || +(a.resolution === b.resolution) - 1)
+          .filter(f => f.container === 'mp4' || f.container === 'webm')
 
-        formats.sort((a, b) => +b.itag - +a.itag)
-
-        let vidFmt
-        formats.some(function (fmt) {
-          ['46', '45', '44', '43', '38', '37', '22', '18'].some(itag => {
-            if (fmt.itag === itag) {
-              vidFmt = fmt
-              return
-            }
-          })
-        })
-
+        const vidFmt = filtered[0]
         if (!vidFmt) return reject(new Error('No suitable video format found'))
 
         return resolve({ info, fmt: vidFmt })
