@@ -64,6 +64,8 @@ class Controller extends EventEmitter {
       })
     })
 
+    this.fileStreams = []
+
     // Create the chromecast player
     this._chromecastPlayer = new ChromecastPlayer(this, this.chromecasts)
   }
@@ -156,7 +158,17 @@ class Controller extends EventEmitter {
             file.id = uuid.v4()
             file.streamUrl = this.server.getPath() + '/' + file.id
             file.subtitlesUrl = file.streamUrl + '/subtitles'
-            this.setState(update(this.state, { playlist: { $push: [file] } }))
+            this.fileStreams.push(file)
+            this.setState(update(this.state, {
+              playlist: {
+                $push: [{
+                  id: file.id,
+                  streamUrl: file.streamUrl,
+                  subtitlesUrl: file.subtitlesUrl,
+                  name: file.name
+                }]
+              }
+            }))
             return file
           }))
           return true
@@ -169,7 +181,7 @@ class Controller extends EventEmitter {
       return files
     }).catch(e => {
       this.setState({ loading: false })
-      console.log(e)
+      console.error(e)
     })
   }
 
@@ -254,9 +266,9 @@ class Controller extends EventEmitter {
    */
 
   togglePlay() {
-    if (this.state.status !== this.STATUS_PLAYING) {
+    if (this.state.status === this.STATUS_PAUSED) {
       this.resume()
-    } else {
+    } else if (this.state.status === this.STATUS_PLAYING) {
       this.pause()
     }
   }
@@ -270,7 +282,7 @@ class Controller extends EventEmitter {
     const show = !this.state.showSubtitles
     this.setState({ showSubtitles: show })
     if (show) {
-      this.emit('showSubtitles')
+      this.emit('showSubtitles', this.state.currentFile.subtitlesUrl)
     } else {
       this.emit('hideSubtitles')
     }
@@ -304,7 +316,6 @@ class Controller extends EventEmitter {
    */
 
   playerMetadata(metadata) {
-    console.log('controller got metadata', metadata)
     this.setState({
       duration: metadata.duration,
       videoWidth: metadata.width,
@@ -387,6 +398,7 @@ class Controller extends EventEmitter {
       if (file.id === this.state.currentFile.id) {
         this.next()
       }
+      this.fileStreams.splice(index, 1)
       this.setState(update(this.state, { playlist: { $splice: [[index, 1]] } }))
     }
   }
@@ -403,8 +415,6 @@ class Controller extends EventEmitter {
   setPlayer(type, playerOpts) {
     const { currentFile, currentTime } = this.state
     const autoPlay = this.state.status === this.STATUS_PLAYING
-
-    console.log('setplayer', type, playerOpts)
 
     if (this.state.status !== this.STATUS_STOPPED) {
       this.stop()
@@ -450,12 +460,11 @@ class Controller extends EventEmitter {
 
 
   /*
-   * Get a file from the playlist by id
+   * Get a file stream by id
    */
 
   getFile(id) {
-    const { playlist } = this.state
-    return playlist[playlist.findIndex(f => f.id === id)]
+    return this.fileStreams[this.fileStreams.findIndex(f => f.id === id)]
   }
 
 

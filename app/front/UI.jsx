@@ -25,7 +25,6 @@ const UI = React.createClass({
   },
 
   componentDidMount() {
-    const videoEl = document.getElementById('video')
     const el = findDOMNode(this)
 
     handleIdle(el, 2500, 'hide')
@@ -60,7 +59,7 @@ const UI = React.createClass({
     const emitter = this.props.emitter
     this.emitter = emitter
 
-    this._htmlPlayer = new HTMLPlayer(videoEl, emitter)
+    this._htmlPlayer = new HTMLPlayer(document.getElementById('video'), emitter)
     this._chimeraPlayer = new WebChimera(document.getElementById('canvas'), emitter)
 
     emitter.on('update', (player, state) => {
@@ -77,7 +76,9 @@ const UI = React.createClass({
   },
 
   _handleTogglePlayClick() {
-    this.emitter.emit('togglePlay')
+    if (this.state.currentFile) {
+      this.emitter.emit('togglePlay')
+    }
   },
 
   _handlePlaylistIconClick() {
@@ -331,7 +332,7 @@ const UI = React.createClass({
         {loading}
         {emptyState}
         <Titlebar onFullscreen={this._handleFullscreenClick} onClose={this._handleCloseClick} onMaximize={this._handleMaximizeClick} onMinimize={this._handleMinimizeClick} isFullscreen={this.state.uiFullscreen}/>
-        <CSSTG transitionName="fade-up" transitionEnterTimeout={125} transitionLeaveTimeout={125}>
+        <CSSTG transitionName="fade-in" transitionEnterTimeout={125} transitionLeaveTimeout={125}>
           {dialog}
         </CSSTG>
         <div className="controls">

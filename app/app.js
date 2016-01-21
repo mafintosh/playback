@@ -58,7 +58,6 @@ app.on('ready', () => {
 
     controller.on('openFileDialog', () => {
       dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] }, (files) => {
-        console.log('Opening files', files)
         if (files) controller.loadFiles(files)
       })
     })

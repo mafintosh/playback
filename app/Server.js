@@ -24,8 +24,8 @@ class Server extends EventEmitter {
   }
 
   handleSubtitles(req, res) {
-    const uri = decodeURIComponent(req.url.split('/')[1])
-    const file = this.controller.getFile(uri)
+    const fileId = decodeURIComponent(req.url.split('/')[1])
+    const file = this.controller.getFile(fileId)
 
     if (!file) {
       res.statusCode = 404
@@ -50,8 +50,10 @@ class Server extends EventEmitter {
   }
 
   handleFile(req, res) {
-    const uri = decodeURIComponent(req.url.split('/')[1])
-    const file = this.controller.getFile(uri)
+    const fileId = decodeURIComponent(req.url.split('/')[1])
+    const file = this.controller.getFile(fileId)
+
+    console.log('handleFile', file, fileId)
 
     if (!file) {
       res.statusCode = 404

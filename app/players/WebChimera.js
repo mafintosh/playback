@@ -56,9 +56,6 @@ class WebChimera {
       this.emitter.emit('playerStatus', {
         currentTime: this.player.time / 1000
       })
-      // if (this.player.state === this.player.Ended) {
-      //   this._onEnd()
-      // }
     }, this.POLL_FREQUENCY)
   }
 
@@ -79,10 +76,12 @@ class WebChimera {
     }
   }
 
-  showSubtitles() {
+  showSubtitles(url) {
+    this.player.subtitles.load(url)
   }
 
   hideSubtitles() {
+    this.player.subtitles.track = 0
   }
 
   setVolume(value) {
