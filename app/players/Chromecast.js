@@ -1,3 +1,5 @@
+import playerEvents from './playerEvents'
+
 class Chromecast {
 
   POLL_FREQUENCY = 1000;
@@ -6,8 +8,7 @@ class Chromecast {
     this.chromecasts = chromecasts
     this.controller = controller
 
-    const list = ['setMuted', 'setVolume', 'start', 'resume', 'pause', 'stop', 'seek', 'hideSubtitles', 'showSubtitles', 'enablePlayer', 'disablePlayer']
-    list.forEach((f) => {
+    playerEvents.forEach((f) => {
       controller.on(f, (...args) => {
         if (controller.state.player === 'chromecast') {
           console.log('chromecast player performing', f, ' with ', args)

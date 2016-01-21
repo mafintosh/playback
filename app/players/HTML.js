@@ -1,3 +1,5 @@
+import playerEvents from './playerEvents'
+
 class HTMLPlayer {
 
   POLL_FREQUENCY = 500;
@@ -8,8 +10,7 @@ class HTMLPlayer {
     this._onEnd = this._onEnd.bind(this)
     this.emitter = emitter
 
-    const list = ['setMuted', 'setVolume', 'start', 'resume', 'pause', 'stop', 'seek', 'hideSubtitles', 'showSubtitles', 'enablePlayer', 'disablePlayer']
-    list.forEach((f) => {
+    playerEvents.forEach((f) => {
       emitter.on(f, (player, ...args) => {
         if (player === 'html') {
           this[f](...args)

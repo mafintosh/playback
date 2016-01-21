@@ -13,6 +13,8 @@ import torrentLoader from './loaders/torrent'
 import httpLoader from './loaders/http'
 import ipfsLoader from './loaders/ipfs'
 
+import playerEvents from './players/playerEvents'
+
 const loaders = [youtubeLoader, magnetLoader, torrentLoader, httpLoader, ipfsLoader, fileLoader]
 
 class Controller extends EventEmitter {
@@ -25,7 +27,7 @@ class Controller extends EventEmitter {
   PLAYER_CHROMECAST = 'chromecast';
 
   REMOTE_RECEIVE = ['togglePlay', 'start', 'remove', 'seek', 'setMuted', 'setVolume', 'toggleSubtitles', 'addAndStart', 'add', 'addSubtitles', 'updateChromecasts', 'setPlayer', 'loadFiles', 'openFileDialog', 'playerMetadata', 'playerEnd', 'playerStatus'];
-  REMOTE_SEND = ['update', 'setMuted', 'setVolume', 'start', 'resume', 'pause', 'stop', 'seek', 'hideSubtitles', 'showSubtitles', 'disablePlayer', 'enablePlayer'];
+  REMOTE_SEND = ['update'].concat(playerEvents);
 
   constructor() {
     super()

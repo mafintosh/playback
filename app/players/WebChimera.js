@@ -1,5 +1,6 @@
 import wcjs from 'wcjs-prebuilt'
 import renderer from 'webgl-video-renderer'
+import playerEvents from './playerEvents'
 
 class WebChimera {
 
@@ -11,8 +12,7 @@ class WebChimera {
     this.context = renderer.setupCanvas(element)
     this.player = wcjs.createPlayer()
 
-    const list = ['setMuted', 'setVolume', 'start', 'resume', 'pause', 'stop', 'seek', 'hideSubtitles', 'showSubtitles', 'enablePlayer', 'disablePlayer']
-    list.forEach((f) => {
+    playerEvents.forEach((f) => {
       emitter.on(f, (player, ...args) => {
         if (player === 'webchimera') {
           console.log('webchimera player performing', f, ' with ', args)

@@ -53,8 +53,6 @@ class Server extends EventEmitter {
     const fileId = decodeURIComponent(req.url.split('/')[1])
     const file = this.controller.getFile(fileId)
 
-    console.log('handleFile', file, fileId)
-
     if (!file) {
       res.statusCode = 404
       res.end()
