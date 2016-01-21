@@ -1,6 +1,6 @@
 class Chromecast {
 
-  POLL_FREQUENCY = 1000
+  POLL_FREQUENCY = 1000;
 
   constructor(controller, chromecasts) {
     this.chromecasts = chromecasts

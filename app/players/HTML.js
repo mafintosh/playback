@@ -1,6 +1,6 @@
 class HTMLPlayer {
 
-  POLL_FREQUENCY = 500
+  POLL_FREQUENCY = 500;
 
   constructor(element, emitter) {
     this.element = element

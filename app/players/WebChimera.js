@@ -3,9 +3,9 @@ import renderer from 'webgl-video-renderer'
 
 class WebChimera {
 
-  constructor(element, emitter) {
-    this.POLL_FREQUENCY = 500
+  POLL_FREQUENCY = 500;
 
+  constructor(element, emitter) {
     this.emitter = emitter
     this.element = element
     this.context = renderer.setupCanvas(element)

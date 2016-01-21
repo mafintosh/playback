@@ -17,15 +17,15 @@ const loaders = [youtubeLoader, magnetLoader, torrentLoader, httpLoader, ipfsLoa
 
 class Controller extends EventEmitter {
 
-  STATUS_STOPPED = 'stopped'
-  STATUS_PAUSED = 'paused'
-  STATUS_PLAYING = 'playing'
-  PLAYER_WEBCHIMERA = 'webchimera'
-  PLAYER_HTML = 'html'
-  PLAYER_CHROMECAST = 'chromecast'
+  STATUS_STOPPED = 'stopped';
+  STATUS_PAUSED = 'paused';
+  STATUS_PLAYING = 'playing';
+  PLAYER_WEBCHIMERA = 'webchimera';
+  PLAYER_HTML = 'html';
+  PLAYER_CHROMECAST = 'chromecast';
 
-  REMOTE_RECEIVE = ['togglePlay', 'start', 'remove', 'seek', 'setMuted', 'setVolume', 'toggleSubtitles', 'addAndStart', 'add', 'addSubtitles', 'updateChromecasts', 'setPlayer', 'loadFiles', 'openFileDialog', 'playerMetadata', 'playerEnd', 'playerStatus']
-  REMOTE_SEND = ['update', 'setMuted', 'setVolume', 'start', 'resume', 'pause', 'stop', 'seek', 'hideSubtitles', 'showSubtitles', 'disablePlayer', 'enablePlayer']
+  REMOTE_RECEIVE = ['togglePlay', 'start', 'remove', 'seek', 'setMuted', 'setVolume', 'toggleSubtitles', 'addAndStart', 'add', 'addSubtitles', 'updateChromecasts', 'setPlayer', 'loadFiles', 'openFileDialog', 'playerMetadata', 'playerEnd', 'playerStatus'];
+  REMOTE_SEND = ['update', 'setMuted', 'setVolume', 'start', 'resume', 'pause', 'stop', 'seek', 'hideSubtitles', 'showSubtitles', 'disablePlayer', 'enablePlayer'];
 
   constructor() {
     super()
