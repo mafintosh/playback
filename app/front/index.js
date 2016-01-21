@@ -1,20 +1,15 @@
 import UI from './UI.jsx'
-import minimist from 'minimist'
+import { ipcRenderer as ipc } from 'electron'
 
-import controller from '../Controller'
+const emitter = {}
 
-const argv = minimist(JSON.parse(window.location.toString().split('#')[1]), {
-  alias: { follow: 'f' },
-  boolean: ['follow']
-})
-
-const uris = argv._
-
-controller.on('ready', () => {
-  UI.init(controller, () => {
-    controller.setPlayer(controller.PLAYER_HTML, { element: document.getElementById('video') })
-    if (uris.length) {
-      controller.addAndPlay(uris)
-    }
+emitter.on = (channel, cb) => {
+  ipc.on(channel, (sender, ...args) => {
+    cb(...args)
   })
+}
+emitter.emit = ipc.send
+
+UI.init(emitter, () => {
+  emitter.emit('clientReady')
 })

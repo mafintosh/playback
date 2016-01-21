@@ -2,19 +2,25 @@ import {
   app,
   dialog,
   BrowserWindow,
-  ipcMain as ipc,
   powerSaveBlocker,
   globalShortcut,
-  default as electron
+  shell,
+  Menu,
+  ipcMain as ipc
 } from 'electron'
+import minimist from 'minimist'
+import clipboard from 'clipboard'
+import Controller from './Controller'
 
-electron.crashReporter.start()
+const argv = minimist(process.argv.slice(2), {
+  alias: { follow: 'f' },
+  boolean: ['follow']
+})
 
-let win
+const argURIs = argv._
 
 const allowSleep = () => {
   if (typeof app.sleepId !== 'undefined') {
-    console.log('Allowing sleep')
     powerSaveBlocker.stop(app.sleepId)
     delete app.sleepId
   }
@@ -22,78 +28,150 @@ const allowSleep = () => {
 
 const preventSleep = () => {
   if (typeof app.sleepId === 'undefined') {
-    console.log('Preventing sleep')
     app.sleepId = powerSaveBlocker.start('prevent-display-sleep')
   }
 }
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
-})
-
-app.on('will-quit', () => {
-  allowSleep()
-})
-
 app.on('ready', () => {
-  win = new BrowserWindow({
-    title: 'playback',
-    frame: false,
-    width: 860,
-    height: 470
+  let win
+
+  const controller = new Controller()
+
+  controller.on('ready', (serverPath) => {
+    win = new BrowserWindow({
+      title: 'playback',
+      frame: false,
+      width: 860,
+      height: 470
+    })
+
+    win.loadURL('file://' + __dirname + '/front/index.html#' + encodeURIComponent(serverPath))
+    win.on('closed', () => win = null)
+
+    // Client loaded
+    ipc.on('clientReady', () => {
+      controller.setPlayer(controller.PLAYER_WEBCHIMERA)
+      if (argURIs.length) {
+        controller.loadFiles(argURIs)
+      }
+    })
+
+    controller.on('openFileDialog', () => {
+      dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] }, (files) => {
+        console.log('Opening files', files)
+        if (files) controller.loadFiles(files)
+      })
+    })
+
+    // Window controls
+    controller.on('close', () => win.close())
+    controller.on('focus', () => win.focus())
+    controller.on('minimize', () => win.minimize())
+    controller.on('maximize', () => win.maximize())
+
+    // Prevent/allow computer sleep
+    controller.on('preventSleep', () => preventSleep())
+    controller.on('allowSleep', () => allowSleep())
+
+    // Media keybaord shortcut handlers
+    globalShortcut.register('mediaplaypause', () => controller.togglePlay())
+    globalShortcut.register('medianexttrack', () => controller.next())
+    globalShortcut.register('mediaprevioustrack', () => controller.previous())
+
+    // Remote IPC send
+    controller.REMOTE_SEND.forEach(f => {
+      controller.on(f, (...args) => {
+        const newArgs = [controller.state.player].concat(args)
+        console.log(`Sending ipc event '${f}' with args`)
+        win.webContents.send(f, ...newArgs)
+      })
+    })
+
+    // Remote IPC Receive
+    controller.REMOTE_RECEIVE.forEach(f => {
+      ipc.on(f, (sender, ...args) => {
+        console.log(`Received ipc commmand '${f}' with args`)
+        controller[f].apply(controller, args)
+      })
+    })
+
+    // Build app menu
+    const menuTemplate = [{
+      label: 'Playback',
+      submenu: [{
+        label: 'About Playback',
+        click() {
+          shell.openExternal('https://mafintosh.github.io/playback/')
+        }
+      }, {
+        type: 'separator'
+      }, {
+        label: 'Quit',
+        accelerator: 'Command+Q',
+        click() {
+          app.quit()
+        }
+      }]
+    }, {
+      label: 'File',
+      submenu: [{
+        label: 'Add media',
+        accelerator: 'Command+O',
+        click() {
+          controller.openFileDialog()
+        }
+      }, {
+        label: 'Add link from clipboard',
+        accelerator: 'CommandOrControl+V',
+        click() {
+          controller.loadFiles(clipboard.readText().split('\n'))
+        }
+      }]
+    }, {
+      label: 'Window',
+      submenu: [{
+        label: 'Minimize',
+        accelerator: 'CmdOrCtrl+M',
+        role: 'minimize'
+      }, {
+        label: 'Close',
+        accelerator: 'CmdOrCtrl+W',
+        role: 'close'
+      }, {
+        type: 'separator'
+      }, {
+        label: 'Toggle Developer Tools',
+        accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
+        click() {
+          win.webContents.openDevTools()
+        }
+      }]
+    }, {
+      label: 'Help',
+      submenu: [{
+        label: 'Report Issue',
+        click() {
+          shell.openExternal('https://github.com/mafintosh/playback/issues')
+        }
+      }, {
+        label: 'View Source Code on GitHub',
+        click() {
+          shell.openExternal('https://github.com/mafintosh/playback')
+        }
+      }, {
+        type: 'separator'
+      }, {
+        label: 'Releases',
+        click() {
+          shell.openExternal('https://github.com/mafintosh/playback/releases')
+        }
+      }]
+    }]
+
+    const appMenu = Menu.buildFromTemplate(menuTemplate)
+    Menu.setApplicationMenu(appMenu)
   })
-  win.loadURL('file://' + __dirname + '/front/index.html#' + JSON.stringify(process.argv.slice(2)))
-  win.webContents.openDevTools()
-
-  win.on('closed', () => {
-    win = null
-  })
-
-  win.on('enter-full-screen', () => { win.send('fullscreen-change', true) })
-  win.on('leave-full-screen', () => { win.send('fullscreen-change', false) })
-
-  globalShortcut.register('mediaplaypause', () => { win.send('togglePlay') })
-  globalShortcut.register('medianexttrack', () => { win.send('next') })
-  globalShortcut.register('mediaprevioustrack', () => { win.send('previous') })
 })
 
-ipc.on('open-file-dialog', () => {
-  const files = dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] })
-  if (files) win.send('load-files', files)
-})
-
-ipc.on('toggle-fullscreen', () => {
-  win.setFullScreen(!win.isFullScreen())
-})
-
-ipc.on('focus', () => {
-  win.focus()
-})
-
-ipc.on('minimize', () => {
-  win.minimize()
-})
-
-ipc.on('maximize', () => {
-  win.maximize()
-})
-
-ipc.on('close', () => {
-  app.quit()
-})
-
-ipc.on('prevent-sleep', () => {
-  preventSleep()
-})
-
-ipc.on('allow-sleep', () => {
-  allowSleep()
-})
-
-ipc.on('resize', (e, message) => {
-  if (win.isMaximized()) return
-  const width = win.getSize()[0]
-  win.setSize(width, message.height / message.width * width | 0)
-})
+app.on('window-all-closed', () => app.quit())
+app.on('will-quit', () => allowSleep())

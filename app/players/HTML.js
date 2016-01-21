@@ -1,31 +1,36 @@
-import { EventEmitter } from 'events'
+class HTMLPlayer {
 
-class HTMLPlayer extends EventEmitter {
+  POLL_FREQUENCY = 500
 
-  static POLL_FREQUENCY = 500
-  get POLL_FREQUENCY() { return HTMLPlayer.POLL_FREQUENCY }
-
-  constructor(controller) {
-    super()
-    this.controller = controller
+  constructor(element, emitter) {
+    this.element = element
     this._onMetadata = this._onMetadata.bind(this)
     this._onEnd = this._onEnd.bind(this)
-  }
+    this.emitter = emitter
 
-  enable(opts) {
-    this.element = opts.element
+    const list = ['setMuted', 'setVolume', 'start', 'resume', 'pause', 'stop', 'seek', 'hideSubtitles', 'showSubtitles', 'enablePlayer', 'disablePlayer']
+    list.forEach((f) => {
+      emitter.on(f, (player, ...args) => {
+        if (player === 'html') {
+          this[f](...args)
+        }
+      })
+    })
+
     this.element.addEventListener('loadedmetadata', this._onMetadata)
     this.element.addEventListener('ended', this._onEnd)
   }
 
-  disable() {
-    this.element.removeEventListener('loadedmetadata', this._onMetadata)
-    this.element.removeEventListener('ended', this._onEnd)
-    this.element = null
+  enablePlayer() {
+    this.element.style.display = 'block'
+  }
+
+  disablePlayer() {
+    this.element.style.display = 'none'
   }
 
   _onMetadata() {
-    this.emit('metadata', {
+    this.emitter.emit('playerMetadata', {
       duration: this.element.duration,
       height: this.element.videoHeight,
       width: this.element.videoWidth
@@ -34,10 +39,24 @@ class HTMLPlayer extends EventEmitter {
 
   _onEnd() {
     this._stopPolling()
-    this.emit('end')
+    this.emitter.emit('playerEnd')
   }
 
-  load(file, autoPlay = false, currentTime = 0, showSubtitles = false) {
+  _startPolling() {
+    this._stopPolling()
+    this.interval = setInterval(() => {
+      this.emitter.emit('playerStatus', {
+        currentTime: this.element.currentTime,
+        buffered: this.element.buffered
+      })
+    }, this.POLL_FREQUENCY)
+  }
+
+  _stopPolling() {
+    clearInterval(this.interval)
+  }
+
+  start(file, autoPlay = false, currentTime = 0, showSubtitles = false, volume = 1) {
     this.stop()
 
     const el = this.element
@@ -46,9 +65,10 @@ class HTMLPlayer extends EventEmitter {
     el.appendChild(src)
     el.load()
     el.currentTime = currentTime
+    el.volume = volume
 
     if (showSubtitles) {
-      this.showSubtitles(file)
+      this.showSubtitles()
     }
 
     if (autoPlay) {
@@ -56,13 +76,13 @@ class HTMLPlayer extends EventEmitter {
     }
   }
 
-  showSubtitles(file) {
+  showSubtitles() {
     if (this.element.querySelector('track')) {
       this.element.querySelector('track').mode = 'showing'
     } else {
       const track = document.createElement('track')
       track.setAttribute('default', 'default')
-      track.setAttribute('src', file.subtitlesUrl)
+      track.setAttribute('src', this.element.querySelector('source').src + '/subtitles')
       track.setAttribute('label', 'Subtitles')
       track.setAttribute('kind', 'subtitles')
       this.element.appendChild(track)
@@ -82,20 +102,6 @@ class HTMLPlayer extends EventEmitter {
     this.element.muted = muted
   }
 
-  _startPolling() {
-    this._stopPolling()
-    this.interval = setInterval(() => {
-      this.emit('status', {
-        currentTime: this.element.currentTime,
-        buffered: this.element.buffered
-      })
-    }, this.POLL_FREQUENCY)
-  }
-
-  _stopPolling() {
-    clearInterval(this.interval)
-  }
-
   resume() {
     this._startPolling()
     this.element.play()
@@ -108,17 +114,15 @@ class HTMLPlayer extends EventEmitter {
 
   stop() {
     this._stopPolling()
-    if (this.element) {
-      this.element.pause()
-      this.element.innerHTML = ''
-      this.element.load()
-    }
+    this.element.pause()
+    this.element.innerHTML = ''
+    this.element.load()
   }
 
-  seekToSecond(second) {
+  seek(second) {
     this.element.currentTime = second
   }
 
 }
 
-module.exports = HTMLPlayer
+export default HTMLPlayer

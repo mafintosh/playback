@@ -21,10 +21,13 @@
 
 .titlebar__stoplight:hover {
 
-  .titlebar__fullscreen-svg,
+  .titlebar__fullscreen-svg{
+    opacity: .65;
+  }
+
   .titlebar__minimize-svg,
   .titlebar__maximize-svg {
-    opacity: .5;
+    opacity: .9;
   }
 
   .titlebar__close-svg {

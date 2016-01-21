@@ -1,77 +1,83 @@
-import { ipcRenderer as ipc } from 'electron'
-
 import handleDrop from 'drag-and-drop-files'
 import React from 'react'
 import { render, findDOMNode } from 'react-dom'
 import Slider from 'react-slider'
 import CSSTG from 'react-addons-css-transition-group'
 
-import Icon from './components/icon'
-import Titlebar from './components/titlebar'
+import Icon from './components/icon.jsx'
+import Titlebar from './components/titlebar.jsx'
 import handleIdle from './utils/mouseidle.js'
+import HTMLPlayer from '../players/HTML.js'
+import WebChimera from '../players/WebChimera.js'
 
-const App = React.createClass({
+const UI = React.createClass({
 
   propTypes: {
-    controller: React.PropTypes.object.isRequired
+    emitter: React.PropTypes.object.isRequired
   },
 
   getInitialState() {
-    return this.props.controller.getState()
+    return {
+      playlist: [],
+      chromecasts: [],
+      volume: 1
+    }
   },
 
   componentDidMount() {
-    this.props.controller.on('update', () => {
-      this.setState(this.props.controller.getState())
-    })
-
+    const videoEl = document.getElementById('video')
     const el = findDOMNode(this)
-    const videoElement = document.getElementById('video')
-
-    handleDrop(el, files => {
-      this._handleLoadFilesEvent(null, files.map(f => f.path))
-    })
 
     handleIdle(el, 2500, 'hide')
+    handleDrop(document.body, files => this._handleLoadFilesEvent(null, files.map(f => f.path)))
 
-    videoElement.addEventListener('click', () => {
+    document.addEventListener('dblclick', e => {
+      if (el.contains(e.target)) return
+      this._handleFullscreenClick()
+    })
+
+    document.addEventListener('click', e => {
+      if (el.contains(e.target)) return
       this.setState({ uiDialog: null })
     })
 
     document.addEventListener('keydown', e => {
-      if (e.keyCode === 27 && this.state.fullscreen) return this._handleFullscreenClick()
-      if (e.keyCode === 13 && e.metaKey) return this._handleFullscreenClick()
-      if (e.keyCode === 13 && e.shiftKey) return this._handleFullscreenClick()
-      if (e.keyCode === 32) return this._handleTogglePlayClick()
-    })
-
-    videoElement.addEventListener('dblclick', () => {
-      this._handleFullscreenClick()
+      if (el.contains(e.target)) return
+      if (e.keyCode === 27 && this.state.uiFullscreen) return this._handleFullscreenClick(e)
+      if (e.keyCode === 13 && e.metaKey) return this._handleFullscreenClick(e)
+      if (e.keyCode === 13 && e.shiftKey) return this._handleFullscreenClick(e)
+      if (e.keyCode === 32) return this._handleTogglePlayClick(e)
     })
 
     document.addEventListener('paste', e => {
       this._handleLoadFilesEvent(null, e.clipboardData.getData('text').split('\n'))
     })
 
-    ipc.on('load-files', this._handleLoadFilesEvent)
-    ipc.on('fullscreen-change', (sender, fullscreen) => { this.setState({ fullscreen }) })
+    document.addEventListener('webkitfullscreenchange', () => {
+      this.setState({ uiFullscreen: document.webkitIsFullScreen })
+    })
 
-    ipc.on('togglePlay', () => { this.props.controller.togglePlay() })
-    ipc.on('next', () => { this.props.controller.next() })
-    ipc.on('previous', () => { this.props.controller.previous() })
+    const emitter = this.props.emitter
+    this.emitter = emitter
+
+    this._htmlPlayer = new HTMLPlayer(videoEl, emitter)
+    this._chimeraPlayer = new WebChimera(document.getElementById('canvas'), emitter)
+
+    emitter.on('update', (player, state) => {
+      this.setState(state)
+    })
   },
 
   componentWillUpdate(nextProps, nextState) {
     if (nextState.videoWidth && this.state.videoWidth !== nextState.videoWidth) {
-      ipc.send('resize', {
-        width: nextState.videoWidth,
-        height: nextState.videoHeight
-      })
+      if (!document.webkitIsFullScreen) {
+        window.resizeTo(window.innerWidth, nextState.videoHeight / nextState.videoWidth * window.innerWidth | 0)
+      }
     }
   },
 
   _handleTogglePlayClick() {
-    this.props.controller.togglePlay()
+    this.emitter.emit('togglePlay')
   },
 
   _handlePlaylistIconClick() {
@@ -79,89 +85,80 @@ const App = React.createClass({
   },
 
   _handleChromecastIconClick() {
-    this.props.controller.updateChromecasts()
+    this.emitter.emit('updateChromecasts')
     this.setState({ uiDialog: this.state.uiDialog === 'chromecasts' ? null : 'chromecasts' })
   },
 
   _handleRefreshChromecastsClick() {
-    this.props.controller.updateChromecasts()
+    this.emitter.emit('updateChromecasts')
   },
 
-  _handleCastItemClick(device, deviceId) {
+  _handleCastItemClick(device) {
     this.setState({ uiDialog: null })
-    if (this.state.casting === deviceId) {
-      this.props.controller.setPlayer(this.props.controller.PLAYER_HTML, { element: this.state.videoElement })
-    } else {
-      this.props.controller.setPlayer(this.props.controller.PLAYER_CHROMECAST, { device, deviceId })
-    }
+    console.log('handle cast item click', device)
+    this.emitter.emit('setPlayer', 'chromecast', { deviceId: device.id })
+  },
+
+  _handlePlayerClick(player) {
+    this.setState({ uiDialog: null })
+    this.emitter.emit('setPlayer', player)
   },
 
   _handlePlaylistItemClick(file) {
     this.setState({ uiDialog: null })
-    this.props.controller.load(file, true)
+    this.emitter.emit('start', file, true)
   },
 
   _handlePlaylistRemoveItemClick(file, index, e) {
     e.stopPropagation()
-    this.props.controller.remove(index)
+    this.emitter.emit('remove', index)
   },
 
   _handleSeek(e) {
     const percentage = e.clientX / window.innerWidth
     const time = this.state.duration * percentage
-    this.props.controller.seekToSecond(time)
+    this.emitter.emit('seek', time)
   },
 
   _handleVolumeIconClick() {
-    this.props.controller.setMuted(!this.state.muted)
+    this.emitter.emit('setMuted', !this.state.muted)
   },
 
   _handleVolumeChange(val) {
-    this.props.controller.setVolume(val / 100)
+    this.emitter.emit('setVolume', val / 100)
   },
 
   _handleFullscreenClick() {
-    ipc.send('toggle-fullscreen')
+    if (document.webkitIsFullScreen) {
+      document.webkitExitFullscreen()
+    } else {
+      document.body.webkitRequestFullScreen()
+    }
   },
 
   _handleMaximizeClick() {
-    ipc.send('maximize')
+    this.emitter.emit('maximize')
   },
 
   _handleMinimizeClick() {
-    ipc.send('minimize')
+    this.emitter.emit('minimize')
   },
 
   _handleCloseClick() {
-    ipc.send('close')
+    this.emitter.emit('close')
   },
 
   _handleAddMediaClick() {
-    ipc.send('open-file-dialog')
+    this.emitter.emit('openFileDialog')
   },
 
   _handleSubtitlesClick() {
-    this.props.controller.toggleSubtitles()
+    this.emitter.emit('toggleSubtitles')
   },
 
-  _handleLoadFilesEvent(sender, files) {
+  _handleLoadFilesEvent(e, files) {
     this.setState({ uiDialog: null })
-
-    const subtitles = files.some(f => {
-      if (f.match(/\.(srt|vtt)$/i)) {
-        this.props.controller.addSubtitles(f)
-        return true
-      }
-    })
-
-    if (!subtitles) {
-      const autoPlay = !this.state.playlist.length
-      if (autoPlay) {
-        this.props.controller.addAndPlay(files)
-      } else {
-        this.props.controller.add(files)
-      }
-    }
+    this.emitter.emit('loadFiles', files)
   },
 
   _handleTimelineMouseMove(e) {
@@ -211,53 +208,56 @@ const App = React.createClass({
   },
 
   _renderChromecastDialog() {
-    let items = this.state.chromecasts.map((cast, i) => {
-      const active = cast.host + cast.name === this.state.casting ? 'active' : ''
-      return <li key={i} onClick={this._handleCastItemClick.bind(this, cast, cast.host + cast.name)} className={active}>{cast.name}</li>
+    let items = this.state.chromecasts.map((d, i) => {
+      const active = d.id === this.state.casting ? 'active' : ''
+      return <li key={i} onClick={this._handleCastItemClick.bind(this, d)} className={active}>{d.name}</li>
     })
 
     if (!items.length) {
       items = [<li key={-1} onClick={this._handleRefreshChromecastsClick}>No chromecasts found. Click to refresh.</li>]
     }
 
+    const players = (
+      <ul>
+        <li className={this.state.player === 'webchimera' ? 'active' : ''} onClick={this._handlePlayerClick.bind(this, 'webchimera')}>Play with WebChimera(libVLC)</li>
+        <li className={this.state.player === 'html' ? 'active' : ''} onClick={this._handlePlayerClick.bind(this, 'html')}>Play with HTML</li>
+      </ul>
+    )
+
     return (
       <div key={'chromecasts'} className="dialog chromecasts">
         <ul>{items}</ul>
+        {players}
       </div>
     )
   },
 
-  render() {
-    const playing = this.state.status === this.props.controller.STATUS_PLAYING
-    const playIcon = playing ? 'pause' : 'play'
-    const title = this.state.currentFile ? this.state.currentFile.name : 'No file'
-    const { currentTime, duration } = this.state
-    const updateSpeed = playing ? this.state.player.POLL_FREQUENCY : 0
-    const progressTime = playing ? currentTime : currentTime
-    const progressStyle = {
-      transition: `width ${updateSpeed}ms linear`,
-      width: duration ? progressTime / duration * 100 + '%' : '0'
-    }
-
+  _renderBuffers() {
     const bufferedBars = []
     const buffered = this.state.buffered
     if (buffered && buffered.length) {
       for (let i = 0; i < buffered.length; i++) {
-        const left = buffered.start(i) / duration * 100
-        const width = (buffered.end(i) - buffered.start(i)) / duration * 100
+        const left = buffered.start(i) / this.state.duration * 100
+        const width = (buffered.end(i) - buffered.start(i)) / this.state.duration * 100
         bufferedBars.push(
-          <div key={i} className="controls__timeline__buffered" style={{ transition: `width ${updateSpeed}ms ease-in-out`, left: left + '%', width: width + '%' }}></div>
+          <div key={i} className="controls__timeline__buffered" style={{ transition: `width 250ms ease-in-out`, left: left + '%', width: width + '%' }}></div>
         )
       }
     }
+    return bufferedBars
+  },
 
+  _renderDialogs() {
     let dialog
     if (this.state.uiDialog === 'playlist') {
       dialog = this._renderPlaylist()
     } else if (this.state.uiDialog === 'chromecasts') {
       dialog = this._renderChromecastDialog()
     }
+    return dialog
+  },
 
+  _renderEmptyState() {
     let emptyState
     if (!this.state.playlist.length) {
       emptyState = (
@@ -270,16 +270,49 @@ const App = React.createClass({
         </div>
       )
     }
+    return emptyState
+  },
 
+  _renderTimelineTooltip() {
     let timelineTooltip
     if (this.state.uiTimelineTooltipPosition) {
       const minLeft = 25
       const maxRight = window.innerWidth - 25
-      const value = this._formatTime(this.state.uiTimelineTooltipPosition / window.innerWidth * duration)
+      const value = this._formatTime(this.state.uiTimelineTooltipPosition / window.innerWidth * this.state.duration)
       timelineTooltip = (
         <div className="controls__timeline__tooltip" style={{ left: Math.min(maxRight, Math.max(minLeft, this.state.uiTimelineTooltipPosition)) + 'px' }}>{value}</div>
       )
     }
+    return timelineTooltip
+  },
+
+  _renderLoadingToast() {
+    let loading
+    if (this.state.loading) {
+      loading = (
+        <div className="toast">Loading...</div>
+      )
+    }
+    return loading
+  },
+
+  render() {
+    const playing = this.state.status === 'playing'
+    const playIcon = playing ? 'pause' : 'play'
+    const title = this.state.currentFile ? this.state.currentFile.name : 'No file'
+    const { currentTime, duration } = this.state
+    const updateSpeed = playing ? 500 : 0
+    const progressTime = playing ? currentTime : currentTime
+    const progressStyle = {
+      transition: `width ${updateSpeed}ms linear`,
+      width: duration ? progressTime / duration * 100 + '%' : '0'
+    }
+
+    const bufferedBars = this._renderBuffers()
+    const dialog = this._renderDialogs()
+    const loading = this._renderLoadingToast()
+    const emptyState = this._renderEmptyState()
+    const timelineTooltip = this._renderTimelineTooltip()
 
     const hasSubtitles = this.state.currentFile && this.state.currentFile.subtitles
     const showingSubtitles = this.state.showSubtitles
@@ -293,18 +326,11 @@ const App = React.createClass({
       volumeIcon = 'volume-down'
     }
 
-    let loading
-    if (this.state.loading) {
-      loading = (
-        <div className="toast">Loading...</div>
-      )
-    }
-
     const app = (
-      <div className={'ui ' + (this.state.status === this.props.controller.STATUS_STOPPED ? 'stopped' : '')}>
+      <div className={'ui ' + (this.state.status === 'stopped' ? 'stopped' : '')}>
         {loading}
         {emptyState}
-        <Titlebar onFullscreen={this._handleFullscreenClick} onClose={this._handleCloseClick} onMaximize={this._handleMaximizeClick} onMinimize={this._handleMinimizeClick} isFullscreen={this.state.fullscreen}/>
+        <Titlebar onFullscreen={this._handleFullscreenClick} onClose={this._handleCloseClick} onMaximize={this._handleMaximizeClick} onMinimize={this._handleMinimizeClick} isFullscreen={this.state.uiFullscreen}/>
         <CSSTG transitionName="fade-up" transitionEnterTimeout={125} transitionLeaveTimeout={125}>
           {dialog}
         </CSSTG>
@@ -340,7 +366,7 @@ const App = React.createClass({
               <Icon icon="playlist-empty"/>
             </button>
             <button onClick={this._handleFullscreenClick}>
-              <Icon icon={this.state.fullscreen ? 'fullscreen-exit' : 'fullscreen'}/>
+              <Icon icon={this.state.uiFullscreen ? 'fullscreen-exit' : 'fullscreen'}/>
             </button>
           </div>
         </div>
@@ -350,8 +376,8 @@ const App = React.createClass({
   }
 })
 
-module.exports = {
-  init: (controller, cb) => {
-    render(<App controller={controller}/>, document.getElementById('react-root'), cb)
+export default {
+  init: (emitter, cb) => {
+    render(<UI emitter={emitter}/>, document.getElementById('react-root'), cb)
   }
 }

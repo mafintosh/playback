@@ -2,14 +2,17 @@ import http from 'http'
 import rangeParser from 'range-parser'
 import pump from 'pump'
 import network from 'network-address'
+import { EventEmitter } from 'events'
 
-class Server {
+class Server extends EventEmitter {
 
   constructor(controller, cb) {
+    super()
     this.controller = controller
     this.server = http.createServer(this.route.bind(this)).listen(0, () => {
-      console.log('Playback server running at: ' + this.getPath())
-      cb()
+      const path = this.getPath()
+      console.log('Playback server running at: ' + path)
+      cb(path)
     })
   }
 
@@ -83,4 +86,4 @@ class Server {
 
 }
 
-module.exports = Server
+export default Server

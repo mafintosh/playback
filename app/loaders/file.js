@@ -43,9 +43,7 @@ module.exports = {
         } else {
           resolve()
         }
-      }).catch(err => {
-        resolve(err)
-      })
+      }).catch(resolve)
     })
   },
 

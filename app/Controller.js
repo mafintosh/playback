@@ -1,6 +1,10 @@
 import { EventEmitter } from 'events'
 import update from 'react-addons-update'
+import uuid from 'node-uuid'
 import chromecasts from 'chromecasts'
+
+import ChromecastPlayer from './players/Chromecast'
+import Server from './Server'
 
 import fileLoader from './loaders/file'
 import youtubeLoader from './loaders/youtube'
@@ -9,29 +13,27 @@ import torrentLoader from './loaders/torrent'
 import httpLoader from './loaders/http'
 import ipfsLoader from './loaders/ipfs'
 
-import ChromecastPlayer from './players/Chromecast'
-import HTMLPlayer from './players/HTML'
-
-import { ipcRenderer as ipc } from 'electron'
-
-import Server from './Server'
-
 const loaders = [youtubeLoader, magnetLoader, torrentLoader, httpLoader, ipfsLoader, fileLoader]
 
 class Controller extends EventEmitter {
 
-  get STATUS_STOPPED() { return 'stopped' }
-  get STATUS_PAUSED() { return 'paused' }
-  get STATUS_PLAYING() { return 'playing' }
-  get PLAYER_HTML() { return 'html '}
-  get PLAYER_CHROMECAST() { return 'chromecast '}
+  STATUS_STOPPED = 'stopped'
+  STATUS_PAUSED = 'paused'
+  STATUS_PLAYING = 'playing'
+  PLAYER_WEBCHIMERA = 'webchimera'
+  PLAYER_HTML = 'html'
+  PLAYER_CHROMECAST = 'chromecast'
+
+  REMOTE_RECEIVE = ['togglePlay', 'start', 'remove', 'seek', 'setMuted', 'setVolume', 'toggleSubtitles', 'addAndStart', 'add', 'addSubtitles', 'updateChromecasts', 'setPlayer', 'loadFiles', 'openFileDialog', 'playerMetadata', 'playerEnd', 'playerStatus']
+  REMOTE_SEND = ['update', 'setMuted', 'setVolume', 'start', 'resume', 'pause', 'stop', 'seek', 'hideSubtitles', 'showSubtitles', 'disablePlayer', 'enablePlayer']
 
   constructor() {
     super()
-    this.server = new Server(this, () => { this.emit('ready') })
-    this._initChromecasts()
-    this._initPlayers()
 
+    // Create server
+    this.server = new Server(this, (serverPath) => this.emit('ready', serverPath))
+
+    // Initial state
     this.setState({
       status: this.STATUS_STOPPED,
       volume: 1,
@@ -47,24 +49,23 @@ class Controller extends EventEmitter {
       chromecasts: [],
       player: null
     })
-  }
 
-  _initChromecasts() {
+    // Setup chromecasts and update listener
     this.chromecasts = chromecasts()
     this.chromecasts.on('update', () => {
-      this.setState({ chromecasts: this.chromecasts.players })
+      this.setState({
+        chromecasts: this.chromecasts.players.map(d => {
+          return {
+            host: d.host,
+            name: d.name,
+            id: d.host + d.name
+          }
+        })
+      })
     })
-  }
 
-  _initPlayers() {
-    const cp = this._chromecastPlayer = new ChromecastPlayer(this)
-    const hp = this._htmlPlayer = new HTMLPlayer(this)
-    const list = [cp, hp]
-    list.forEach(p => {
-      p.on('end', this._handlePlayerEnd.bind(this))
-      p.on('metadata', this._handlePlayerMetadata.bind(this))
-      p.on('status', this._handlePlayerStatus.bind(this))
-    })
+    // Create the chromecast player
+    this._chromecastPlayer = new ChromecastPlayer(this, this.chromecasts)
   }
 
 
@@ -83,7 +84,6 @@ class Controller extends EventEmitter {
 
   setState(state) {
     this.state = Object.assign({}, this.state || {}, state)
-    console.log('Setting state', this.state)
     this.emit('update', this.state)
   }
 
@@ -98,30 +98,25 @@ class Controller extends EventEmitter {
 
 
   /*
-   * Toggle playing
+   * Load files (media or subtitles)
    */
 
-  togglePlay() {
-    if (this.state.status !== this.STATUS_PLAYING) {
-      this.resume()
-    } else {
-      this.pause()
+  loadFiles(files) {
+    const subtitles = files.some(f => {
+      if (f.match(/\.(srt|vtt)$/i)) {
+        this.addSubtitles(f)
+        return true
+      }
+    })
+
+    if (!subtitles) {
+      const autoPlay = !this.state.playlist.length
+      if (autoPlay) {
+        this.addAndStart(files)
+      } else {
+        this.add(files)
+      }
     }
-  }
-
-
-  /*
-   * Toggle showing subtitles
-   */
-
-  toggleSubtitles() {
-    const show = !this.state.showSubtitles
-    if (show) {
-      this.state.player.showSubtitles(this.state.currentFile)
-    } else {
-      this.state.player.hideSubtitles()
-    }
-    this.setState({ showSubtitles: show })
   }
 
 
@@ -135,7 +130,7 @@ class Controller extends EventEmitter {
       fileLoader.loadSubtitle(path).then(data => {
         this.state.currentFile.subtitles = data
         if (this.state.showSubtitles) {
-          this.state.player.showSubtitles(this.state.currentFile)
+          this.emit('showSubtitles')
         }
         this.setState({ loading: false })
       })
@@ -158,7 +153,8 @@ class Controller extends EventEmitter {
       loaders.some(loader => {
         if (loader.test(uri)) {
           proms.push(loader.load(uri).then(file => {
-            file.streamUrl = this.server.getPath() + '/' + encodeURIComponent(file.uri)
+            file.id = uuid.v4()
+            file.streamUrl = this.server.getPath() + '/' + file.id
             file.subtitlesUrl = file.streamUrl + '/subtitles'
             this.setState(update(this.state, { playlist: { $push: [file] } }))
             return file
@@ -171,6 +167,9 @@ class Controller extends EventEmitter {
     return Promise.all(proms).then(files => {
       this.setState({ loading: false })
       return files
+    }).catch(e => {
+      this.setState({ loading: false })
+      console.log(e)
     })
   }
 
@@ -179,19 +178,19 @@ class Controller extends EventEmitter {
    * Add URI(s) to the playlist and start
    */
 
-  addAndPlay(uris) {
+  addAndStart(uris) {
     return this.add(uris).then(files => {
-      this.load(files[0], true)
+      this.start(files[0], true)
       return files
     })
   }
 
 
   /*
-   * Load a file
+   * Play a file
    */
 
-  load(file, autoPlay = false, currentTime = 0, showSubtitles = false) {
+  start(file, autoPlay = false, currentTime = 0, showSubtitles = false) {
     if (this.state.status !== this.STATUS_STOPPED) { this.stop() }
 
     this.setState({
@@ -201,22 +200,22 @@ class Controller extends EventEmitter {
       currentTime
     })
 
-    this.state.player.load(file, autoPlay, currentTime, showSubtitles)
-
     if (autoPlay) {
-      ipc.send('prevent-sleep')
+      this.emit('preventSleep')
     }
+
+    this.emit('start', file, autoPlay, currentTime, showSubtitles, this.state.volume)
   }
 
 
   /*
-   * Resume playing a file
+   * Resume playing current file
    */
 
   resume() {
     this.setState({ status: this.STATUS_PLAYING })
-    this.state.player.resume()
-    ipc.send('prevent-sleep')
+    this.emit('preventSleep')
+    this.emit('resume')
   }
 
 
@@ -226,8 +225,8 @@ class Controller extends EventEmitter {
 
   pause() {
     this.setState({ status: this.STATUS_PAUSED })
-    this.state.player.pause()
-    ipc.send('allow-sleep')
+    this.emit('allowSleep')
+    this.emit('pause')
   }
 
 
@@ -245,8 +244,36 @@ class Controller extends EventEmitter {
       videoWidth: 0,
       videoHeight: 0
     })
-    this.state.player.stop()
-    ipc.send('allow-sleep')
+    this.emit('allowSleep')
+    this.emit('stop')
+  }
+
+
+  /*
+   * Toggle playing
+   */
+
+  togglePlay() {
+    if (this.state.status !== this.STATUS_PLAYING) {
+      this.resume()
+    } else {
+      this.pause()
+    }
+  }
+
+
+  /*
+   * Toggle showing subtitles
+   */
+
+  toggleSubtitles() {
+    const show = !this.state.showSubtitles
+    this.setState({ showSubtitles: show })
+    if (show) {
+      this.emit('showSubtitles')
+    } else {
+      this.emit('hideSubtitles')
+    }
   }
 
 
@@ -254,9 +281,9 @@ class Controller extends EventEmitter {
    * Seek to a particular second
    */
 
-  seekToSecond(second) {
-    this.state.player.seekToSecond(second)
+  seek(second) {
     this.setState({ currentTime: second })
+    this.emit('seek', second)
   }
 
 
@@ -264,7 +291,7 @@ class Controller extends EventEmitter {
    * Handle when the player emits a status. Set currentTime and buffered list
    */
 
-  _handlePlayerStatus(status) {
+  playerStatus(status) {
     this.setState({
       currentTime: status.currentTime,
       buffered: status.buffered
@@ -276,7 +303,8 @@ class Controller extends EventEmitter {
    * Handle when the player emits metadata. Set the video duration, width, and height if available.
    */
 
-  _handlePlayerMetadata(metadata) {
+  playerMetadata(metadata) {
+    console.log('controller got metadata', metadata)
     this.setState({
       duration: metadata.duration,
       videoWidth: metadata.width,
@@ -289,7 +317,7 @@ class Controller extends EventEmitter {
    * Handle when the player has ended the current file. Start next in the playlist.
    */
 
-  _handlePlayerEnd() {
+  playerEnd() {
     this.next()
   }
 
@@ -300,7 +328,7 @@ class Controller extends EventEmitter {
 
   getNext() {
     const { currentFile, playlist } = this.state
-    const currentIndex = playlist.indexOf(currentFile)
+    const currentIndex = playlist.findIndex(f => currentFile.id === f.id)
     if (currentIndex > -1) {
       const nextFile = playlist[currentIndex + 1]
       return nextFile
@@ -314,7 +342,7 @@ class Controller extends EventEmitter {
 
   getPrevious() {
     const { currentFile, playlist } = this.state
-    const currentIndex = playlist.indexOf(currentFile)
+    const currentIndex = playlist.findIndex(f => currentFile.id === f.id)
     if (currentIndex > -1) {
       const prevFile = playlist[currentIndex - 1]
       return prevFile
@@ -329,7 +357,7 @@ class Controller extends EventEmitter {
   next() {
     const nextFile = this.getNext()
     if (!nextFile) return this.stop()
-    this.load(nextFile, this.state.status === this.STATUS_PLAYING)
+    this.start(nextFile, this.state.status === this.STATUS_PLAYING)
   }
 
 
@@ -340,24 +368,23 @@ class Controller extends EventEmitter {
   previous() {
     const prevFile = this.getPrevious()
     if (this.state.currentTime > 10) {
-      this.seekToSecond(0)
+      this.seek(0)
     } else if (!prevFile) {
       this.stop()
     } else {
-      this.load(prevFile, this.state.status === this.STATUS_PLAYING)
+      this.start(prevFile, this.state.status === this.STATUS_PLAYING)
     }
   }
 
 
   /*
-   * Remove an item from the playlist by index. If it's the currently playing file, play the next or stop if it's the last
+   * Remove an item from the playlist by index. If it's the currently playing file, go next()
    */
 
   remove(index) {
     const file = this.state.playlist[index]
     if (file) {
-      const { currentFile } = this.state
-      if (file === currentFile) {
+      if (file.id === this.state.currentFile.id) {
         this.next()
       }
       this.setState(update(this.state, { playlist: { $splice: [[index, 1]] } }))
@@ -377,27 +404,27 @@ class Controller extends EventEmitter {
     const { currentFile, currentTime } = this.state
     const autoPlay = this.state.status === this.STATUS_PLAYING
 
+    console.log('setplayer', type, playerOpts)
+
     if (this.state.status !== this.STATUS_STOPPED) {
       this.stop()
     }
 
-    if (this.state.player) {
-      this.state.player.disable()
-    }
+    this.emit('disablePlayer')
 
-    let player
     if (type === this.PLAYER_CHROMECAST) {
-      player = this._chromecastPlayer
-      player.enable(playerOpts)
-      this.setState({ player, casting: playerOpts.deviceId })
+      this.setState({ player: type, casting: playerOpts.deviceId })
+      this.emit('enablePlayer', playerOpts.deviceId)
     } else if (type === this.PLAYER_HTML) {
-      player = this._htmlPlayer
-      player.enable(playerOpts)
-      this.setState({ player, casting: null })
+      this.setState({ player: type, casting: null })
+      this.emit('enablePlayer')
+    } else if (type === this.PLAYER_WEBCHIMERA) {
+      this.setState({ player: type, casting: null })
+      this.emit('enablePlayer')
     }
 
     if (currentFile) {
-      this.load(currentFile, autoPlay, currentTime)
+      this.start(currentFile, autoPlay, currentTime)
     }
   }
 
@@ -407,8 +434,8 @@ class Controller extends EventEmitter {
    */
 
   setVolume(volume) {
-    this.state.player.setVolume(volume)
     this.setState({ volume })
+    this.emit('setVolume', volume)
   }
 
 
@@ -417,21 +444,29 @@ class Controller extends EventEmitter {
    */
 
   setMuted(muted) {
-    this.state.player.setMuted(muted)
     this.setState({ muted })
+    this.emit('setMuted', muted)
   }
 
 
   /*
-   * Get a file from the playlist
+   * Get a file from the playlist by id
    */
 
-  getFile(uri) {
+  getFile(id) {
     const { playlist } = this.state
-    return playlist[playlist.find(uri, f => f.uri === uri)]
+    return playlist[playlist.findIndex(f => f.id === id)]
   }
 
 
+  /*
+   * Open the file dialog
+   */
+
+  openFileDialog() {
+    this.emit('openFileDialog')
+  }
+
 }
 
-module.exports = new Controller()
+export default Controller

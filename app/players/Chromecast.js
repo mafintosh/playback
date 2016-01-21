@@ -1,23 +1,32 @@
-import { EventEmitter } from 'events'
-
-class Chromecast extends EventEmitter {
+class Chromecast {
 
   POLL_FREQUENCY = 1000
 
-  constructor(controller) {
-    super()
+  constructor(controller, chromecasts) {
+    this.chromecasts = chromecasts
     this.controller = controller
+
+    const list = ['setMuted', 'setVolume', 'start', 'resume', 'pause', 'stop', 'seek', 'hideSubtitles', 'showSubtitles', 'enablePlayer', 'disablePlayer']
+    list.forEach((f) => {
+      controller.on(f, (...args) => {
+        if (controller.state.player === 'chromecast') {
+          console.log('chromecast player performing', f, ' with ', args)
+          this[f](...args)
+        }
+      })
+    })
   }
 
-  enable(opts) {
-    this.device = opts.device
+  enablePlayer(id) {
+    const device = this.chromecasts.players[this.chromecasts.players.findIndex(d => d.host + d.name === id)]
+    this.device = device
   }
 
-  disable() {
+  disablePlayer() {
     this.device = null
   }
 
-  load(file, autoPlay = false, currentTime = 0, showSubtitles = false) {
+  start(file, autoPlay = false, currentTime = 0, showSubtitles = false, volume = 1) {
     this.active = true
     this.device.play(file.streamUrl, {
       autoPlay,
@@ -25,11 +34,7 @@ class Chromecast extends EventEmitter {
       seek: currentTime,
       autoSubtitles: showSubtitles,
       subtitles: file.subtitlesUrl ? [file.subtitlesUrl] : []
-    }, this._onMetadata.bind(this))
-
-    if (autoPlay) {
-      this._startPolling()
-    }
+    }, this._onMetadata.bind(this, volume, autoPlay))
   }
 
   showSubtitles() {
@@ -40,17 +45,25 @@ class Chromecast extends EventEmitter {
     this.device.subtitles(false)
   }
 
-  _onMetadata(err, status) {
-    this.emit('metadata', { duration: status.media.duration })
+  _onMetadata(volume, autoPlay, err, status) {
+    if (autoPlay) {
+      this._startPolling()
+    }
+    this.device.volume(volume)
+    this.controller.playerMetadata({ duration: status.media.duration })
+  }
+
+  _onEnd() {
+    this._stopPolling()
+    this.active = false
+    this.controller.playerEnd()
   }
 
   _onStatus(err, status) {
     if (!status) {
-      this._stopPolling()
-      this.active = false
-      this.emit('end')
+      this._onEnd()
     } else {
-      this.emit('status', { currentTime: status.currentTime })
+      this.controller.playerStatus({ currentTime: status.currentTime })
     }
   }
 
@@ -83,10 +96,18 @@ class Chromecast extends EventEmitter {
     }
   }
 
-  seekToSecond(second) {
+  seek(second) {
     this.device.seek(second)
+  }
+
+  setVolume(value) {
+    this.device.volume(value)
+  }
+
+  setMuted(muted) {
+    this.device.volume(muted ? 0 : 0.5)
   }
 
 }
 
-module.exports = Chromecast
+export default Chromecast
