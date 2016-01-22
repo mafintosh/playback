@@ -36,7 +36,7 @@ const preventSleep = () => {
 app.on('ready', () => {
   let win
 
-  const controller = new Controller()
+  const controller = new Controller(argv.follow)
 
   controller.on('ready', (serverPath) => {
     win = new BrowserWindow({

@@ -29,11 +29,11 @@ class Controller extends EventEmitter {
   REMOTE_RECEIVE = ['togglePlay', 'start', 'remove', 'seek', 'setMuted', 'setVolume', 'toggleSubtitles', 'addAndStart', 'add', 'addSubtitles', 'updateChromecasts', 'setPlayer', 'loadFiles', 'openFileDialog', 'playerMetadata', 'playerEnd', 'playerStatus'];
   REMOTE_SEND = ['update'].concat(playerEvents);
 
-  constructor() {
+  constructor(follow) {
     super()
 
     // Create server
-    this.server = new Server(this, (serverPath) => this.emit('ready', serverPath))
+    this.server = new Server(this, follow, (serverPath) => this.emit('ready', serverPath))
 
     // Initial state
     this.setState({
