@@ -343,6 +343,7 @@ class Controller extends EventEmitter {
 
   getNext() {
     const { currentFile, playlist } = this.state
+    if (!currentFile) return
     const currentIndex = playlist.findIndex(f => currentFile.id === f.id)
     if (currentIndex > -1) {
       const nextFile = playlist[currentIndex + 1]
@@ -357,6 +358,7 @@ class Controller extends EventEmitter {
 
   getPrevious() {
     const { currentFile, playlist } = this.state
+    if (!currentFile) return
     const currentIndex = playlist.findIndex(f => currentFile.id === f.id)
     if (currentIndex > -1) {
       const prevFile = playlist[currentIndex - 1]
