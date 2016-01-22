@@ -27,7 +27,7 @@ module.exports = {
         // TODO: resolve with array of files?
         torrent.files.some(f => {
           f.downloadSpeed = torrent.downloadSpeed()
-          if (/\.(mp4|mkv|mp3|mov)$/i.test(f.name)) {
+          if (/\.(mp4|mkv|mp3|mov|avi)$/i.test(f.name)) {
             f.select()
             f.uri = torrent.magnetURI
             const basename = f.name.substr(0, f.name.lastIndexOf('.'))
@@ -44,13 +44,13 @@ module.exports = {
           }
         })
 
-        torrent.on('download', (chunkSize) => {
-          console.log('chunk size: ' + chunkSize)
-          console.log('total downloaded: ' + torrent.downloaded)
-          console.log('download speed: ' + torrent.downloadSpeed())
-          console.log('progress: ' + torrent.progress)
-          console.log('======')
-        })
+        // torrent.on('download', (chunkSize) => {
+        //   console.log('chunk size: ' + chunkSize)
+        //   console.log('total downloaded: ' + torrent.downloaded)
+        //   console.log('download speed: ' + torrent.downloadSpeed())
+        //   console.log('progress: ' + torrent.progress)
+        //   console.log('======')
+        // })
 
         torrent.on('done', () => {
           console.log('torrent finished downloading')
