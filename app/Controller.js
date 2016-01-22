@@ -401,7 +401,7 @@ class Controller extends EventEmitter {
   remove(index) {
     const file = this.state.playlist[index]
     if (file) {
-      if (file.id === this.state.currentFile.id) {
+      if (this.state.currentFile && file.id === this.state.currentFile.id) {
         this.next()
       }
       this.fileStreams.splice(index, 1)
