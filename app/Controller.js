@@ -427,13 +427,13 @@ class Controller extends EventEmitter {
     this.emit('disablePlayer')
 
     if (type === this.PLAYER_CHROMECAST) {
-      this.setState({ player: type, casting: playerOpts.deviceId })
+      this.setState({ player: type, casting: playerOpts.deviceId, buffering: false, buffered: null })
       this.emit('enablePlayer', playerOpts.deviceId)
     } else if (type === this.PLAYER_HTML) {
-      this.setState({ player: type, casting: null })
+      this.setState({ player: type, casting: null, buffering: false, buffered: null })
       this.emit('enablePlayer')
     } else if (type === this.PLAYER_WEBCHIMERA) {
-      this.setState({ player: type, casting: null })
+      this.setState({ player: type, casting: null, buffering: false, buffered: null })
       this.emit('enablePlayer')
     }
 
