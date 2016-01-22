@@ -64,10 +64,10 @@ app.on('ready', () => {
     })
 
     // Window controls
-    controller.on('close', () => win.close())
-    controller.on('focus', () => win.focus())
-    controller.on('minimize', () => win.minimize())
-    controller.on('maximize', () => win.maximize())
+    ipc.on('close', () => win.close())
+    ipc.on('focus', () => win.focus())
+    ipc.on('minimize', () => win.minimize())
+    ipc.on('maximize', () => win.maximize())
 
     // Prevent/allow computer sleep
     controller.on('preventSleep', () => preventSleep())
