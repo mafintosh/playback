@@ -28,7 +28,7 @@ class WebChimera {
 
     this._onEnd = this._onEnd.bind(this)
     this._onBuffer = debounce(this._onBuffer.bind(this), 100)
-    this._onWindowResize = this._onWindowResize.bind(this)
+    this._onWindowResize = debounce(this._onWindowResize.bind(this), 50)
     this.player.onBuffering = this._onBuffer
     this.player.onEndReached = this._onEnd
   }
