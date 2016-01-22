@@ -13,7 +13,8 @@ import clipboard from 'clipboard'
 import Controller from './Controller'
 
 const argv = minimist(process.argv.slice(2), {
-  alias: { follow: 'f' },
+  alias: { follow: 'f', player: 'p' },
+  string: ['player'],
   boolean: ['follow']
 })
 
@@ -50,7 +51,7 @@ app.on('ready', () => {
 
     // Client loaded
     ipc.on('clientReady', () => {
-      controller.setPlayer(controller.PLAYER_WEBCHIMERA)
+      controller.setPlayer(argv.player || controller.PLAYER_WEBCHIMERA)
       if (argURIs.length) {
         controller.loadFiles(argURIs)
       }
