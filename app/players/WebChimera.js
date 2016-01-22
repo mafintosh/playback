@@ -1,6 +1,7 @@
 import wcjs from 'wcjs-prebuilt'
 import renderer from 'webgl-video-renderer'
 import playerEvents from './playerEvents'
+import debounce from 'lodash.debounce'
 
 class WebChimera {
 
@@ -21,20 +22,12 @@ class WebChimera {
       })
     })
 
-    this.player.onFrameSetup = (width, height) => {
-      this.emitter.emit('playerMetadata', {
-        duration: this.player.length / 1000,
-        width,
-        height
-      })
-    }
-
     this.player.onFrameReady = (frame) => {
       this.context.render(frame, frame.width, frame.height, frame.uOffset, frame.vOffset)
     }
 
     this._onEnd = this._onEnd.bind(this)
-    this._onBuffer = this._onBuffer.bind(this)
+    this._onBuffer = debounce(this._onBuffer.bind(this), 100)
     this._onWindowResize = this._onWindowResize.bind(this)
     this.player.onBuffering = this._onBuffer
     this.player.onEndReached = this._onEnd
@@ -102,10 +95,18 @@ class WebChimera {
     this.player.time = currentTime * 1000
     this.player.volume = volume * 100
 
-    if (!autoPlay) {
-      this.player.pause()
-    } else {
-      this._startPolling()
+    this.player.onFrameSetup = (width, height) => {
+      this.emitter.emit('playerMetadata', {
+        duration: this.player.length / 1000,
+        width,
+        height
+      })
+
+      if (!autoPlay) {
+        this.player.pause()
+      } else {
+        this._startPolling()
+      }
     }
   }
 
