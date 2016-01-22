@@ -47,7 +47,7 @@ module.exports = {
 
         const filtered = info.formats
           .sort((a, b) => +(a.resolution > b.resolution) || +(a.resolution === b.resolution) - 1)
-          .filter(f => f.audioEncoding && (f.container === 'mp4' || f.container === 'webm'))
+          .filter(f => f.audioEncoding && f.resolution && (f.container === 'mp4' || f.container === 'webm'))
 
         const vidFmt = filtered[filtered.length - 1]
 
