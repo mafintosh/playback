@@ -62,6 +62,10 @@ body {
   height: 100%;
 }
 
+body.hide {
+  cursor: none;
+}
+
 .ui {
   transition: opacity 250ms ease-in-out;
   position: fixed;
@@ -69,7 +73,6 @@ body {
 
 .ui.hide:not(.stopped) {
   opacity: 0;
-  cursor: none;
 
   .controls {
     bottom: -50px;

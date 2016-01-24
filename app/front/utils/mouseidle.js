@@ -3,10 +3,12 @@ import debounce from 'lodash.debounce'
 module.exports = (elem, timeout, className) => {
   const hide = debounce(() => {
     elem.classList.add(className)
+    document.body.classList.add(className)
   }, timeout)
 
   const show = () => {
     elem.classList.remove(className)
+    document.body.classList.remove(className)
   }
 
   const listener = (e) => {
