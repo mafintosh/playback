@@ -446,7 +446,7 @@ canvas {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: rgba(255,255,255,.2);
+  color: rgba(255,255,255,.4);
 
   .empty-state__heading {
     font-size: 16px;
@@ -454,11 +454,10 @@ canvas {
   }
 
   .empty-state__icon {
-    border: 4px dashed rgba(255,255,255,.2);
     border-radius: 20px;
     padding: 80px;
     margin-bottom: 20px;
-    background-image: url(../images/popcorn.gif);
+    background-image: url(../images/splash.gif);
     background-repeat: no-repeat;
     background-position: center center;
     background-color: #fff;
