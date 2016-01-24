@@ -335,11 +335,16 @@ const UI = React.createClass({
       )
     }
 
+    let titlebar
+    if (process.platform === 'darwin') {
+      titlebar = <Titlebar onFullscreen={this._handleFullscreenClick} onClose={this._handleCloseClick} onMaximize={this._handleMaximizeClick} onMinimize={this._handleMinimizeClick} isFullscreen={this.state.uiFullscreen}/>
+    }
+
     const app = (
       <div className={'ui ' + (this.state.status === 'stopped' ? 'stopped' : '')}>
         {loading}
         {emptyState}
-        <Titlebar onFullscreen={this._handleFullscreenClick} onClose={this._handleCloseClick} onMaximize={this._handleMaximizeClick} onMinimize={this._handleMinimizeClick} isFullscreen={this.state.uiFullscreen}/>
+        {titlebar}
         <CSSTG transitionName="fade-in" transitionEnterTimeout={125} transitionLeaveTimeout={125}>
           {dialog}
         </CSSTG>

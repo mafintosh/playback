@@ -41,7 +41,7 @@ app.on('ready', () => {
   controller.on('ready', (serverPath) => {
     win = new BrowserWindow({
       title: 'playback',
-      frame: false,
+      frame: process.platform !== 'darwin',
       width: 860,
       height: 470
     })
