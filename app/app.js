@@ -65,7 +65,6 @@ app.on('ready', () => {
 
     // Window controls
     ipc.on('close', () => win.close())
-    ipc.on('focus', () => win.focus())
     ipc.on('minimize', () => win.minimize())
     ipc.on('maximize', () => win.maximize())
 
