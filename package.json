@@ -46,7 +46,7 @@
     "babelify": "^7.2.0",
     "browserify": "^13.0.0",
     "electron-packager": "^5.2.1",
-    "electron-prebuilt": "0.36.4",
+    "electron-prebuilt": "^0.36.5",
     "eslint": "^1.10.3",
     "eslint-config-airbnb": "^2.1.1",
     "eslint-plugin-react": "^3.11.3",
