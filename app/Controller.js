@@ -209,7 +209,7 @@ class Controller extends EventEmitter {
 
     this.setState({
       status: autoPlay ? this.STATUS_PLAYING : this.STATUS_PAUSED,
-      currentFile: file,
+      currentFile: Object.assign({}, file),
       duration: 0,
       currentTime
     })
