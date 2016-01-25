@@ -22,10 +22,6 @@ class WebChimera {
       })
     })
 
-    this.player.onFrameReady = (frame) => {
-      this.context.render(frame, frame.width, frame.height, frame.uOffset, frame.vOffset)
-    }
-
     this._onEnd = this._onEnd.bind(this)
     this._onBuffer = debounce(this._onBuffer.bind(this), 100)
     this._onWindowResize = debounce(this._onWindowResize.bind(this), 50)
@@ -91,6 +87,11 @@ class WebChimera {
 
   start(file, autoPlay = false, currentTime = 0, showSubtitles = false, volume = 1) {
     this.stop()
+
+    this.player.onFrameReady = (frame) => {
+      this.context.render(frame, frame.width, frame.height, frame.uOffset, frame.vOffset)
+    }
+
     this.player.play(file.streamUrl)
     this.player.time = currentTime * 1000
     this.player.volume = volume * 100
@@ -139,6 +140,7 @@ class WebChimera {
   stop() {
     this._stopPolling()
     this.player.stop()
+    this.player.onFrameReady = null
     this.context.fillBlack()
   }
 
