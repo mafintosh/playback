@@ -89,6 +89,7 @@ var onTop = false
 
 $(window).on('contextmenu', function (e) {
   e.preventDefault()
+  videoDown = false
 
   var menu = new Menu()
 
