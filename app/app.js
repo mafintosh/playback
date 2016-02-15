@@ -51,7 +51,7 @@ app.on('ready', () => {
 
     // Client loaded
     ipc.on('clientReady', () => {
-      controller.setPlayer(argv.player || controller.PLAYER_WEBCHIMERA)
+      controller.setPlayer(argv.player || controller.PLAYER_HTML)
       if (argURIs.length) {
         controller.loadFiles(argURIs)
       }

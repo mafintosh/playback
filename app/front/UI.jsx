@@ -8,7 +8,6 @@ import Icon from './components/icon.jsx'
 import Titlebar from './components/titlebar.jsx'
 import handleIdle from './utils/mouseidle.js'
 import HTMLPlayer from '../players/HTML.js'
-import WebChimera from '../players/WebChimera.js'
 
 const UI = React.createClass({
 
@@ -60,7 +59,6 @@ const UI = React.createClass({
     this.emitter = emitter
 
     this._htmlPlayer = new HTMLPlayer(document.getElementById('video'), emitter)
-    this._chimeraPlayer = new WebChimera(document.getElementById('canvas'), emitter)
 
     emitter.on('update', (player, state) => {
       this.setState(state)
@@ -98,11 +96,6 @@ const UI = React.createClass({
     this.setState({ uiDialog: null })
     console.log('handle cast item click', device)
     this.emitter.emit('setPlayer', 'chromecast', { deviceId: device.id })
-  },
-
-  _handlePlayerClick(player) {
-    this.setState({ uiDialog: null })
-    this.emitter.emit('setPlayer', player)
   },
 
   _handlePlaylistItemClick(file) {
@@ -218,17 +211,9 @@ const UI = React.createClass({
       items = [<li key={-1} onClick={this._handleRefreshChromecastsClick}>No chromecasts found. Click to refresh.</li>]
     }
 
-    const players = (
-      <ul>
-        <li className={this.state.player === 'webchimera' ? 'active' : ''} onClick={this._handlePlayerClick.bind(this, 'webchimera')}>Play with WebChimera (libVLC)</li>
-        <li className={this.state.player === 'html' ? 'active' : ''} onClick={this._handlePlayerClick.bind(this, 'html')}>Play with HTML</li>
-      </ul>
-    )
-
     return (
       <div key={'chromecasts'} className="dialog chromecasts">
         <ul>{items}</ul>
-        {players}
       </div>
     )
   },

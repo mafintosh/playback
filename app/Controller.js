@@ -22,7 +22,6 @@ class Controller extends EventEmitter {
   STATUS_STOPPED = 'stopped';
   STATUS_PAUSED = 'paused';
   STATUS_PLAYING = 'playing';
-  PLAYER_WEBCHIMERA = 'webchimera';
   PLAYER_HTML = 'html';
   PLAYER_CHROMECAST = 'chromecast';
 
@@ -432,9 +431,6 @@ class Controller extends EventEmitter {
       this.setState({ player: type, casting: playerOpts.deviceId, buffering: false, buffered: null })
       this.emit('enablePlayer', playerOpts.deviceId)
     } else if (type === this.PLAYER_HTML) {
-      this.setState({ player: type, casting: null, buffering: false, buffered: null })
-      this.emit('enablePlayer')
-    } else if (type === this.PLAYER_WEBCHIMERA) {
       this.setState({ player: type, casting: null, buffering: false, buffered: null })
       this.emit('enablePlayer')
     }
