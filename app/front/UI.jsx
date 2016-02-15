@@ -55,6 +55,10 @@ const UI = React.createClass({
       this.setState({ uiFullscreen: document.webkitIsFullScreen })
     })
 
+    document.addEventListener('contextmenu', () => {
+      this._handleContextMenu()
+    })
+
     const emitter = this.props.emitter
     this.emitter = emitter
 
@@ -157,6 +161,10 @@ const UI = React.createClass({
 
   _handleTimelineMouseMove(e) {
     this.setState({ uiTimelineTooltipPosition: e.clientX })
+  },
+
+  _handleContextMenu() {
+    this.emitter.emit('showContextMenu')
   },
 
   _formatTime(totalSeconds) {

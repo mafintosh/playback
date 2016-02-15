@@ -6,6 +6,7 @@ import {
   globalShortcut,
   shell,
   Menu,
+  MenuItem,
   ipcMain as ipc
 } from 'electron'
 import minimist from 'minimist'
@@ -67,6 +68,28 @@ app.on('ready', () => {
     ipc.on('close', () => win.close())
     ipc.on('minimize', () => win.minimize())
     ipc.on('maximize', () => win.maximize())
+    ipc.on('showContextMenu', () => {
+      const menu = new Menu()
+
+      menu.append(new MenuItem({
+        label: 'Always on top',
+        type: 'checkbox',
+        checked: win.isAlwaysOnTop(),
+        click: () => win.setAlwaysOnTop(!win.isAlwaysOnTop())
+      }))
+
+      menu.append(new MenuItem({
+        label: 'Paste link from clipboard',
+        click: () => controller.loadFiles(clipboard.readText().split('\n'))
+      }))
+
+      menu.append(new MenuItem({
+        label: 'Toggle subtitles',
+        click: () => controller.toggleSubtitles()
+      }))
+
+      menu.popup(win)
+    })
 
     // Prevent/allow computer sleep
     controller.on('preventSleep', () => preventSleep())
