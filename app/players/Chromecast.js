@@ -27,7 +27,7 @@ class Chromecast {
     this.device = null
   }
 
-  start(file, autoPlay = false, currentTime = 0, showSubtitles = false, volume = 1) {
+  start(file, autoPlay = false, currentTime = 0, showSubtitles = false, volume = 1, muted = false) {
     this.active = true
     this.device.play(file.streamUrl, {
       autoPlay,
@@ -35,7 +35,7 @@ class Chromecast {
       seek: currentTime,
       autoSubtitles: showSubtitles,
       subtitles: file.subtitlesUrl ? [file.subtitlesUrl] : []
-    }, this._onMetadata.bind(this, volume, autoPlay))
+    }, this._onMetadata.bind(this, volume, muted, autoPlay))
   }
 
   showSubtitles() {

@@ -217,7 +217,7 @@ class Controller extends EventEmitter {
       this.emit('preventSleep')
     }
 
-    this.emit('start', file, autoPlay, currentTime, showSubtitles, this.state.volume)
+    this.emit('start', file, autoPlay, currentTime, showSubtitles, this.state.volume, this.state.muted)
   }
 
 

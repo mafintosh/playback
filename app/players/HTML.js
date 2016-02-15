@@ -72,7 +72,7 @@ class HTMLPlayer {
     clearInterval(this.interval)
   }
 
-  start(file, autoPlay = false, currentTime = 0, showSubtitles = false, volume = 1) {
+  start(file, autoPlay = false, currentTime = 0, showSubtitles = false, volume = 1, muted = false) {
     this.stop()
 
     const el = this.element
@@ -82,6 +82,7 @@ class HTMLPlayer {
     el.load()
     el.currentTime = currentTime
     el.volume = volume
+    el.muted = muted
 
     if (showSubtitles) {
       this.showSubtitles()
