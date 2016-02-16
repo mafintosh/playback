@@ -38,7 +38,7 @@ app.on('ready', function () {
     transparent: true
   })
 
-  win.loadUrl('file://' + path.join(__dirname, 'index.html#' + JSON.stringify(process.argv.slice(2))))
+  win.loadURL('file://' + path.join(__dirname, 'index.html#' + JSON.stringify(process.argv.slice(2))))
 
   ipc.on('close', function () {
     app.quit()
