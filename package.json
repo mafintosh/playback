@@ -49,14 +49,14 @@
     "playback": "./index.js"
   },
   "scripts": {
-    "rebuild": "npm rebuild --runtime=electron --target=0.36.5 --disturl=https://atom.io/download/atom-shell",
+    "rebuild": "npm rebuild --runtime=electron --target=0.36.7 --disturl=https://atom.io/download/atom-shell",
     "start": "electron index.js",
     "lint": "eslint app/** --ext .js,.jsx",
     "sass": "node-sass app/front/styles/main.scss app/front/styles/main.css",
     "dev": "npm run lint && npm run sass && npm run start",
-    "mac-bundle": "electron-packager . Playback --platform=darwin --arch=x64 --version=0.36.5 --ignore='node_modules/(electron-packager|electron-prebuilt)' && cp info.plist Playback-darwin-x64/Playback.app/Contents/Info.plist && cp icon.icns Playback-darwin-x64/Playback.app/Contents/Resources/atom.icns",
-    "win-bundle": "electron-packager . Playback --platform=win32 --arch=ia32 --version=0.36.5 --ignore='node_modules/(electron-packager|electron-prebuilt)' --icon=icon.ico",
-    "linux-64-bundle": "electron-packager . Playback --platform=linux --arch=x64 --version=0.36.5 --ignore='node_modules/(electron-packager|electron-prebuilt)'"
+    "mac-bundle": "electron-packager . Playback --platform=darwin --arch=x64 --version=0.36.7 --ignore='node_modules/(electron-packager|electron-prebuilt)' && cp info.plist Playback-darwin-x64/Playback.app/Contents/Info.plist && cp icon.icns Playback-darwin-x64/Playback.app/Contents/Resources/atom.icns",
+    "win-bundle": "electron-packager . Playback --platform=win32 --arch=ia32 --version=0.36.7 --ignore='node_modules/(electron-packager|electron-prebuilt)' --icon=icon.ico",
+    "linux-64-bundle": "electron-packager . Playback --platform=linux --arch=x64 --version=0.36.7 --ignore='node_modules/(electron-packager|electron-prebuilt)'"
   },
   "repository": {
     "type": "git",
