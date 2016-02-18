@@ -19,13 +19,8 @@ module.exports = (elem, timeout, className) => {
     }
   }
 
-  const mouseout = () => {
-    elem.classList.add(className)
-    document.body.classList.add(className)
-  }
-
   document.addEventListener('mousemove', listener)
   document.addEventListener('mousedown', listener)
   document.addEventListener('mouseup', listener)
-  document.addEventListener('mouseout', mouseout)
+  document.addEventListener('mouseout', hide)
 }
