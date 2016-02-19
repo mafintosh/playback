@@ -3,7 +3,7 @@
 var app = require('app')
 var BrowserWindow = require('browser-window')
 var path = require('path')
-var ipc = require('ipc')
+var ipc = require('electron').ipcMain
 var dialog = require('dialog')
 var shell = require('shell')
 var powerSaveBlocker = require('electron').powerSaveBlocker
@@ -38,7 +38,7 @@ app.on('ready', function () {
     transparent: true
   })
 
-  win.loadUrl('file://' + path.join(__dirname, 'index.html#' + JSON.stringify(process.argv.slice(2))))
+  win.loadURL('file://' + path.join(__dirname, 'index.html#' + JSON.stringify(process.argv.slice(2))))
 
   ipc.on('close', function () {
     app.quit()
