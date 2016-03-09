@@ -4,7 +4,7 @@ import duplex from 'duplexify'
 
 module.exports = {
   test(uri) {
-    return /youtube\.com\/watch/i.test(uri)
+    return /youtube\.com\/watch|youtu.be/i.test(uri)
   },
 
   load(uri) {
