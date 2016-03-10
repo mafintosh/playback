@@ -102,7 +102,6 @@ const UI = React.createClass({
 
   _handleCastItemClick (device) {
     this.setState({ uiDialog: null })
-    console.log('handle cast item click', device)
     this.emitter.emit('setPlayer', 'chromecast', { deviceId: device.id })
   },
 

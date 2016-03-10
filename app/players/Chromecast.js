@@ -9,9 +9,9 @@ function Chromecast (controller, chromecasts) {
   this.controller = controller
 
   playerEvents.forEach((f) => {
-    controller.on(f, function (player) {
-      if (player === 'chromecast') {
-        this[f].apply(this, Array.prototype.slice.call(arguments, 1))
+    controller.on(f, function () {
+      if (this.controller.state.player === 'chromecast') {
+        this[f].apply(this, Array.prototype.slice.call(arguments))
       }
     }.bind(this))
   })
@@ -35,7 +35,7 @@ Object.assign(Chromecast.prototype, {
       seek: currentTime,
       autoSubtitles: showSubtitles,
       subtitles: file.subtitlesUrl ? [file.subtitlesUrl] : []
-    }, this._onMetadata.bind(this, volume, muted, autoPlay))
+    }, this._onMetadata.bind(this, volume, autoPlay))
   },
 
   showSubtitles () {

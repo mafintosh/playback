@@ -43,8 +43,6 @@ Object.assign(Server.prototype, {
     const fileId = decodeURIComponent(req.url.split('/')[1])
     const file = this.controller.getFile(fileId)
 
-    console.log(file)
-
     if (!file) {
       res.statusCode = 404
       res.end()
@@ -52,8 +50,6 @@ Object.assign(Server.prototype, {
     }
 
     const buf = file.subtitles
-
-    console.log(buf)
 
     if (buf) {
       res.setHeader('Content-Type', 'text/vtt; charset=utf-8')
