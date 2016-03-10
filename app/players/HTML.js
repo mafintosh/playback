@@ -1,57 +1,58 @@
-import playerEvents from './playerEvents'
+'use strict'
 
-class HTMLPlayer {
+const playerEvents = require('./playerEvents')
 
-  POLL_FREQUENCY = 500;
+function HTMLPlayer (element, emitter) {
+  this.POLL_FREQUENCY = 500
 
-  constructor(element, emitter) {
-    this.element = element
-    this._onMetadata = this._onMetadata.bind(this)
-    this._onEnd = this._onEnd.bind(this)
-    this.emitter = emitter
+  this.element = element
+  this._onMetadata = this._onMetadata.bind(this)
+  this._onEnd = this._onEnd.bind(this)
+  this.emitter = emitter
 
-    playerEvents.forEach((f) => {
-      emitter.on(f, (player, ...args) => {
-        if (player === 'html') {
-          this[f](...args)
-        }
-      })
-    })
+  playerEvents.forEach((f) => {
+    emitter.on(f, function (player) {
+      if (player === 'html') {
+        this[f].apply(this, Array.prototype.slice.call(arguments, 1))
+      }
+    }.bind(this))
+  })
 
-    this.element.addEventListener('loadedmetadata', this._onMetadata)
-    this.element.addEventListener('ended', this._onEnd)
-    this.element.addEventListener('waiting', this._onWaitingChange.bind(this, 'waiting'))
-    this.element.addEventListener('playing', this._onWaitingChange.bind(this, 'playing'))
-  }
+  this.element.addEventListener('loadedmetadata', this._onMetadata)
+  this.element.addEventListener('ended', this._onEnd)
+  this.element.addEventListener('waiting', this._onWaitingChange.bind(this, 'waiting'))
+  this.element.addEventListener('playing', this._onWaitingChange.bind(this, 'playing'))
+}
 
-  enablePlayer() {
+Object.assign(HTMLPlayer.prototype, {
+  enablePlayer () {
     this.element.style.display = 'block'
-  }
+  },
 
-  disablePlayer() {
+  disablePlayer () {
     this.element.style.display = 'none'
-  }
+  },
 
-  _onWaitingChange(state) {
+  _onWaitingChange (state) {
     this.emitter.emit('playerStatus', {
       buffering: state === 'waiting'
     })
-  }
+  },
 
-  _onMetadata() {
+  _onMetadata () {
     this.emitter.emit('playerMetadata', {
       duration: this.element.duration,
       height: this.element.videoHeight,
       width: this.element.videoWidth
     })
-  }
+  },
 
-  _onEnd() {
+  _onEnd () {
     this._stopPolling()
     this.emitter.emit('playerEnd')
-  }
+  },
 
-  _startPolling() {
+  _startPolling () {
     this._stopPolling()
     this.interval = setInterval(() => {
       const buffers = []
@@ -66,13 +67,13 @@ class HTMLPlayer {
         buffered: buffers
       })
     }, this.POLL_FREQUENCY)
-  }
+  },
 
-  _stopPolling() {
+  _stopPolling () {
     clearInterval(this.interval)
-  }
+  },
 
-  start(file, autoPlay = false, currentTime = 0, showSubtitles = false, volume = 1, muted = false) {
+  start (file, autoPlay, currentTime, showSubtitles, volume, muted) {
     this.stop()
 
     const el = this.element
@@ -91,9 +92,9 @@ class HTMLPlayer {
     if (autoPlay) {
       this.resume()
     }
-  }
+  },
 
-  showSubtitles() {
+  showSubtitles () {
     if (this.element.querySelector('track')) {
       this.element.querySelector('track').mode = 'showing'
     } else {
@@ -104,42 +105,41 @@ class HTMLPlayer {
       track.setAttribute('kind', 'subtitles')
       this.element.appendChild(track)
     }
-  }
+  },
 
-  hideSubtitles() {
+  hideSubtitles () {
     this.element.querySelector('track').mode = 'hidden'
     this.element.removeChild(this.element.querySelector('track'))
-  }
+  },
 
-  setVolume(value) {
+  setVolume (value) {
     this.element.volume = value
-  }
+  },
 
-  setMuted(muted) {
+  setMuted (muted) {
     this.element.muted = muted
-  }
+  },
 
-  resume() {
+  resume () {
     this._startPolling()
     this.element.play()
-  }
+  },
 
-  pause() {
+  pause () {
     this._stopPolling()
     this.element.pause()
-  }
+  },
 
-  stop() {
+  stop () {
     this._stopPolling()
     this.element.pause()
     this.element.innerHTML = ''
     this.element.load()
-  }
+  },
 
-  seek(second) {
+  seek (second) {
     this.element.currentTime = second
   }
+})
 
-}
-
-export default HTMLPlayer
+module.exports = HTMLPlayer

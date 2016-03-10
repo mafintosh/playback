@@ -1,33 +1,33 @@
-import playerEvents from './playerEvents'
+'use strict'
 
-class Chromecast {
+const playerEvents = require('./playerEvents')
 
-  POLL_FREQUENCY = 1000;
+function Chromecast (controller, chromecasts) {
+  this.POLL_FREQUENCY = 1000
 
-  constructor(controller, chromecasts) {
-    this.chromecasts = chromecasts
-    this.controller = controller
+  this.chromecasts = chromecasts
+  this.controller = controller
 
-    playerEvents.forEach((f) => {
-      controller.on(f, (...args) => {
-        if (controller.state.player === 'chromecast') {
-          console.log('chromecast player performing', f, ' with ', args)
-          this[f](...args)
-        }
-      })
-    })
-  }
+  playerEvents.forEach((f) => {
+    controller.on(f, function (player) {
+      if (player === 'chromecast') {
+        this[f].apply(this, Array.prototype.slice.call(arguments, 1))
+      }
+    }.bind(this))
+  })
+}
 
-  enablePlayer(id) {
-    const device = this.chromecasts.players[this.chromecasts.players.findIndex(d => d.host + d.name === id)]
+Object.assign(Chromecast.prototype, {
+  enablePlayer (id) {
+    const device = this.chromecasts.players[this.chromecasts.players.findIndex((d) => d.host + d.name === id)]
     this.device = device
-  }
+  },
 
-  disablePlayer() {
+  disablePlayer () {
     this.device = null
-  }
+  },
 
-  start(file, autoPlay = false, currentTime = 0, showSubtitles = false, volume = 1, muted = false) {
+  start (file, autoPlay, currentTime, showSubtitles, volume, muted) {
     this.active = true
     this.device.play(file.streamUrl, {
       autoPlay,
@@ -36,79 +36,79 @@ class Chromecast {
       autoSubtitles: showSubtitles,
       subtitles: file.subtitlesUrl ? [file.subtitlesUrl] : []
     }, this._onMetadata.bind(this, volume, muted, autoPlay))
-  }
+  },
 
-  showSubtitles() {
+  showSubtitles () {
     this.device.subtitles(1)
-  }
+  },
 
-  hideSubtitles() {
+  hideSubtitles () {
     this.device.subtitles(false)
-  }
+  },
 
-  _onMetadata(volume, autoPlay, err, status) {
+  _onMetadata (volume, autoPlay, err, status) {
     if (autoPlay) {
       this._startPolling()
     }
     this.device.volume(volume)
     this.controller.playerMetadata({ duration: status.media.duration })
-  }
+  },
 
-  _onEnd() {
+  _onEnd () {
     this._stopPolling()
     this.active = false
     this.controller.playerEnd()
-  }
+  },
 
-  _onStatus(err, status) {
+  _onStatus (err, status) {
+    if (err) return
     if (!status) {
       this._onEnd()
     } else {
       this.controller.playerStatus({ currentTime: status.currentTime })
     }
-  }
+  },
 
-  _startPolling() {
+  _startPolling () {
     this._stopPolling()
     this.interval = setInterval(() => {
       this.device.status(this._onStatus.bind(this))
     }, this.POLL_FREQUENCY)
-  }
+  },
 
-  _stopPolling() {
+  _stopPolling () {
     clearInterval(this.interval)
-  }
+  },
 
-  resume() {
+  resume () {
     this.device.resume()
     this._startPolling()
-  }
+  },
 
-  pause() {
+  pause () {
     this._stopPolling()
     this.device.pause()
-  }
+  },
 
-  stop() {
+  stop () {
     this._stopPolling()
     if (this.active) {
       this.active = false
       this.device.stop()
     }
-  }
+  },
 
-  seek(second) {
+  seek (second) {
     this.device.seek(second)
-  }
+  },
 
-  setVolume(value) {
+  setVolume (value) {
     this.device.volume(value)
-  }
+  },
 
-  setMuted(muted) {
+  setMuted (muted) {
     this.device.volume(muted ? 0 : 0.5)
   }
+})
 
-}
-
-export default Chromecast
+module.exports = Chromecast

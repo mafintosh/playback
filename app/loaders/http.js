@@ -1,17 +1,20 @@
-import request from 'request'
+'use strict'
+
+const request = require('request')
 
 module.exports = {
-  test(uri) {
+  test (uri) {
     return /^https?:\/\//i.test(uri)
   },
 
-  load(uri) {
+  load (uri) {
     return new Promise((resolve, reject) => {
       const file = { uri }
 
       file.name = uri.lastIndexOf('/') > -1 ? uri.split('/').pop() : uri
 
-      file.createReadStream = (opts = {}) => {
+      file.createReadStream = (options) => {
+        const opts = options || {}
         if (opts.start || opts.end) {
           const rs = 'bytes=' + (opts.start || 0) + '-' + (opts.end || file.length || '')
           return request(uri, { headers: { Range: rs } })

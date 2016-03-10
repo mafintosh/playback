@@ -1,17 +1,21 @@
-import {
-  app,
-  dialog,
-  BrowserWindow,
-  powerSaveBlocker,
-  globalShortcut,
-  shell,
-  Menu,
-  MenuItem,
-  ipcMain as ipc
-} from 'electron'
-import minimist from 'minimist'
-import clipboard from 'clipboard'
-import Controller from './Controller'
+'use strict'
+
+const electron = require('electron')
+const app = electron.app
+const dialog = electron.dialog
+const BrowserWindow = electron.BrowserWindow
+const powerSaveBlocker = electron.powerSaveBlocker
+const globalShortcut = electron.globalShortcut
+const shell = electron.shell
+const Menu = electron.Menu
+const MenuItem = electron.MenuItem
+const ipc = electron.ipcMain
+
+const path = require('path')
+
+const minimist = require('minimist')
+const clipboard = require('clipboard')
+const Controller = require('./Controller')
 
 const argv = minimist(process.argv.slice(2), {
   alias: { follow: 'f', player: 'p' },
@@ -47,8 +51,10 @@ app.on('ready', () => {
       height: 470
     })
 
-    win.loadURL('file://' + __dirname + '/front/index.html#' + encodeURIComponent(serverPath))
-    win.on('closed', () => win = null)
+    win.loadURL(path.join('file://', __dirname, '/front/index.html#', encodeURIComponent(serverPath)))
+    win.on('closed', () => {
+      win = null
+    })
 
     // Client loaded
     ipc.on('clientReady', () => {
@@ -101,19 +107,19 @@ app.on('ready', () => {
     globalShortcut.register('mediaprevioustrack', () => controller.previous())
 
     // Remote IPC send
-    controller.REMOTE_SEND.forEach(f => {
-      controller.on(f, (...args) => {
-        const newArgs = [controller.state.player].concat(args)
+    controller.REMOTE_SEND.forEach((f) => {
+      controller.on(f, function () {
+        const newArgs = [f, controller.state.player].concat(Array.prototype.slice.call(arguments))
         console.log(`Sending ipc event '${f}'`)
-        win.webContents.send(f, ...newArgs)
+        win.webContents.send.apply(win.webContents, newArgs)
       })
     })
 
     // Remote IPC Receive
-    controller.REMOTE_RECEIVE.forEach(f => {
-      ipc.on(f, (sender, ...args) => {
+    controller.REMOTE_RECEIVE.forEach((f) => {
+      ipc.on(f, function (sender) {
         console.log(`Received ipc event '${f}'`)
-        controller[f].apply(controller, args)
+        controller[f].apply(controller, Array.prototype.slice.call(arguments, 1))
       })
     })
 
@@ -122,7 +128,7 @@ app.on('ready', () => {
       label: 'Playback',
       submenu: [{
         label: 'About Playback',
-        click() {
+        click () {
           shell.openExternal('https://mafintosh.github.io/playback/')
         }
       }, {
@@ -130,7 +136,7 @@ app.on('ready', () => {
       }, {
         label: 'Quit',
         accelerator: 'Command+Q',
-        click() {
+        click () {
           app.quit()
         }
       }]
@@ -139,13 +145,13 @@ app.on('ready', () => {
       submenu: [{
         label: 'Add media',
         accelerator: 'Command+O',
-        click() {
+        click () {
           controller.openFileDialog()
         }
       }, {
         label: 'Add link from clipboard',
         accelerator: 'CommandOrControl+V',
-        click() {
+        click () {
           controller.loadFiles(clipboard.readText().split('\n'))
         }
       }]
@@ -164,7 +170,7 @@ app.on('ready', () => {
       }, {
         label: 'Toggle Developer Tools',
         accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
-        click() {
+        click () {
           win.webContents.openDevTools()
         }
       }]
@@ -172,19 +178,19 @@ app.on('ready', () => {
       label: 'Help',
       submenu: [{
         label: 'Report Issue',
-        click() {
+        click () {
           shell.openExternal('https://github.com/mafintosh/playback/issues')
         }
       }, {
         label: 'View Source Code on GitHub',
-        click() {
+        click () {
           shell.openExternal('https://github.com/mafintosh/playback')
         }
       }, {
         type: 'separator'
       }, {
         label: 'Releases',
-        click() {
+        click () {
           shell.openExternal('https://github.com/mafintosh/playback/releases')
         }
       }]

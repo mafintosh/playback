@@ -1,4 +1,6 @@
-import debounce from 'lodash.debounce'
+'use strict'
+
+const debounce = require('lodash.debounce')
 
 module.exports = (elem, timeout, className) => {
   const hide = debounce(() => {

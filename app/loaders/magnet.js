@@ -1,31 +1,33 @@
-import torrents from 'webtorrent'
-import concat from 'concat-stream'
-import vtt from 'srt-to-vtt'
+'use strict'
+
+const torrents = require('webtorrent')
+const concat = require('concat-stream')
+const vtt = require('srt-to-vtt')
 
 module.exports = {
-  test(uri) {
+  test (uri) {
     return /magnet:/i.test(uri)
   },
 
-  load(uriOrBuffer) {
+  load (uriOrBuffer) {
     return new Promise((resolve) => {
       console.log(uriOrBuffer)
       const engine = torrents()
       const subtitles = {}
 
-      engine.on('error', err => {
+      engine.on('error', (err) => {
         console.error(err)
       })
 
-      engine.add(uriOrBuffer, torrent => {
-        torrent.files.forEach(f => {
+      engine.add(uriOrBuffer, (torrent) => {
+        torrent.files.forEach((f) => {
           if (/\.(vtt|srt)$/i.test(f.name)) {
             subtitles[f.name] = f
           }
         })
 
         // TODO: resolve with array of files?
-        torrent.files.some(f => {
+        torrent.files.some((f) => {
           f.downloadSpeed = torrent.downloadSpeed()
           if (/\.(mp4|mkv|mp3|mov|avi)$/i.test(f.name)) {
             f.select()
@@ -33,7 +35,7 @@ module.exports = {
             const basename = f.name.substr(0, f.name.lastIndexOf('.'))
             const subtitle = subtitles[basename + '.srt'] || subtitles[basename + '.vtt']
             if (subtitle) {
-              this._loadSubtitles(subtitle).then(data => {
+              this._loadSubtitles(subtitle).then((data) => {
                 f.subtitles = data
                 resolve(f)
               })
@@ -59,9 +61,9 @@ module.exports = {
     })
   },
 
-  _loadSubtitles(subtitle) {
+  _loadSubtitles (subtitle) {
     return new Promise((resolve) => {
-      subtitle.createReadStream().pipe(vtt()).pipe(concat(data => resolve(data)))
+      subtitle.createReadStream().pipe(vtt()).pipe(concat((data) => resolve(data)))
     })
   }
 }

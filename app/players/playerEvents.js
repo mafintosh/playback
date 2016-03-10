@@ -1,4 +1,4 @@
-export default [
+module.exports = [
   'setMuted',
   'setVolume',
   'start',

@@ -1,12 +1,14 @@
-import httpLoader from './http'
-import fileLoader from './file'
+'use strict'
+
+const httpLoader = require('./http')
+const fileLoader = require('./file')
 
 module.exports = {
-  test(uri) {
+  test (uri) {
     return /^\/*(ipfs|ipns)\//i.test(uri)
   },
 
-  load(uri) {
+  load (uri) {
     let link = uri
     if (uri[0] !== '/') link = '/' + link // may be stripped in add
 

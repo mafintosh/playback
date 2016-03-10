@@ -1,44 +1,49 @@
-import http from 'http'
-import rangeParser from 'range-parser'
-import pump from 'pump'
-import network from 'network-address'
-import { EventEmitter } from 'events'
-import playerEvents from './players/playerEvents'
-import multicastdns from 'multicast-dns'
-import request from 'request'
-import JSONStream from 'JSONStream'
-import eos from 'end-of-stream'
+'use strict'
+
+const http = require('http')
+const util = require('util')
+const rangeParser = require('range-parser')
+const pump = require('pump')
+const network = require('network-address')
+const EventEmitter = require('events').EventEmitter
+const playerEvents = require('./players/playerEvents')
+const multicastdns = require('multicast-dns')
+const request = require('request')
+const JSONStream = require('JSONStream')
+const eos = require('end-of-stream')
 
 const mdns = multicastdns()
 
-class Server extends EventEmitter {
+function Server (controller, follow, cb) {
+  this.controller = controller
 
-  constructor(controller, follow, cb) {
-    super()
-    this.controller = controller
-    this.server = http.createServer(this.route.bind(this)).listen(0, () => {
-      const path = this.getPath()
-      console.log('Playback server running at: ' + path)
-      cb(path)
-    })
+  this.server = http.createServer(this.route.bind(this)).listen(0, () => {
+    const path = this.getPath()
+    console.log('Playback server running at: ' + path)
+    cb(path)
+  })
 
-    if (follow) {
-      this._startMDNSFollow()
-    } else {
-      this._startMDNSListen()
-    }
+  if (follow) {
+    this._startMDNSFollow()
+  } else {
+    this._startMDNSListen()
   }
+}
 
-  route(req, res) {
+Object.assign(Server.prototype, {
+
+  route (req, res) {
     if (req.headers.origin) res.setHeader('Access-Control-Allow-Origin', req.headers.origin)
     if (req.url === '/follow') return this.handleFollow(req, res)
     if (req.url.endsWith('/subtitles')) return this.handleSubtitles(req, res)
     return this.handleFile(req, res)
-  }
+  },
 
-  handleSubtitles(req, res) {
+  handleSubtitles (req, res) {
     const fileId = decodeURIComponent(req.url.split('/')[1])
     const file = this.controller.getFile(fileId)
+
+    console.log(file)
 
     if (!file) {
       res.statusCode = 404
@@ -48,6 +53,8 @@ class Server extends EventEmitter {
 
     const buf = file.subtitles
 
+    console.log(buf)
+
     if (buf) {
       res.setHeader('Content-Type', 'text/vtt; charset=utf-8')
       res.setHeader('Content-Length', buf.length)
@@ -56,17 +63,21 @@ class Server extends EventEmitter {
       res.statusCode = 404
       res.end()
     }
-  }
+  },
 
-  handleFollow(req, res) {
+  handleFollow (req, res) {
     const stringify = JSONStream.stringify()
+    const state = this.controller.getState()
 
     stringify.pipe(res)
 
-    stringify.write({ type: 'update', arguments: [this.controller.getState()] })
+    stringify.write({ type: 'update', arguments: [state] })
 
     // Initial sync
-    const { currentFile, status, currentTime } = this.controller.getState()
+    const currentFile = state.currentFile
+    const status = state.status
+    const currentTime = state.currentTime
+
     if (status !== this.controller.STATUS_STOPPED) {
       stringify.write({ type: 'start', arguments: [currentFile, status === this.controller.STATUS_PLAYING, currentTime] })
     }
@@ -74,21 +85,23 @@ class Server extends EventEmitter {
     const listeners = {}
 
     // Add listeners
-    playerEvents.forEach(f => {
-      const l = (...args) => stringify.write({ type: f, arguments: args })
+    playerEvents.forEach((f) => {
+      const l = function () {
+        stringify.write({ type: f, arguments: Array.prototype.slice.call(arguments) })
+      }
       listeners[f] = l
       this.controller.on(f, l)
     })
 
     // Remove listeners on eos
     eos(res, () => {
-      playerEvents.forEach(f => {
+      playerEvents.forEach((f) => {
         this.controller.removeListener(f, listeners[f])
       })
     })
-  }
+  },
 
-  handleFile(req, res) {
+  handleFile (req, res) {
     const fileId = decodeURIComponent(req.url.split('/')[1])
     const file = this.controller.getFile(fileId)
 
@@ -117,13 +130,13 @@ class Server extends EventEmitter {
     if (req.method === 'HEAD') return res.end()
 
     pump(file.createReadStream(range), res)
-  }
+  },
 
-  getPath() {
+  getPath () {
     return `http://${network()}:${this.server.address().port}`
-  }
+  },
 
-  _startMDNSListen() {
+  _startMDNSListen () {
     mdns.on('query', (query) => {
       const valid = query.questions.some(function (q) {
         return q.name === 'playback'
@@ -140,9 +153,9 @@ class Server extends EventEmitter {
         }]
       })
     })
-  }
+  },
 
-  _startMDNSFollow() {
+  _startMDNSFollow () {
     // query for playback server
     const query = () => {
       mdns.query({
@@ -159,7 +172,7 @@ class Server extends EventEmitter {
 
     // check if a response is from playback, then stream /follow
     const self = this
-    mdns.on('response', function onresponse(response) {
+    mdns.on('response', function onresponse (response) {
       response.answers.forEach((a) => {
         if (a.name !== 'playback') return
         clearInterval(interval)
@@ -167,7 +180,7 @@ class Server extends EventEmitter {
 
         request('http://' + a.data.target + ':' + a.data.port + '/follow').pipe(JSONStream.parse('*')).on('data', (data) => {
           if (playerEvents.indexOf(data.type) > -1) {
-            self.controller[data.type](...data.arguments)
+            self.controller[data.type].apply(self.controller, data.arguments)
           } else if (data.type === 'update') {
             self.controller.setState(data.arguments[0])
           }
@@ -175,6 +188,8 @@ class Server extends EventEmitter {
       })
     })
   }
-}
+})
 
-export default Server
+util.inherits(Server, EventEmitter)
+
+module.exports = Server

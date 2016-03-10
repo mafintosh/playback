@@ -1,18 +1,20 @@
-import ytdl from 'ytdl-core'
-import request from 'request'
-import duplex from 'duplexify'
+'use strict'
+
+const ytdl = require('ytdl-core')
+const request = require('request')
+const duplex = require('duplexify')
 
 module.exports = {
-  test(uri) {
+  test (uri) {
     return /youtube\.com\/watch|youtu.be/i.test(uri)
   },
 
-  load(uri) {
+  load (uri) {
     return new Promise((resolve, reject) => {
-      const file = { uri }
+      const file = { uri: uri }
       const url = /https?:/.test(uri) ? uri : 'https:' + uri
 
-      this._getYoutubeData(url).then(data => {
+      this._getYoutubeData(url).then((data) => {
         const fmt = data.fmt
         let vidUrl = fmt.url
         const info = data.info
@@ -25,13 +27,14 @@ module.exports = {
           file.length = +len
           file.name = info.title
 
-          file.createReadStream = (opts = {}) => {
+          file.createReadStream = (options) => {
+            const opts = options || {}
             const stream = duplex()
-            this._getYoutubeData(url).then(data2 => {
+            this._getYoutubeData(url).then((data2) => {
               vidUrl = data2.fmt.url
               if (opts.start || opts.end) vidUrl += '&range=' + ([opts.start || 0, opts.end || len].join('-'))
               stream.setReadable(request(vidUrl))
-            }).catch(err2 => reject(err2))
+            }).catch((err2) => reject(err2))
             return stream
           }
           resolve(file)
@@ -40,21 +43,21 @@ module.exports = {
     })
   },
 
-  _getYoutubeData(url) {
+  _getYoutubeData (url) {
     return new Promise((resolve, reject) => {
       ytdl.getInfo(url, (err, info) => {
         if (err) return reject(err)
 
         const filtered = info.formats
           .sort((a, b) => +(a.resolution > b.resolution) || +(a.resolution === b.resolution) - 1)
-          .filter(f => f.audioEncoding && f.resolution && (f.container === 'mp4' || f.container === 'webm'))
+          .filter((f) => f.audioEncoding && f.resolution && (f.container === 'mp4' || f.container === 'webm'))
 
         const vidFmt = filtered[filtered.length - 1]
 
         console.log('Choosing youtube video format: ', vidFmt.container, vidFmt.resolution)
         if (!vidFmt) return reject(new Error('No suitable video format found'))
 
-        return resolve({ info, fmt: vidFmt })
+        return resolve({ info: info, fmt: vidFmt })
       })
     })
   }
