@@ -1,0 +1,485 @@
+@import 'titlebar';
+
+$body-bg: black;
+$body-font: Arial;
+$primary: #579A57;
+$controls-bg: rgba(0, 0, 0, 0.84);
+$controls-fg: #aaa;
+$controls-icon-color: #fff;
+$controls-icon-on-color: $primary;
+$controls-icon-color-hover: $primary;
+$controls-timeline-height: 6px;
+$controls-timeline-hover-height: 10px;
+$controls-timeline-bg: rgba(218, 218, 218, 0.12);
+$controls-timeline-progress-bg: $primary;
+$controls-timeline-buffered-bg: rgba(218, 218, 218, 0.12);
+
+$controls-timeline-tooltip-bg: rgba(0,0,0,.95);
+$controls-timeline-tooltip-fg: #fff;
+
+$toast-bg: $controls-bg;
+$toast-fg: $controls-fg;
+
+$playlist-bg: rgba(20,20,20,.95);
+$playlist-fg: $controls-fg;
+$playlist-button-bg: $primary;
+$playlist-button-fg: #fff;
+$playlist-button-hover-bg: lighten($primary, 10%);
+$playlist-button-hover-fg: #fff;
+$playlist-item-icon-fg: #999;
+$playlist-item-hover-bg: rgba(255,255,255,.05);
+$playlist-item-hover-fg: #fff;
+$playlist-item-active-bg: rgba(255,255,255,.15);
+$playlist-item-active-fg: #fff;
+
+$btn-bg: $primary;
+$btn-fg: #fff;
+$btn-hover-bg: lighten($primary, 10%);
+$btn-hover-fg: #fff;
+
+$slider-height: 26px;
+$slider-bar-height: 4px;
+$slider-width: 75px;
+$slider-bar-bg: rgba(255,255,255,.1);
+$slider-bar-active-bg: $primary;
+$slider-handle-bg: #fff;
+$slider-handle-width: 4px;
+$slider-handle-height: 20px;
+
+*, *:after, *:before {
+  box-sizing: inherit;
+}
+
+body {
+  background: $body-bg;
+  overflow: hidden;
+  font-family: $body-font;
+  font-size: 13px;
+  margin: 0;
+  cursor: default;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+}
+
+body.hide {
+  cursor: none;
+}
+
+.ui {
+  transition: opacity 250ms ease-in-out;
+  position: fixed;
+}
+
+.ui.hide:not(.stopped) {
+  opacity: 0;
+
+  .controls {
+    bottom: -50px;
+  }
+
+  .dialog {
+    right: -20px;
+  }
+
+  .titlebar {
+    top: -30px;
+  }
+}
+
+.ui.stopped {
+  .controls > .controls__timeline:hover > .controls__timeline__tooltip {
+    opacity: 0;
+  }
+}
+
+video {
+  -webkit-app-region: drag;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+.canvas-container {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+canvas {
+  -webkit-app-region: drag;
+  width: 100%;
+  max-height: 100%;
+}
+
+.ui, .controls, .dialog {
+  -webkit-app-region: no-drag;
+}
+
+.btn {
+  background: $btn-bg;
+  color: $btn-fg;
+  padding: 8px 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 2px;
+  font-family: inherit;
+
+  &:hover {
+    background: $btn-hover-bg;
+    color: $btn-hover-fg;
+  }
+}
+
+
+.dialog {
+  position: fixed;
+  bottom: 55px;
+  right: 10px;
+  max-height: calc(100% - 100px);
+  width: 400px;
+  background: $playlist-bg;
+  color: $playlist-fg;
+  display: flex;
+  flex-direction: column;
+  z-index: 2;
+  transition: right 250ms ease-in-out;
+
+  > ul {
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    flex: 1;
+
+    &:empty {
+      padding: 6px 0 0 0;
+    }
+
+    > li {
+      padding: 10px 6px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      display: flex;
+      align-items: center;
+      min-height: 44px;
+
+      > .playlist__item-icon {
+        width: 30px;
+        text-align: center;
+        margin-right: 6px;
+        color: $playlist-item-icon-fg;
+      }
+
+      > .playlist__item-title {
+        flex: 1;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+
+      > .playlist__item-action {
+        width: 0;
+        opacity: 0;
+        overflow: hidden;
+        transition: opacity 125ms ease-in-out, width 125ms ease-in-out, color 125ms ease-in-out;
+        color: rgba(255,255,255,.2);
+      }
+
+      &:hover {
+        background-color: $playlist-item-hover-bg;
+        color: $playlist-item-hover-fg;
+
+        > .playlist__item-action {
+          width: 28px;
+          opacity: 1;
+
+          &:hover {
+            color: #fff;
+          }
+        }
+      }
+
+      &.active {
+        background-color: $playlist-item-active-bg;
+        color: $playlist-item-active-fg;
+      }
+    }
+  }
+
+  > div {
+    padding: 0 6px 6px 6px;
+  }
+
+  > div > .btn {
+    width: 100%;
+  }
+}
+
+.controls {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  background-color: $controls-bg;
+  color: $controls-fg;
+  transition: opacity 250ms ease-in-out, bottom 250ms ease-in-out;
+
+  .controls__timeline {
+    height: $controls-timeline-height;
+    width: 100%;
+    background: $controls-timeline-bg;
+    position: relative;
+    z-index: 1;
+    top: 0;
+    margin-top: 0;
+    transition: height 125ms ease-in-out, top 125ms ease-in-out, margin-top 125ms ease-in-out;
+
+    // hit target
+    &:before {
+      content: "";
+      position: absolute;
+      top: -4px;
+      bottom: -4px;
+      width: 100%;
+    }
+
+    &:hover {
+      height: $controls-timeline-hover-height;
+      top: ($controls-timeline-hover-height - $controls-timeline-height) / 2;
+      margin-top: ($controls-timeline-hover-height - $controls-timeline-height) / -2;
+    }
+
+    > .controls__timeline__progress {
+      position: absolute;
+      height: 100%;
+      background-color: $controls-timeline-progress-bg;
+    }
+
+    > .controls__timeline__buffered {
+      position: absolute;
+      height: 100%;
+      background-color: $controls-timeline-buffered-bg;
+    }
+
+    > .controls__timeline__tooltip {
+      background: $controls-timeline-tooltip-bg;
+      border-radius: 3px;
+      padding: 4px 8px;
+      color: $controls-timeline-tooltip-fg;
+      text-align: center;
+      font-size: 12px;
+      position: absolute;
+      z-index: 100;
+      opacity: 0;
+      transition: opacity 250ms ease-in-out;
+      transform: translate(-50%, -28px);
+
+      &:before {
+        transition: height 125ms ease-in-out;
+        content: "";
+        width: 2px;
+        height: $controls-timeline-height;
+        background-color: rgba(255,255,255,.5);
+        left: calc(50% - 1px);
+        top: 28px;
+        display: block;
+        position: absolute;
+        z-index: 1;
+      }
+
+      &:after {
+        width: 0;
+        height: 0;
+        top: 100%;
+        left: 50%;
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-top: 6px solid $controls-timeline-tooltip-bg;
+        content: "";
+        margin-left: -6px;
+        position: absolute;
+      }
+    }
+
+    &:hover {
+      .controls__timeline__tooltip {
+        opacity: 1;
+
+        &:before {
+          height: $controls-timeline-hover-height;
+        }
+
+      }
+    }
+  }
+
+  .controls__toolbar {
+    padding: 6px;
+    display: flex;
+    align-items: center;
+
+    button {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: $controls-icon-color;
+      transition: color 125ms ease-in-out;
+
+      &:hover:not(:disabled) {
+        color: $controls-icon-color-hover;
+      }
+
+      &:disabled {
+        opacity: .4;
+      }
+
+      &.muted {
+        opacity: .4;
+      }
+
+      &.on {
+        color: $controls-icon-on-color;
+      }
+    }
+
+    .controls__title {
+      flex: 1;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .controls__metadata {
+      margin-right: 10px;
+    }
+
+    .controls__toolbar__volume {
+      display: inline-block;
+      position: relative;
+
+      &:hover {
+        // hit target
+        &:before {
+          content: "";
+          position: absolute;
+          left: 0;
+          right: -100px;
+          top: -20px;
+          bottom: -10px;
+        }
+
+        > button {
+          position: relative;
+          z-index: 1;
+        }
+
+        .controls__toolbar__volume__slider {
+          opacity: 1;
+          width: $slider-width + 4px;
+          padding: 0 4px;
+          margin-right: 16px;
+        }
+      }
+    }
+
+    .controls__toolbar__volume__slider {
+      margin-right: 0;
+      display: inline-block;
+      vertical-align: middle;
+      opacity: 0;
+      width: 0;
+      overflow: hidden;
+      transition: width 250ms ease-in-out, opacity 250ms ease-in-out, margin-right 250ms ease-in-out;
+      z-index: 100;
+      border-radius: 2px;
+      padding: 0 4px;
+    }
+  }
+}
+
+.toast-container {
+  position: fixed;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.toast {
+  background: $toast-bg;
+  color: $toast-fg;
+  padding: 12px 24px;
+  box-shadow: 0px 1px 6px rgba(0,0,0,.5);
+}
+
+.slider {
+  position: relative;
+  width: $slider-width;
+  height: $slider-height;
+
+  > .bar {
+    top: ($slider-height - $slider-bar-height) / 2;
+    height: $slider-bar-height;
+    background-color: $slider-bar-bg;
+
+    &.bar-0 {
+      background-color: $slider-bar-active-bg;
+    }
+  }
+
+  > .handle {
+    height: $slider-handle-height;
+    top: ($slider-height - $slider-handle-height) / 2;
+    width: $slider-handle-width;
+    background: $slider-handle-bg;
+  }
+}
+
+.empty-state {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,.4);
+
+  .empty-state__heading {
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+
+  .empty-state__icon {
+    border-radius: 20px;
+    padding: 80px;
+    margin-bottom: 20px;
+    background-image: url(../images/splash.gif);
+    background-repeat: no-repeat;
+    background-position: center center;
+  }
+}
+
+.fade-in-enter {
+  opacity: 0.01;
+}
+
+.fade-in-enter.fade-in-enter-active {
+  opacity: 1;
+  transition: opacity 125ms ease-in-out, right 125ms ease-in-out;
+}
+
+.fade-in-leave {
+  opacity: 1;
+}
+
+.fade-in-leave.fade-in-leave-active {
+  opacity: 0.01;
+  transition: opacity 125ms ease-in-out, right 125ms ease-in-out;
+}

@@ -26,8 +26,8 @@ If you think it is missing a feature or you've found a bug feel free to open an 
 
 ## Development
 
-Simply clone this repo and run `npm install` and then `npm run rebuild`.
-Afterwards you can run `npm start` to run the app.
+Simply clone this repo and run `npm install`.
+Afterwards you can run `npm run dev` to compile, lint, then start.
 
 ## License
 

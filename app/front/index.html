@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Playback</title>
+    <link rel="stylesheet" href="./styles/main.css">
+  </head>
+  <body>
+    <video id="video"></video>
+    <div class="canvas-container">
+      <canvas id="canvas"></canvas>
+    </div>
+    <div id="react-root"></div>
+    <script>
+      require('babel-register')()
+      require('./index.js')
+    </script>
+  </body>
+</html>
