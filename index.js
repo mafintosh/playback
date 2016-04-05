@@ -28,6 +28,27 @@ var argv = minimist(JSON.parse(window.location.toString().split('#')[1]), {
   boolean: ['follow']
 })
 
+
+var FILTER_VALS = {};
+var el = document.querySelector('video');
+
+var set = function (filter, value) {
+  FILTER_VALS[filter] = typeof value == 'number' ? Math.round(value * 10) / 10 : value;
+  if (value == 0 || (typeof value == 'string' && value.indexOf('0') == 0)) {
+    delete FILTER_VALS[filter];
+  }
+  render();
+}
+
+var render = function () {
+  var vals = [];
+  Object.keys(FILTER_VALS).sort().forEach(function(key, i) {
+    vals.push(key + '(' + FILTER_VALS[key] + ')');
+  });
+  var val = vals.join(' ');
+  el.style.webkitFilter = val;
+}
+
 var printError = function (err) {
   if (err) console.log(err)
 }
@@ -191,6 +212,7 @@ $('#controls-timeline').on('mouseout', function (e) {
 })
 
 var isVolumeSliderClicked = false
+var isBrightnessSliderClicked = false
 
 function updateAudioVolume(value) {
   media.volume(value)
@@ -220,6 +242,28 @@ $('#controls-volume-slider').on('mouseup', function (e) {
   isVolumeSliderClicked = false
 })
 
+function updateBrightnessSlider(brightness) {
+  var val = brightness.value * 10;
+  brightness.style.background = '-webkit-gradient(linear, left top, right top, color-stop(' + val.toString() + '%, #31A357), color-stop(' + val.toString() + '%, #727374))'
+}
+
+$('#controls-brightness-slider').on('mousemove', function (e) {
+  if (isBrightnessSliderClicked) {
+    var brightness = $('#controls-brightness-slider')[0]
+    updateBrightnessSlider(brightness)
+  }
+})
+
+$('#controls-brightness-slider').on('mousedown', function (e) {
+  isBrightnessSliderClicked = true
+})
+
+$('#controls-brightness-slider').on('mouseup', function (e) {
+  var brightness = $('#controls-brightness-slider')[0]
+  updateBrightnessSlider(brightness)
+  isBrightnessSliderClicked = false
+})
+
 $(document).on('keydown', function (e) {
   if (e.keyCode === 27 && isFullscreen) return onfullscreentoggle(e)
   if (e.keyCode === 13 && e.metaKey) return onfullscreentoggle(e)
@@ -228,6 +272,7 @@ $(document).on('keydown', function (e) {
 
   if ($('#controls-playlist').hasClass('selected')) $('#controls-playlist').trigger('click')
   if ($('#controls-chromecast').hasClass('selected')) $('#controls-chromecast').trigger('click')
+  if ($('#controls-settings').hasClass('selected')) $('#controls-settings').trigger('click')
 })
 
 mouseidle($('#idle')[0], 3000, 'hide-cursor')
@@ -286,14 +331,15 @@ list.once('update', function () {
 })
 
 var popupSelected = function () {
-  return $('#controls-playlist').hasClass('selected') || $('#controls-chromecast').hasClass('selected')
+  return $('#controls-playlist').hasClass('selected') || $('#controls-chromecast').hasClass('selected') || $('#controls-settings').hasClass('selected')
 }
 
 var closePopup = function (e) {
-  if (e && (e.target === $('#controls-playlist .mega-octicon')[0] || e.target === $('#controls-chromecast .chromecast')[0])) return
+  if (e && (e.target === $('#controls-playlist .mega-octicon')[0] || e.target === $('#controls-chromecast .chromecast')[0] || e.target === $('#controls-settings .mega-octicon')[0])) return
   $('#popup')[0].style.opacity = 0
   $('#controls-playlist').removeClass('selected')
   $('#controls-chromecast').removeClass('selected')
+  $('#controls-settings').removeClass('selected')
 }
 
 $('#controls').on('click', closePopup)
@@ -327,6 +373,19 @@ var updatePopup = function () {
     $('#popup')[0].style.opacity = 0
   }
 }
+
+$('#controls-settings').on('click', function (e) {
+  if ($('#controls-settings').hasClass('selected')) {
+    closePopup()
+    return
+  }
+
+  $('#popup')[0].className = 'settings'
+  $('#controls .controls-main .selected').removeClass('selected')
+  $('#controls-settings').addClass('selected')
+  chromecasts.update()
+  updatePopup()
+})
 
 $('#controls-chromecast').on('click', function (e) {
   if ($('#controls-chromecast').hasClass('selected')) {

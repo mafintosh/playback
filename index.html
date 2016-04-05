@@ -21,6 +21,14 @@
           <div class="header">Chromecasts</div>
           <div id="chromecast-entries"></div>
         </div>
+        <div id="settings-popup">
+          <div class="header">Settings</div>
+          <span class="brightness mega-octicon octicon-light-bulb">
+            <label>Brightness</label>
+            <input id="controls-brightness-slider" 
+            type="range" oninput="set('brightness', this.valueAsNumber);" 
+            value="0" step="0.1" min="0" max="10"></span>
+        </div>
       </div>
       <div id="titlebar"></div>
       <div id="idle"></div>
@@ -42,6 +50,9 @@
             <span id="controls-time-total">‒‒:‒‒</span>
           </div>
           <div id="controls-name" class="center"></div>
+          <div id="controls-settings" class="center">
+            <span class="button"><span class="mega-octicon octicon-gear"></span></span>
+          </div>
         </div>
         <div class="right controls-secondary">
           <div id="player-downloadspeed"></div>

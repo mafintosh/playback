@@ -40,7 +40,8 @@ body, html {
   background-size: 100%;
   background-position: -50%;
   background-repeat: no-repeat;
-  -webkit-filter: grayscale(100%);
+  /*-webkit-filter: grayscale(100%);*/
+  /*-webkit-filter: blur(13px);*/
 }
 
 #overlay {
@@ -77,11 +78,31 @@ body, html {
   display: none;
 }
 
+#popup.chromecast #settings-popup {
+  display: none;
+}
+
 #popup.playlist #playlist-popup {
   display: block;
 }
 
 #popup.playlist #chromecast-popup {
+  display: none;
+}
+
+#popup.playlist #settings-popup {
+  display: none;
+}
+
+#popup.settings #settings-popup {
+  display: block;
+}
+
+#popup.settings #chromecast-popup {
+  display: none;
+}
+
+#popup.settings #playlist-popup {
   display: none;
 }
 
@@ -102,6 +123,15 @@ body, html {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/*.brightness {
+    color: #fff;
+  font-size: 13px;
+  padding: 10px 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}*/
 
 @-webkit-keyframes spin {
   to { -webkit-transform: rotate(360deg); }
@@ -277,9 +307,10 @@ body:hover #overlay, body:hover .titlebar {
 
 #controls-play span:hover .mega-octicon, #player-downloadspeed span:hover .mega-octicon,
 #controls-fullscreen span:hover .mega-octicon, #controls-playlist span:hover .mega-octicon,
-#controls-chromecast span:hover .mega-octicon {
+#controls-chromecast span:hover .mega-octicon, #controls-settings span:hover .mega-octicon {
   color: #31A357;
 }
+
 
 #controls-chromecast .chromecast {
   background-image: url('chromecast.png');
@@ -368,3 +399,45 @@ body:hover #overlay, body:hover .titlebar {
   float: left;
   margin-left: 20px;
 }
+
+
+#controls-settings {
+  float: right;
+  margin-right: 10px; 
+  margin-top: 10px !important;
+}
+
+.brightness {
+  margin-top: 20px;
+  margin-left: 10px;
+
+}
+
+#controls-brightness-slider {
+  -webkit-appearance: none;
+  background: #727374;
+  width: 50px;
+  height: 4px;
+  border-radius: 0px;
+  float: right;
+  margin-top: 12px;
+  margin-left: 5px;
+}
+
+#controls-brightness-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  background-color: #31A357;
+  opacity: 1.0;
+  width: 9px;
+  height: 9px;
+  border-radius: 4.5px;
+}
+
+#controls-brightness-slider:focus {
+  outline: none;
+}
+
+#settings-popup span label {
+  font-size: 15px;
+}
+
