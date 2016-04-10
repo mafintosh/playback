@@ -36,7 +36,7 @@ var onsubs = function (data) {
   media.subtitles(data)
 }
 
-ipc.on('add-to-playlist', function (links) {
+ipc.on('add-to-playlist', function (event, links) {
   links.forEach(function (link) {
     if (/\.(vtt|srt)$/i.test(link)) {
       fs.createReadStream(link).pipe(vtt()).pipe(concat(onsubs))
