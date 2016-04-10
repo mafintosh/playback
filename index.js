@@ -159,6 +159,25 @@ var onplaytoggle = function () {
   else media.play()
 }
 
+var onrepeatcycle = function () {
+  var $controlsRepeat = $('#controls-repeat')
+  if (!list.repeating) {
+    $controlsRepeat.addClass('repeating')
+    list.repeat()
+    return
+  }
+
+  if (!list.repeatingOne) {
+    $controlsRepeat.addClass('one')
+    list.repeatOne()
+    return
+  }
+
+  $controlsRepeat.removeClass('repeating')
+  $controlsRepeat.removeClass('one')
+  list.unrepeat()
+}
+
 $('#idle').on('dblclick', onfullscreentoggle)
 $('#controls-fullscreen').on('click', onfullscreentoggle)
 
@@ -479,6 +498,7 @@ media.on('metadata', function () {
 })
 
 $('#controls-play').on('click', onplaytoggle)
+$('#controls-repeat').on('click', onrepeatcycle)
 
 media.on('end', function () {
   ipc.send('allow-sleep')
