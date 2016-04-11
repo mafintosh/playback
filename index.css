@@ -266,10 +266,25 @@ body:hover #overlay, body:hover .titlebar {
 }
 
 #controls-play {
-  margin: 6px 9px 6px 14px;
+  margin: 6px 5px 6px 14px;
 }
 
-#controls-play, #player-downloadspeed, #controls-fullscreen, #controls-playlist, #controls-chromecast {
+#controls-repeat {
+  margin: 6px 9px 6px 5px;
+  min-width: 40px;
+}
+
+#controls-repeat.repeating .mega-ion:before,
+#controls-repeat.repeating .mega-ion:after {
+  color: #31A357;
+}
+
+#controls-repeat.one .mega-ion:after {
+  content: '1';
+  padding-left: 2px;
+}
+
+#controls-play, #controls-repeat, #player-downloadspeed, #controls-fullscreen, #controls-playlist, #controls-chromecast {
   float: left;
 }
 

@@ -234,7 +234,11 @@ module.exports = function () {
   that.selectNext = function () {
     if (!that.entries.length) return null
     if (!that.selected) return that.select(0)
-    if (that.selected.id === that.entries.length - 1) return null
+    if (that.repeatingOne) return that.select(that.selected.id)
+    if (that.selected.id === that.entries.length - 1) {
+      if (that.repeating) return that.select(0)
+      else return null
+    }
     return that.select(that.selected.id + 1)
   }
 
@@ -257,6 +261,24 @@ module.exports = function () {
     if (/^\/*(ipfs|ipns)\//i.test(link)) return onipfslink(link, cb)
     if (/^https?:\/\//i.test(link)) return onhttplink(link, cb)
     onfile(link, cb)
+  }
+
+  that.repeating = false
+  that.repeatingOne = false
+
+  that.repeat = function () {
+    that.repeating = true
+    that.repeatingOne = false
+  }
+
+  that.repeatOne = function () {
+    that.repeating = true
+    that.repeatingOne = true
+  }
+
+  that.unrepeat = function () {
+    that.repeating = false
+    that.repeatingOne = false
   }
 
   return that
