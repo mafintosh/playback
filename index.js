@@ -138,18 +138,18 @@ var onfullscreentoggle = function (e) {
     return
   }
 
-  var $icon = $('#controls-fullscreen .mega-octicon')
+  var $icon = $('#controls-fullscreen .js-icon')
   if (isFullscreen) {
     isFullscreen = false
     $('#titlebar')[0].style.display = 'block'
-    $icon.removeClass('octicon-screen-normal')
-    $icon.addClass('octicon-screen-full')
+    $icon.removeClass('ion-arrow-shrink')
+    $icon.addClass('ion-arrow-expand')
     ipc.send('exit-full-screen')
   } else {
     isFullscreen = true
     $('#titlebar')[0].style.display = 'none'
-    $icon.removeClass('octicon-screen-full')
-    $icon.addClass('octicon-screen-normal')
+    $icon.removeClass('ion-arrow-expand')
+    $icon.addClass('ion-arrow-shrink')
     ipc.send('enter-full-screen')
   }
 }
@@ -244,7 +244,7 @@ var updatePlaylist = function () {
 
   list.entries.forEach(function (entry, i) {
     html += '<div class="playlist-entry ' + (i % 2 ? 'odd ' : '') + (list.selected === entry ? 'selected ' : '') + '" data-index="' + i + '" data-id="' + entry.id + '">' +
-      '<span>' + entry.name + '</span><span class="status octicon"></span></div>'
+      '<span>' + entry.name + '</span><span class="status"></span></div>'
   })
 
   $('#playlist-entries')[0].innerHTML = html
@@ -268,7 +268,7 @@ var updateSpeeds = function () {
   list.entries.forEach(function (entry, i) {
     if (!entry.downloadSpeed) return
 
-    $('.playlist-entry[data-index="' + i + '"] .status').addClass('octicon-sync')
+    $('.playlist-entry[data-index="' + i + '"] .status').addClass('ion-loop')
 
     var kilobytes = entry.downloadSpeed() / 1024
     var megabytes = kilobytes / 1024
@@ -290,7 +290,7 @@ var popupSelected = function () {
 }
 
 var closePopup = function (e) {
-  if (e && (e.target === $('#controls-playlist .mega-octicon')[0] || e.target === $('#controls-chromecast .chromecast')[0])) return
+  if (e && (e.target === $('#controls-playlist .js-icon')[0] || e.target === $('#controls-chromecast .chromecast')[0])) return
   $('#popup')[0].style.opacity = 0
   $('#controls-playlist').removeClass('selected')
   $('#controls-chromecast').removeClass('selected')
@@ -489,14 +489,14 @@ media.on('play', function () {
   ipc.send('prevent-sleep')
   $('#splash').toggleClass('hidden', !media.casting)
   $('#player').toggleClass('hidden', media.casting)
-  $('#controls-play .octicon-playback-play').removeClass('octicon-playback-play')
-  $('#controls-play .mega-octicon').addClass('octicon-playback-pause')
+  $('#controls-play .js-icon').removeClass('ion-play')
+  $('#controls-play .js-icon').addClass('ion-pause')
 })
 
 media.on('pause', function () {
   ipc.send('allow-sleep')
-  $('#controls-play .octicon-playback-pause').removeClass('octicon-playback-pause')
-  $('#controls-play .mega-octicon').addClass('octicon-playback-play')
+  $('#controls-play .js-icon').removeClass('ion-pause')
+  $('#controls-play .js-icon').addClass('ion-play')
 })
 
 var server = http.createServer(function (req, res) {

@@ -132,6 +132,10 @@ body, html {
   animation: spin 1.5s infinite linear;
 }
 
+.playlist-entry .status:before {
+  font-size: 14px;
+}
+
 .playlist-entry .status:after {
   -webkit-transform: rotate(45deg);
   -moz-transform: rotate(45deg);
@@ -269,15 +273,15 @@ body:hover #overlay, body:hover .titlebar {
   float: left;
 }
 
-#controls-play .mega-octicon, #player-downloadspeed .mega-octicon,
-#controls-fullscreen .mega-octicon, #controls-playlist .mega-octicon {
+#controls-play .mega-ion, #player-downloadspeed .mega-ion,
+#controls-fullscreen .mega-ion, #controls-playlist .mega-ion {
   /* this is the click buffer */
   padding: 3px 6px;
 }
 
-#controls-play span:hover .mega-octicon, #player-downloadspeed span:hover .mega-octicon,
-#controls-fullscreen span:hover .mega-octicon, #controls-playlist span:hover .mega-octicon,
-#controls-chromecast span:hover .mega-octicon {
+#controls-play span:hover .mega-ion, #player-downloadspeed span:hover .mega-ion,
+#controls-fullscreen span:hover .mega-ion, #controls-playlist span:hover .mega-ion,
+#controls-chromecast span:hover .mega-ion {
   color: #31A357;
 }
 
@@ -306,16 +310,16 @@ body:hover #overlay, body:hover .titlebar {
   padding: 3px 20px;
 }
 
-#controls-playlist.selected .mega-octicon {
+#controls-playlist.selected .mega-ion {
   color: #31A357;
 }
 
-.mega-octicon {
+.mega-ion:before {
   color: #F0F0F0;
-  font-size: 22px;
+  font-size: 30px;
 }
 
-#controls-play .mega-octicon {
+#controls-play .mega-ion {
   color: #31A357;
 }
 
