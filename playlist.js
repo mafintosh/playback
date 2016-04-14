@@ -231,15 +231,25 @@ module.exports = function () {
     that.emit('deselect')
   }
 
-  that.selectNext = function () {
+  that.selectNext = function (loop) {
     if (!that.entries.length) return null
     if (!that.selected) return that.select(0)
-    if (that.repeatingOne) return that.select(that.selected.id)
+    if (that.repeatingOne && !loop) return that.select(that.selected.id)
     if (that.selected.id === that.entries.length - 1) {
-      if (that.repeating) return that.select(0)
+      if (that.repeating || loop) return that.select(0)
       else return null
     }
     return that.select(that.selected.id + 1)
+  }
+
+  that.selectPrevious = function (loop) {
+    if (!that.entries.length) return null
+    if (!that.selected) return that.select(that.entries.length - 1)
+    if (that.selected.id === 0) {
+      if (that.repeating || loop) return that.select(that.entries.length - 1)
+      else return null
+    }
+    return that.select(that.selected.id - 1)
   }
 
   that.select = function (id) {

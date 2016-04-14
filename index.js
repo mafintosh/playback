@@ -159,6 +159,16 @@ var onplaytoggle = function () {
   else media.play()
 }
 
+var onnexttrack = function () {
+  var shouldLoop = true
+  list.selectNext(shouldLoop)
+}
+
+var onprevioustrack = function () {
+  var shouldLoop = true
+  list.selectPrevious(shouldLoop)
+}
+
 var onrepeatcycle = function () {
   var $controlsRepeat = $('#controls-repeat')
   if (!list.repeating) {
@@ -499,6 +509,9 @@ media.on('metadata', function () {
 
 $('#controls-play').on('click', onplaytoggle)
 $('#controls-repeat').on('click', onrepeatcycle)
+ipc.on('media-play-pause', onplaytoggle)
+ipc.on('media-next-track', onnexttrack)
+ipc.on('media-previous-track', onprevioustrack)
 
 media.on('end', function () {
   ipc.send('allow-sleep')
