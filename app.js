@@ -46,7 +46,10 @@ app.on('ready', function () {
 
   ipc.on('open-file-dialog', function () {
     var files = dialog.showOpenDialog({ properties: [ 'openFile', 'multiSelections' ]})
-    if (files) win.send('add-to-playlist', files)
+    if (files) {
+      files.forEach(app.addRecentDocument)
+      win.send('add-to-playlist', files)
+    }
   })
 
   ipc.on('open-url-in-external', function (event, url) {
