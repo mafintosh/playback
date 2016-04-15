@@ -7,6 +7,7 @@ var ipc = require('electron').ipcMain
 var dialog = require('dialog')
 var shell = require('shell')
 var powerSaveBlocker = require('electron').powerSaveBlocker
+var globalShortcut = require('electron').globalShortcut
 
 var win
 var link
@@ -97,4 +98,23 @@ app.on('ready', function () {
   ipc.on('allow-sleep', function () {
     powerSaveBlocker.stop(app.sleepId)
   })
+
+  globalShortcut.register('MediaPlayPause', function () {
+    win.send('media-play-pause')
+  })
+
+  globalShortcut.register('MediaNextTrack', function () {
+    win.send('media-next-track')
+  })
+
+  globalShortcut.register('MediaPreviousTrack', function () {
+    win.send('media-previous-track')
+  })
+
+})
+
+app.on('will-quit', function () {
+
+  globalShortcut.unregisterAll()
+
 })
