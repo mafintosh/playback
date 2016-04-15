@@ -122,7 +122,7 @@ module.exports = function ($video) {
         chromecast.resume()
       }
     } else {
-      if (atEnd && url === lastUrl) $video.time(0)
+      if (atEnd && url === lastUrl) that.time(0)
       if (!url) {
         $video.play()
       } else {
