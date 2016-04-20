@@ -270,7 +270,7 @@ body:hover #overlay, body:hover .titlebar {
 }
 
 #controls-repeat {
-  margin: 6px 9px 6px 5px;
+  margin: 6px 0 6px 5px;
   min-width: 40px;
 }
 
@@ -357,24 +357,38 @@ body:hover #overlay, body:hover .titlebar {
 }
 
 #controls-volume {
-  margin: 11px 9px 11px 0;
-  padding: 0;
+  padding: 6px 10px 6px 5px;
   float: left;
+}
+
+#controls-volume .mega-ion {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+#controls-volume:hover #controls-volume-slider {
+  width: 50px;
+}
+
+#controls-volume:hover #controls-volume-slider::-webkit-slider-thumb {
+  width: 7px;
 }
 
 #controls-volume-slider {
   -webkit-appearance: none;
   background: -webkit-gradient(linear, left top, right top, color-stop(50%, #31A357), color-stop(50%, #727374));
-  width: 50px;
+  width: 0;
   height: 3px;
   border-radius: 0px;
+  vertical-align: middle;
+  transition: width 100ms;
 }
 
 #controls-volume-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   background-color: #31A357;
   opacity: 1.0;
-  width: 7px;
+  width: 0;
   height: 7px;
   border-radius: 3.5px;
 }
