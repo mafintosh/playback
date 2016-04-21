@@ -176,5 +176,9 @@ module.exports = function ($video) {
     $video.volume = value
   }
 
+  that.playbackRate = function (value) {
+    $video.playbackRate = value
+  }
+
   return that
 }

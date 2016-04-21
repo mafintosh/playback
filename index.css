@@ -340,6 +340,7 @@ body:hover #overlay, body:hover .titlebar {
 
 #controls-time {
   width: 100px;
+  margin-left: 5px;
   float: left;
 }
 
@@ -356,45 +357,51 @@ body:hover #overlay, body:hover .titlebar {
   min-width: 33px;
 }
 
-#controls-volume {
-  padding: 6px 10px 6px 5px;
+#controls-volume,
+#controls-pbrate {
+  padding: 6px 5px;
   float: left;
 }
 
-#controls-volume .mega-ion {
+#controls-volume .mega-ion,
+#controls-pbrate .mega-ion {
   display: inline-block;
   vertical-align: middle;
 }
 
-#controls-volume:hover #controls-volume-slider {
-  width: 50px;
-}
-
-#controls-volume:hover #controls-volume-slider::-webkit-slider-thumb {
-  width: 7px;
-}
-
-#controls-volume-slider {
+.slider {
   -webkit-appearance: none;
-  background: -webkit-gradient(linear, left top, right top, color-stop(50%, #31A357), color-stop(50%, #727374));
-  width: 0;
+  width: 50px;
   height: 3px;
   border-radius: 0px;
   vertical-align: middle;
-  transition: width 100ms;
 }
 
-#controls-volume-slider::-webkit-slider-thumb {
+.slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   background-color: #31A357;
   opacity: 1.0;
-  width: 0;
+  width: 7px;
   height: 7px;
   border-radius: 3.5px;
 }
 
-#controls-volume-slider:focus {
+.slider:focus {
   outline: none;
+}
+
+.hidden-slider .slider,
+.hidden-slider .slider::-webkit-slider-thumb {
+  width: 0;
+  transition: width 100ms;
+}
+
+.hidden-slider:hover .slider {
+  width: 50px;
+}
+
+.hidden-slider:hover .slider::-webkit-slider-thumb {
+  width: 7px;
 }
 
 #controls-name {

@@ -220,6 +220,7 @@ $('#controls-timeline').on('mouseout', function (e) {
 })
 
 var isVolumeSliderClicked = false
+var isPbrateSliderClicked = false
 
 function updateAudioVolume(value) {
   media.volume(value)
@@ -227,6 +228,18 @@ function updateAudioVolume(value) {
 
 function updateVolumeSlider(volume) {
   var val = volume.value * 100
+  volume.style.background = '-webkit-gradient(linear, left top, right top, color-stop(' + val.toString() + '%, #31A357), color-stop(' + val.toString() + '%, #727374))'
+}
+
+function updatePlaybackRate(value) {
+  media.playbackRate(value)
+}
+
+function updatePlaybackRateSlider(volume) {
+  var min = 0.5
+  var max = 4
+  var scaled = (volume.value - min) / (max - min)
+  var val = scaled * 100
   volume.style.background = '-webkit-gradient(linear, left top, right top, color-stop(' + val.toString() + '%, #31A357), color-stop(' + val.toString() + '%, #727374))'
 }
 
@@ -247,6 +260,25 @@ $('#controls-volume-slider').on('mouseup', function (e) {
   updateAudioVolume(volume.value)
   updateVolumeSlider(volume)
   isVolumeSliderClicked = false
+})
+
+$('#controls-pbrate-slider').on('mousemove', function (e) {
+  if (isPbrateSliderClicked) {
+    var volume = $('#controls-pbrate-slider')[0]
+    updatePlaybackRate(volume.value)
+    updatePlaybackRateSlider(volume)
+  }
+})
+
+$('#controls-pbrate-slider').on('mousedown', function (e) {
+  isPbrateSliderClicked = true
+})
+
+$('#controls-pbrate-slider').on('mouseup', function (e) {
+  var volume = $('#controls-pbrate-slider')[0]
+  updatePlaybackRate(volume.value)
+  updatePlaybackRateSlider(volume)
+  isPbrateSliderClicked = false
 })
 
 $(document).on('keydown', function (e) {
@@ -668,8 +700,18 @@ server.listen(0, function () {
   }, 10)
 })
 
-media.volume(0.5)
-$('#controls-volume-slider')[0].setAttribute("value", 0.5)
-$('#controls-volume-slider')[0].setAttribute("min", 0)
-$('#controls-volume-slider')[0].setAttribute("max", 1)
-$('#controls-volume-slider')[0].setAttribute("step", 0.05)
+var volumeSlider = $('#controls-volume-slider')[0]
+volumeSlider.setAttribute("value", 0.5)
+volumeSlider.setAttribute("min", 0)
+volumeSlider.setAttribute("max", 1)
+volumeSlider.setAttribute("step", 0.05)
+updateAudioVolume(0.5)
+updateVolumeSlider(volumeSlider)
+
+var pbrateSlider = $('#controls-pbrate-slider')[0]
+pbrateSlider.setAttribute("value", 1)
+pbrateSlider.setAttribute("min", 0.5)
+pbrateSlider.setAttribute("max", 4)
+pbrateSlider.setAttribute("step", 0.25)
+updatePlaybackRate(1)
+updatePlaybackRateSlider(pbrateSlider)
