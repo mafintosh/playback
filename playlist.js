@@ -10,6 +10,8 @@ var concat = require('concat-stream')
 
 var noop = function () {}
 
+var allowedExts = ["mpg", "mkv", "mp4", "mp3", "vtt", "srt"]
+
 module.exports = function () {
   var that = new events.EventEmitter()
 
@@ -141,6 +143,10 @@ module.exports = function () {
 
       file.length = st.size
       file.name = path.basename(link)
+      var filenameArr = file.name.split(".")
+      file.extension = filenameArr[filenameArr.length-1].toLowerCase()
+      if (allowedExts.indexOf(file.extension) == -1) return cb("File format not supported")
+
       file.createReadStream = function (opts) {
         return fs.createReadStream(link, opts)
       }
