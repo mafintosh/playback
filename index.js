@@ -243,6 +243,13 @@ function updatePlaybackRateSlider(volume) {
   volume.style.background = '-webkit-gradient(linear, left top, right top, color-stop(' + val.toString() + '%, #31A357), color-stop(' + val.toString() + '%, #727374))'
 }
 
+function defaultPlaybackRate() {
+  updatePlaybackRate(1)
+  var volume = $('#controls-pbrate-slider')[0]
+  volume.value = 1
+  updatePlaybackRateSlider(volume)
+}
+
 $('#controls-volume-slider').on('mousemove', function (e) {
   if (isVolumeSliderClicked) {
     var volume = $('#controls-volume-slider')[0]
@@ -279,6 +286,10 @@ $('#controls-pbrate-slider').on('mouseup', function (e) {
   updatePlaybackRate(volume.value)
   updatePlaybackRateSlider(volume)
   isPbrateSliderClicked = false
+})
+
+$('#controls-pbrate').on("dblclick", function () {
+  defaultPlaybackRate()
 })
 
 $(document).on('keydown', function (e) {
