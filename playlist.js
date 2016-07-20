@@ -28,7 +28,7 @@ module.exports = function () {
 
       torrent.files.forEach(function (f) {
         if (/\.(vtt|srt)$/i.test(f.name)) {
-          subtitles[f.name] = f;
+          subtitles[f.name] = f
         }
       })
 
@@ -41,12 +41,11 @@ module.exports = function () {
           var basename = f.name.substr(0, f.name.lastIndexOf('.'))
           var subtitle = subtitles[basename + '.srt'] || subtitles[basename + '.vtt']
           if (subtitle) {
-             subtitle.createReadStream().pipe(vtt()).pipe(concat(function(data) {
-               f.subtitles = data
+            subtitle.createReadStream().pipe(vtt()).pipe(concat(function (data) {
+              f.subtitles = data
             }))
           }
         }
-
       })
 
       setInterval(function () {
@@ -111,22 +110,21 @@ module.exports = function () {
           return +a.itag - +b.itag
         })
 
-        var vidFmt
         formats.forEach(function (fmt) {
           // prefer webm
-          if (fmt.itag === '46') return vidFmt = fmt
-          if (fmt.itag === '45') return vidFmt = fmt
-          if (fmt.itag === '44') return vidFmt = fmt
-          if (fmt.itag === '43') return vidFmt = fmt
+          if (fmt.itag === '46') return (vidFmt = fmt)
+          if (fmt.itag === '45') return (vidFmt = fmt)
+          if (fmt.itag === '44') return (vidFmt = fmt)
+          if (fmt.itag === '43') return (vidFmt = fmt)
 
           // otherwise h264
-          if (fmt.itag === '38') return vidFmt = fmt
-          if (fmt.itag === '37') return vidFmt = fmt
-          if (fmt.itag === '22') return vidFmt = fmt
-          if (fmt.itag === '18') return vidFmt = fmt
+          if (fmt.itag === '38') return (vidFmt = fmt)
+          if (fmt.itag === '37') return (vidFmt = fmt)
+          if (fmt.itag === '22') return (vidFmt = fmt)
+          if (fmt.itag === '18') return (vidFmt = fmt)
         })
 
-        if (!vidFmt) return cb (new Error('No suitable video format found'))
+        if (!vidFmt) return cb(new Error('No suitable video format found'))
 
         cb(null, {info: info, fmt: vidFmt})
       })
@@ -157,9 +155,9 @@ module.exports = function () {
         var ext = extensions.shift()
         if (!ext) return ondone()
 
-        fs.exists(basename + '.' + ext, function(exists) {
+        fs.exists(basename + '.' + ext, function (exists) {
           if (!exists) return next()
-          fs.createReadStream(basename + '.' + ext).pipe(vtt()).pipe(concat(function(data) {
+          fs.createReadStream(basename + '.' + ext).pipe(vtt()).pipe(concat(function (data) {
             file.subtitles = data
             ondone()
           }))
@@ -199,11 +197,11 @@ module.exports = function () {
   }
 
   var onipfslink = function (link, cb) {
-    if (link[0] != '/') link = "/" + link // / may be stripped in add
+    if (link[0] !== '/') link = '/' + link // / may be stripped in add
 
     var local = 'localhost:8080' // todo: make this configurable
     var gateway = 'gateway.ipfs.io'
-    var file = {}
+    var file = { }
 
     // first, try the local http gateway
     var u = 'http://' + local + link
