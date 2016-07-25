@@ -196,12 +196,12 @@ $('#controls-timeline').on('click', function (e) {
   media.time(time)
 })
 
-function updateTimelineTooltip(e) {
+function updateTimelineTooltip (e) {
   var tooltip = $('#controls-timeline-tooltip')[0]
   var percentage = e.pageX / $('#controls-timeline')[0].offsetWidth
-  var time =  formatTime(percentage * media.duration)
+  var time = formatTime(percentage * media.duration)
   tooltip.innerHTML = time
-  tooltip.style.left = (e.pageX - tooltip.offsetWidth / 2) + "px"
+  tooltip.style.left = (e.pageX - tooltip.offsetWidth / 2) + 'px'
 }
 
 $('#controls-timeline').on('mousemove', function (e) {
@@ -222,25 +222,32 @@ $('#controls-timeline').on('mouseout', function (e) {
 var isVolumeSliderClicked = false
 var isPbrateSliderClicked = false
 
-function updateAudioVolume(value) {
+function updateAudioVolume (value) {
   media.volume(value)
 }
 
-function updateVolumeSlider(volume) {
+function updateVolumeSlider (volume) {
   var val = volume.value * 100
   volume.style.background = '-webkit-gradient(linear, left top, right top, color-stop(' + val.toString() + '%, #31A357), color-stop(' + val.toString() + '%, #727374))'
 }
 
-function updatePlaybackRate(value) {
+function updatePlaybackRate (value) {
   media.playbackRate(value)
 }
 
-function updatePlaybackRateSlider(volume) {
+function updatePlaybackRateSlider (volume) {
   var min = 0.5
   var max = 4
   var scaled = (volume.value - min) / (max - min)
   var val = scaled * 100
   volume.style.background = '-webkit-gradient(linear, left top, right top, color-stop(' + val.toString() + '%, #31A357), color-stop(' + val.toString() + '%, #727374))'
+}
+
+function defaultPlaybackRate () {
+  updatePlaybackRate(1)
+  var volume = $('#controls-pbrate-slider')[0]
+  volume.value = 1
+  updatePlaybackRateSlider(volume)
 }
 
 $('#controls-volume-slider').on('mousemove', function (e) {
@@ -279,6 +286,10 @@ $('#controls-pbrate-slider').on('mouseup', function (e) {
   updatePlaybackRate(volume.value)
   updatePlaybackRateSlider(volume)
   isPbrateSliderClicked = false
+})
+
+$('#controls-pbrate').on('dblclick', function () {
+  defaultPlaybackRate()
 })
 
 $(document).on('keydown', function (e) {
@@ -442,7 +453,7 @@ var appmenu_template = [
     submenu: [
       {
         label: 'About Playback',
-        click: function() { ipc.send('open-url-in-external', 'https://mafintosh.github.io/playback/') }
+        click: function () { ipc.send('open-url-in-external', 'https://mafintosh.github.io/playback/') }
       },
       {
         type: 'separator'
@@ -450,7 +461,7 @@ var appmenu_template = [
       {
         label: 'Quit',
         accelerator: 'Command+Q',
-        click: function() { ipc.send('close') }
+        click: function () { ipc.send('close') }
       }
     ]
   },
@@ -460,7 +471,7 @@ var appmenu_template = [
       {
         label: 'Add media',
         accelerator: 'Command+O',
-        click: function() { ipc.send('open-file-dialog') }
+        click: function () { ipc.send('open-file-dialog') }
       },
       {
         label: 'Add link from clipboard',
@@ -475,7 +486,7 @@ var appmenu_template = [
       {
         label: 'Minimize',
         accelerator: 'Command+M',
-        click: function() { ipc.send('minimize') }
+        click: function () { ipc.send('minimize') }
       },
       {
         label: 'Toggle Full Screen',
@@ -489,18 +500,18 @@ var appmenu_template = [
     submenu: [
       {
         label: 'Report Issue',
-        click: function() { ipc.send('open-url-in-external', 'https://github.com/mafintosh/playback/issues') }
+        click: function () { ipc.send('open-url-in-external', 'https://github.com/mafintosh/playback/issues') }
       },
       {
         label: 'View Source Code on GitHub',
-        click: function() { ipc.send('open-url-in-external', 'https://github.com/mafintosh/playback') }
+        click: function () { ipc.send('open-url-in-external', 'https://github.com/mafintosh/playback') }
       },
       {
         type: 'separator'
       },
       {
         label: 'Releases',
-        click: function() { ipc.send('open-url-in-external', 'https://github.com/mafintosh/playback/releases') }
+        click: function () { ipc.send('open-url-in-external', 'https://github.com/mafintosh/playback/releases') }
       }
     ]
   }
@@ -585,7 +596,7 @@ var server = http.createServer(function (req, res) {
     var stringify = JSONStream.stringify()
 
     var onseek = function () {
-      stringify.write({type: 'seek', time: media.time() })
+      stringify.write({ type: 'seek', time: media.time() })
     }
 
     var onsubs = function (data) {
@@ -593,7 +604,7 @@ var server = http.createServer(function (req, res) {
     }
 
     stringify.pipe(res)
-    stringify.write({type: 'open', url: 'http://' + network() + ':' + server.address().port + '/' + list.selected.id, time: media.time() })
+    stringify.write({ type: 'open', url: 'http://' + network() + ':' + server.address().port + '/' + list.selected.id, time: media.time() })
 
     media.on('subtitles', onsubs)
     media.on('seek', onseek)
@@ -640,7 +651,7 @@ server.listen(0, function () {
   })
 
   if (argv.follow) {
-    mdns.on('response', function onresponse(response) {
+    mdns.on('response', function onresponse (response) {
       response.answers.forEach(function (a) {
         if (a.name !== 'playback') return
         clearInterval(interval)
@@ -701,17 +712,17 @@ server.listen(0, function () {
 })
 
 var volumeSlider = $('#controls-volume-slider')[0]
-volumeSlider.setAttribute("value", 0.5)
-volumeSlider.setAttribute("min", 0)
-volumeSlider.setAttribute("max", 1)
-volumeSlider.setAttribute("step", 0.05)
+volumeSlider.setAttribute('value', 0.5)
+volumeSlider.setAttribute('min', 0)
+volumeSlider.setAttribute('max', 1)
+volumeSlider.setAttribute('step', 0.05)
 updateAudioVolume(0.5)
 updateVolumeSlider(volumeSlider)
 
 var pbrateSlider = $('#controls-pbrate-slider')[0]
-pbrateSlider.setAttribute("value", 1)
-pbrateSlider.setAttribute("min", 0.5)
-pbrateSlider.setAttribute("max", 4)
-pbrateSlider.setAttribute("step", 0.25)
+pbrateSlider.setAttribute('value', 1)
+pbrateSlider.setAttribute('min', 0.5)
+pbrateSlider.setAttribute('max', 4)
+pbrateSlider.setAttribute('step', 0.25)
 updatePlaybackRate(1)
 updatePlaybackRateSlider(pbrateSlider)

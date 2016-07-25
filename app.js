@@ -46,7 +46,7 @@ app.on('ready', function () {
   })
 
   ipc.on('open-file-dialog', function () {
-    var files = dialog.showOpenDialog({ properties: [ 'openFile', 'multiSelections' ]})
+    var files = dialog.showOpenDialog({ properties: [ 'openFile', 'multiSelections' ] })
     if (files) {
       files.forEach(app.addRecentDocument)
       win.send('add-to-playlist', files)
@@ -110,11 +110,8 @@ app.on('ready', function () {
   globalShortcut.register('MediaPreviousTrack', function () {
     win.send('media-previous-track')
   })
-
 })
 
 app.on('will-quit', function () {
-
   globalShortcut.unregisterAll()
-
 })

@@ -80,7 +80,7 @@ module.exports = function ($video) {
   $video.addEventListener('loadedmetadata', function () {
     if (chromecast) return
     that.width = $video.videoWidth
-    that.height =  $video.videoHeight
+    that.height = $video.videoHeight
     that.ratio = that.width / that.height
     that.duration = $video.duration
     that.emit('metadata')
@@ -117,7 +117,7 @@ module.exports = function ($video) {
         var subsUrl = mediaUrl.replace(/(:\/\/.+)\/.*/, '$1/subtitles')
         var subsList = []
         for (var i = 0; i < 100; i++) subsList.push(subsUrl)
-        chromecast.play(mediaUrl, {title: 'Playback', seek: time || 0, subtitles: subsList, autoSubtitles: !!subs }, onmetadata)
+        chromecast.play(mediaUrl, { title: 'Playback', seek: time || 0, subtitles: subsList, autoSubtitles: !!subs }, onmetadata)
       } else {
         chromecast.resume()
       }
@@ -164,7 +164,7 @@ module.exports = function ($video) {
     if (!buf) return null
     var $track = document.createElement('track')
     $track.setAttribute('default', 'default')
-    $track.setAttribute('src', 'data:text/vtt;base64,'+buf.toString('base64'))
+    $track.setAttribute('src', 'data:text/vtt;base64,' + buf.toString('base64'))
     $track.setAttribute('label', 'Subtitles')
     $track.setAttribute('kind', 'subtitles')
     $video.appendChild($track)
