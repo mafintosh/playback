@@ -22,8 +22,14 @@ module.exports = function () {
     var subtitles = {}
 
     engine.add(link, {
-      announce: [ 'wss://tracker.webtorrent.io' ]
-    }, function (torrent) {
+        tracker: {
+          announce: [ 
+            'wss://tracker.btorrent.xyz',
+            'wss://tracker.openwebtorrent.com',
+            'wss://tracker.fastcast.nz'
+          ]
+        }
+      }, function (torrent) {
       console.log('torrent ready')
 
       torrent.files.forEach(function (f) {
