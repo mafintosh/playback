@@ -1,12 +1,11 @@
+const {remote, ipcRenderer} = require('electron');
+const {Menu, MenuItem, clipboard} = remote;
 var request = require('request')
 var drop = require('drag-and-drop-files')
 var mdns = require('multicast-dns')()
 var concat = require('concat-stream')
 var vtt = require('srt-to-vtt')
-var ipc = require('electron').ipcRenderer
-var remote = require('remote')
-var Menu = remote.require('menu')
-var MenuItem = remote.require('menu-item')
+var ipc = ipcRenderer
 var http = require('http')
 var rangeParser = require('range-parser')
 var pump = require('pump')
@@ -18,7 +17,6 @@ var network = require('network-address')
 var chromecasts = require('chromecasts')()
 var $ = require('dombo')
 var titlebar = require('titlebar')()
-var clipboard = require('clipboard')
 var player = require('./player')
 var playlist = require('./playlist')
 var mouseidle = require('./mouseidle')
@@ -54,9 +52,7 @@ $(document).on('paste', function (e) {
 var media = player($('#player')[0])
 var list = playlist()
 
-if (process.platform !== 'win32') {
-  titlebar.appendTo('#titlebar')
-}
+titlebar.appendTo('#titlebar')
 
 drop($('body')[0], function (files) {
   for (var i = 0; i < files.length; i++) {
