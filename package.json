@@ -22,7 +22,7 @@
     "roboto-fontface": "^0.4.2",
     "srt-to-vtt": "^1.0.2",
     "titlebar": "^1.1.0",
-    "webtorrent": "^0.63.3",
+    "webtorrent": "^0.107.16",
     "ytdl-core": "^0.5.1"
   },
   "devDependencies": {
