@@ -26,7 +26,7 @@
     "ytdl-core": "^0.5.1"
   },
   "devDependencies": {
-    "electron-packager": "^5.1.1",
+    "electron-packager": "^14.1.0",
     "electron-prebuilt": "0.35.4"
   },
   "bin": {
